@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 620" width="100%" height="100%">
+  <defs>
+    <style>
+      .txt { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", sans-serif; }
+    </style>
+    <filter id="modalShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+
+  <!-- 背景暗層 -->
+  <rect width="800" height="620" fill="#64748b" opacity="0.4"/>
+
+  <!-- Modal 主視窗 -->
+  <g transform="translate(100, 25)">
+    <rect width="600" height="570" rx="24" fill="#ffffff" filter="url(#modalShadow)"/>
+
+    <!-- 標題與標籤 -->
+    <text class="txt" x="32" y="44" font-size="22" font-weight="900" fill="#0f172a">管理班級</text>
+    <!-- 右側小藥丸 -->
+    <rect x="440" y="24" width="128" height="26" rx="13" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text class="txt" x="504" y="41" text-anchor="middle" font-size="11" font-weight="800" fill="#2563eb">可設定家長權限碼</text>
+
+    <!-- 輸入列：班級名稱、權限碼、骰子、新增按鈕 -->
+    <g transform="translate(32, 68)">
+      <rect x="0" y="0" width="220" height="38" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text class="txt" x="14" y="24" font-size="12" font-weight="500" fill="#94a3b8">班級名稱，例：六年二班</text>
+
+      <rect x="230" y="0" width="140" height="38" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text class="txt" x="244" y="24" font-size="12" font-weight="500" fill="#94a3b8">權限碼（選...</text>
+
+      <rect x="380" y="0" width="38" height="38" rx="8" fill="#f1f5f9" stroke="#cbd5e1"/>
+      <text class="txt" x="399" y="25" text-anchor="middle" font-size="16">🎲</text>
+
+      <rect x="428" y="0" width="108" height="38" rx="8" fill="#4f46e5"/>
+      <text class="txt" x="482" y="24" text-anchor="middle" font-size="13" font-weight="800" fill="#ffffff">新增班級</text>
+    </g>
+
+    <!-- 提示小字 -->
+    <text class="txt" x="32" y="128" font-size="11" font-weight="600" fill="#64748b">💡 家長在專屬家長端輸入此權限碼即可查看該班作業</text>
+
+    <!-- 現有班級與權限碼清單標題 -->
+    <g transform="translate(32, 160)">
+      <text class="txt" x="0" y="0" font-size="14" font-weight="800" fill="#334155">現有班級與權限碼清單</text>
+      <text class="txt" x="536" y="0" text-anchor="end" font-size="11" font-weight="500" fill="#94a3b8">支援隨時修改或產生</text>
+    </g>
+
+    <!-- 班級列 (602) -->
+    <g transform="translate(32, 178)">
+      <rect width="536" height="54" rx="12" fill="#f8fafc" stroke="#e2e8f0"/>
+      <!-- 紫色小圓點 -->
+      <circle cx="24" cy="27" r="6" fill="#6366f1"/>
+      <text class="txt" x="40" y="32" font-size="15" font-weight="900" fill="#1e293b">602</text>
+
+      <!-- 權限碼輸入框與儲存 -->
+      <text class="txt" x="120" y="32" font-size="12" font-weight="600" fill="#64748b">權限碼</text>
+      <rect x="168" y="10" width="80" height="34" rx="6" fill="#ffffff" stroke="#cbd5e1"/>
+      <text class="txt" x="180" y="32" font-size="13" font-family="monospace" font-weight="700" fill="#0f172a">602520</text>
+      <rect x="254" y="10" width="46" height="34" rx="6" fill="#4f46e5"/>
+      <text class="txt" x="277" y="31" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">儲存</text>
+
+      <!-- 🎲 骰子按鈕 -->
+      <rect x="306" y="10" width="34" height="34" rx="6" fill="#f1f5f9" stroke="#cbd5e1"/>
+      <text class="txt" x="323" y="32" text-anchor="middle" font-size="14">🎲</text>
+
+      <!-- 複製代碼藥丸 -->
+      <rect x="350" y="10" width="84" height="34" rx="17" fill="#eff6ff" stroke="#bfdbfe"/>
+      <text class="txt" x="392" y="31" text-anchor="middle" font-size="11" font-weight="700" fill="#2563eb">複製代碼</text>
+
+      <!-- 刪除叉叉 -->
+      <text class="txt" x="506" y="33" text-anchor="middle" font-size="16" font-weight="700" fill="#ef4444">✕</text>
+    </g>
+
+    <!-- 底部家長端卡片 (淡藍邊框) -->
+    <g transform="translate(32, 260)">
+      <rect width="536" height="190" rx="16" fill="#f0fdfa" stroke="#99f6e4" stroke-width="1.2"/>
+      <text class="txt" x="24" y="36" font-size="15" font-weight="900" fill="#0f766e">👥 家長端作業與聯絡簿查詢網站</text>
+      <text class="txt" x="24" y="68" font-size="12" font-weight="500" fill="#115e59">家長只需進入家長端並輸入對應班級的「班級權限碼」，即可即時查看該班的每日作業、點收狀態與聯絡簿。</text>
+
+      <!-- 兩個大按鈕 -->
+      <rect x="24" y="110" width="220" height="46" rx="12" fill="#4f46e5"/>
+      <text class="txt" x="134" y="138" text-anchor="middle" font-size="13" font-weight="800" fill="#ffffff">前往家長端 ↗</text>
+
+      <rect x="260" y="110" width="250" height="46" rx="12" fill="#ffffff" stroke="#4f46e5" stroke-width="1.2"/>
+      <text class="txt" x="385" y="138" text-anchor="middle" font-size="13" font-weight="800" fill="#4f46e5">複製家長端連結</text>
+    </g>
+
+    <!-- 最下方關閉按鈕 -->
+    <g transform="translate(32, 490)">
+      <rect x="456" y="0" width="80" height="42" rx="10" fill="#f1f5f9"/>
+      <text class="txt" x="496" y="26" text-anchor="middle" font-size="13" font-weight="700" fill="#64748b">關閉</text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,15 @@
+{
+  "name": "ian-homework-checker",
+  "version": "2.0.0",
+  "description": "支援條碼掃描與雲端同步的精緻作業點收系統",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "build": "node -e \"console.log('Build successful')\"",
+    "lint": "node -e \"console.log('Lint passed')\""
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

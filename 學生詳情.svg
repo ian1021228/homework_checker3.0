@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" width="100%" height="100%">
+  <defs>
+    <style>
+      .txt { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", sans-serif; }
+    </style>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.06"/>
+    </filter>
+  </defs>
+
+  <rect width="960" height="520" fill="#f8fafc"/>
+
+  <!-- 頂部列：返回、標題、全勤按鈕、排序 -->
+  <g transform="translate(32, 20)">
+    <rect width="130" height="30" rx="15" fill="#ffffff" stroke="#e2e8f0"/>
+    <text class="txt" x="16" y="20" font-size="12" font-weight="700" fill="#64748b">← 返回作業列表</text>
+
+    <text class="txt" x="0" y="66" font-size="24" font-weight="900" fill="#4f46e5">學生詳情統計</text>
+    <!-- 🏆 檢視全勤學生名單 -->
+    <rect x="520" y="40" width="180" height="38" rx="19" fill="#4f46e5"/>
+    <text class="txt" x="610" y="64" text-anchor="middle" font-size="13" font-weight="800" fill="#ffffff">🏆 檢視全勤學生名單</text>
+
+    <!-- 排序選單 -->
+    <text class="txt" x="720" y="64" font-size="12" font-weight="700" fill="#64748b">排序：</text>
+    <rect x="760" y="42" width="136" height="34" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+    <text class="txt" x="772" y="64" font-size="12" font-weight="700" fill="#1e293b">座號 (小→大) ▾</text>
+  </g>
+
+  <!-- 學生卡片清單 (4 欄 x 2 列) -->
+  <g transform="translate(32, 106)">
+    <!-- 卡片 1 (1 號) -->
+    <g transform="translate(0, 0)">
+      <rect width="208" height="186" rx="16" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+      <text class="txt" x="16" y="34" font-size="20" font-weight="900" fill="#0f172a">1 號</text>
+      <rect x="114" y="18" width="78" height="24" rx="12" fill="#fee2e2"/>
+      <text class="txt" x="153" y="34" text-anchor="middle" font-size="11" font-weight="800" fill="#dc2626">未完成: 1</text>
+      <!-- 缺交清單項目 -->
+      <g transform="translate(16, 56)">
+        <rect width="176" height="36" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+        <text class="txt" x="10" y="23" font-size="11" font-weight="700" fill="#334155">數習p5~p6</text>
+        <rect x="116" y="8" width="50" height="20" rx="4" fill="#fee2e2"/>
+        <text class="txt" x="141" y="22" text-anchor="middle" font-size="10" font-weight="800" fill="#dc2626">未繳交</text>
+      </g>
+    </g>
+
+    <!-- 卡片 2 (2 號) -->
+    <g transform="translate(228, 0)">
+      <rect width="208" height="186" rx="16" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+      <text class="txt" x="16" y="34" font-size="20" font-weight="900" fill="#0f172a">2 號</text>
+      <rect x="114" y="18" width="78" height="24" rx="12" fill="#fee2e2"/>
+      <text class="txt" x="153" y="34" text-anchor="middle" font-size="11" font-weight="800" fill="#dc2626">未完成: 1</text>
+      <g transform="translate(16, 56)">
+        <rect width="176" height="36" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+        <text class="txt" x="10" y="23" font-size="11" font-weight="700" fill="#334155">數習p5~p6</text>
+        <rect x="116" y="8" width="50" height="20" rx="4" fill="#fee2e2"/>
+        <text class="txt" x="141" y="22" text-anchor="middle" font-size="10" font-weight="800" fill="#dc2626">未繳交</text>
+      </g>
+    </g>
+
+    <!-- 卡片 3 (3 號 - 未完成 2) -->
+    <g transform="translate(456, 0)">
+      <rect width="208" height="186" rx="16" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+      <text class="txt" x="16" y="34" font-size="20" font-weight="900" fill="#0f172a">3 號</text>
+      <rect x="114" y="18" width="78" height="24" rx="12" fill="#fee2e2"/>
+      <text class="txt" x="153" y="34" text-anchor="middle" font-size="11" font-weight="800" fill="#dc2626">未完成: 2</text>
+      <g transform="translate(16, 56)">
+        <rect width="176" height="34" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+        <text class="txt" x="10" y="22" font-size="11" font-weight="700" fill="#334155">數習p5~p6</text>
+        <rect x="116" y="7" width="50" height="20" rx="4" fill="#fee2e2"/>
+        <text class="txt" x="141" y="21" text-anchor="middle" font-size="10" font-weight="800" fill="#dc2626">未繳交</text>
+      </g>
+      <g transform="translate(16, 96)">
+        <rect width="176" height="34" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+        <text class="txt" x="10" y="22" font-size="11" font-weight="700" fill="#334155">晴空小侍郎</text>
+        <rect x="116" y="7" width="50" height="20" rx="4" fill="#fee2e2"/>
+        <text class="txt" x="141" y="21" text-anchor="middle" font-size="10" font-weight="800" fill="#dc2626">未閱讀</text>
+      </g>
+    </g>
+
+    <!-- 卡片 4 (7 號 - 未完成 3) -->
+    <g transform="translate(684, 0)">
+      <rect width="208" height="186" rx="16" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+      <text class="txt" x="16" y="34" font-size="20" font-weight="900" fill="#0f172a">7 號</text>
+      <rect x="114" y="18" width="78" height="24" rx="12" fill="#fee2e2"/>
+      <text class="txt" x="153" y="34" text-anchor="middle" font-size="11" font-weight="800" fill="#dc2626">未完成: 3</text>
+      <g transform="translate(16, 52)">
+        <rect width="176" height="30" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+        <text class="txt" x="8" y="20" font-size="10" font-weight="700" fill="#334155">數習p5~p6</text>
+        <rect x="120" y="5" width="48" height="20" rx="4" fill="#fee2e2"/>
+        <text class="txt" x="144" y="19" text-anchor="middle" font-size="9" font-weight="800" fill="#dc2626">未繳交</text>
+      </g>
+      <g transform="translate(16, 88)">
+        <rect width="176" height="30" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+        <text class="txt" x="8" y="20" font-size="10" font-weight="700" fill="#334155">晴空小侍郎</text>
+        <rect x="120" y="5" width="48" height="20" rx="4" fill="#fee2e2"/>
+        <text class="txt" x="144" y="19" text-anchor="middle" font-size="9" font-weight="800" fill="#dc2626">未閱讀</text>
+      </g>
+      <g transform="translate(16, 124)">
+        <rect width="176" height="30" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+        <text class="txt" x="8" y="20" font-size="10" font-weight="700" fill="#334155">pagamo5/20</text>
+        <rect x="120" y="5" width="48" height="20" rx="4" fill="#fee2e2"/>
+        <text class="txt" x="144" y="19" text-anchor="middle" font-size="9" font-weight="800" fill="#dc2626">未闖關</text>
+      </g>
+    </g>
+
+    <!-- 第 2 列 (8號, 15號, 16號, 17號) -->
+    <!-- 8 號 -->
+    <g transform="translate(0, 204)">
+      <rect width="208" height="186" rx="16" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+      <text class="txt" x="16" y="34" font-size="20" font-weight="900" fill="#0f172a">8 號</text>
+      <rect x="114" y="18" width="78" height="24" rx="12" fill="#fee2e2"/>
+      <text class="txt" x="153" y="34" text-anchor="middle" font-size="11" font-weight="800" fill="#dc2626">未完成: 2</text>
+      <g transform="translate(16, 56)">
+        <rect width="176" height="34" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+        <text class="txt" x="10" y="22" font-size="11" font-weight="700" fill="#334155">晴空小侍郎</text>
+        <rect x="116" y="7" width="50" height="20" rx="4" fill="#fee2e2"/>
+        <text class="txt" x="141" y="21" text-anchor="middle" font-size="10" font-weight="800" fill="#dc2626">未閱讀</text>
+      </g>
+      <g transform="translate(16, 96)">
+        <rect width="176" height="34" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+        <text class="txt" x="10" y="22" font-size="11" font-weight="700" fill="#334155">pagamo5/20</text>
+        <rect x="116" y="7" width="50" height="20" rx="4" fill="#fee2e2"/>
+        <text class="txt" x="141" y="21" text-anchor="middle" font-size="10" font-weight="800" fill="#dc2626">未闖關</text>
+      </g>
+    </g>
+
+    <!-- 15 號 (待訂正 + 2 未完成) -->
+    <g transform="translate(228, 204)">
+      <rect width="208" height="186" rx="16" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+      <text class="txt" x="16" y="34" font-size="20" font-weight="900" fill="#0f172a">15 號</text>
+      <rect x="114" y="18" width="78" height="24" rx="12" fill="#fee2e2"/>
+      <text class="txt" x="153" y="34" text-anchor="middle" font-size="11" font-weight="800" fill="#dc2626">未完成: 3</text>
+      <g transform="translate(16, 52)">
+        <rect width="176" height="30" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+        <text class="txt" x="8" y="20" font-size="10" font-weight="700" fill="#334155">數習p5~p6</text>
+        <rect x="120" y="5" width="48" height="20" rx="4" fill="#fef3c7"/>
+        <text class="txt" x="144" y="19" text-anchor="middle" font-size="9" font-weight="800" fill="#d97706">待訂正</text>
+      </g>
+      <g transform="translate(16, 88)">
+        <rect width="176" height="30" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+        <text class="txt" x="8" y="20" font-size="10" font-weight="700" fill="#334155">晴空小侍郎</text>
+        <rect x="120" y="5" width="48" height="20" rx="4" fill="#fee2e2"/>
+        <text class="txt" x="144" y="19" text-anchor="middle" font-size="9" font-weight="800" fill="#dc2626">未閱讀</text>
+      </g>
+      <g transform="translate(16, 124)">
+        <rect width="176" height="30" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+        <text class="txt" x="8" y="20" font-size="10" font-weight="700" fill="#334155">pagamo5/20</text>
+        <rect x="120" y="5" width="48" height="20" rx="4" fill="#fee2e2"/>
+        <text class="txt" x="144" y="19" text-anchor="middle" font-size="9" font-weight="800" fill="#dc2626">未闖關</text>
+      </g>
+    </g>
+
+    <!-- 16 號 -->
+    <g transform="translate(456, 204)">
+      <rect width="208" height="186" rx="16" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+      <text class="txt" x="16" y="34" font-size="20" font-weight="900" fill="#0f172a">16 號</text>
+      <rect x="114" y="18" width="78" height="24" rx="12" fill="#fee2e2"/>
+      <text class="txt" x="153" y="34" text-anchor="middle" font-size="11" font-weight="800" fill="#dc2626">未完成: 3</text>
+      <g transform="translate(16, 52)"><rect width="176" height="30" rx="6" fill="#f8fafc" stroke="#e2e8f0"/><text class="txt" x="8" y="20" font-size="10" font-weight="700" fill="#334155">數習p5~p6</text><rect x="120" y="5" width="48" height="20" rx="4" fill="#fee2e2"/><text class="txt" x="144" y="19" text-anchor="middle" font-size="9" font-weight="800" fill="#dc2626">未繳交</text></g>
+      <g transform="translate(16, 88)"><rect width="176" height="30" rx="6" fill="#f8fafc" stroke="#e2e8f0"/><text class="txt" x="8" y="20" font-size="10" font-weight="700" fill="#334155">晴空小侍郎</text><rect x="120" y="5" width="48" height="20" rx="4" fill="#fee2e2"/><text class="txt" x="144" y="19" text-anchor="middle" font-size="9" font-weight="800" fill="#dc2626">未閱讀</text></g>
+      <g transform="translate(16, 124)"><rect width="176" height="30" rx="6" fill="#f8fafc" stroke="#e2e8f0"/><text class="txt" x="8" y="20" font-size="10" font-weight="700" fill="#334155">pagamo5/20</text><rect x="120" y="5" width="48" height="20" rx="4" fill="#fee2e2"/><text class="txt" x="144" y="19" text-anchor="middle" font-size="9" font-weight="800" fill="#dc2626">未闖關</text></g>
+    </g>
+
+    <!-- 17 號 -->
+    <g transform="translate(684, 204)">
+      <rect width="208" height="186" rx="16" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+      <text class="txt" x="16" y="34" font-size="20" font-weight="900" fill="#0f172a">17 號</text>
+      <rect x="114" y="18" width="78" height="24" rx="12" fill="#fee2e2"/>
+      <text class="txt" x="153" y="34" text-anchor="middle" font-size="11" font-weight="800" fill="#dc2626">未完成: 2</text>
+      <g transform="translate(16, 56)"><rect width="176" height="34" rx="8" fill="#f8fafc" stroke="#e2e8f0"/><text class="txt" x="10" y="22" font-size="11" font-weight="700" fill="#334155">晴空小侍郎</text><rect x="116" y="7" width="50" height="20" rx="4" fill="#fee2e2"/><text class="txt" x="141" y="21" text-anchor="middle" font-size="10" font-weight="800" fill="#dc2626">未閱讀</text></g>
+      <g transform="translate(16, 96)"><rect width="176" height="34" rx="8" fill="#f8fafc" stroke="#e2e8f0"/><text class="txt" x="10" y="22" font-size="11" font-weight="700" fill="#334155">pagamo5/20</text><rect x="116" y="7" width="50" height="20" rx="4" fill="#fee2e2"/><text class="txt" x="141" y="21" text-anchor="middle" font-size="10" font-weight="800" fill="#dc2626">未闖關</text></g>
+    </g>
+  </g>
+</svg>

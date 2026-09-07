@@ -1,0 +1,6 @@
+{
+  "name": "親師作業點收X聯絡簿系統 3.0",
+  "description": "親師作業點收X聯絡簿系統 3.0 - 支援實體條碼掃描槍、雲端備份與親師聯絡簿整合的全方位作業點收系統",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

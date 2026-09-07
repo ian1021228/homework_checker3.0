@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 680" width="100%" height="100%">
+  <defs>
+    <style>
+      .txt { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", sans-serif; }
+    </style>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.06"/>
+    </filter>
+  </defs>
+
+  <rect width="900" height="680" fill="#f8fafc"/>
+
+  <!-- 頂部學習進度卡片 -->
+  <g transform="translate(32, 20)">
+    <rect width="836" height="340" rx="20" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+
+    <!-- 座號圓形徽章與標題 -->
+    <circle cx="44" cy="44" r="20" fill="#1e3a8a"/>
+    <text class="txt" x="44" y="52" text-anchor="middle" font-size="18" font-weight="900" fill="#ffffff">1</text>
+    <text class="txt" x="76" y="44" font-size="20" font-weight="900" fill="#0f172a">座號 1 號 學習進度概況</text>
+    <text class="txt" x="296" y="44" font-size="12" font-weight="700" fill="#2563eb">更換座號</text>
+    <text class="txt" x="76" y="66" font-size="11" font-weight="500" fill="#64748b">點選下方標籤可快速篩選相關作業</text>
+    <text class="txt" x="800" y="44" text-anchor="end" font-size="11" font-weight="500" fill="#94a3b8">最後更新：8/30 09:56</text>
+
+    <!-- 3 個指標方塊 (完成 0, 待訂正 0, 未繳交 1) -->
+    <g transform="translate(24, 90)">
+      <!-- 綠色已完成 -->
+      <rect x="0" y="0" width="250" height="96" rx="14" fill="#f0fdf4" stroke="#86efac" stroke-width="1.2"/>
+      <text class="txt" x="18" y="28" font-size="13" font-weight="800" fill="#15803d">✓ 已完成</text>
+      <text class="txt" x="18" y="74" font-size="40" font-weight="900" fill="#16a34a">0</text>
+      <text class="txt" x="52" y="72" font-size="12" font-weight="600" fill="#15803d">項作業</text>
+
+      <!-- 黃色待訂正 -->
+      <rect x="268" y="0" width="250" height="96" rx="14" fill="#fefce8" stroke="#fde047" stroke-width="1.2"/>
+      <text class="txt" x="286" y="28" font-size="13" font-weight="800" fill="#a16207">! 待訂正</text>
+      <text class="txt" x="286" y="74" font-size="40" font-weight="900" fill="#ca8a04">0</text>
+      <text class="txt" x="320" y="72" font-size="12" font-weight="600" fill="#a16207">項作業</text>
+
+      <!-- 紅色未繳交 -->
+      <rect x="536" y="0" width="250" height="96" rx="14" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.2"/>
+      <text class="txt" x="554" y="28" font-size="13" font-weight="800" fill="#b91c1c">✕ 未繳交</text>
+      <text class="txt" x="554" y="74" font-size="40" font-weight="900" fill="#dc2626">1</text>
+      <text class="txt" x="584" y="72" font-size="12" font-weight="600" fill="#b91c1c">項作業</text>
+    </g>
+
+    <!-- 黃色重點提醒卡片 -->
+    <g transform="translate(24, 204)">
+      <rect width="786" height="54" rx="12" fill="#fffbeb" stroke="#fde68a"/>
+      <text class="txt" x="16" y="32" font-size="13" font-weight="800" fill="#b45309">🔔 重點提醒：請提醒孩子以下 1 項作業</text>
+      <text class="txt" x="260" y="32" font-size="13" font-weight="700" fill="#1e293b">123</text>
+      <rect x="686" y="14" width="84" height="26" rx="13" fill="#fee2e2"/>
+      <text class="txt" x="728" y="31" text-anchor="middle" font-size="11" font-weight="800" fill="#dc2626">✕ 未繳交</text>
+    </g>
+
+    <!-- 今日各項作業明細列 -->
+    <g transform="translate(24, 274)">
+      <rect width="786" height="46" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
+      <rect x="14" y="10" width="68" height="26" rx="6" fill="#e2e8f0"/>
+      <text class="txt" x="48" y="27" text-anchor="middle" font-size="11" font-weight="700" fill="#475569">一般作業</text>
+      <text class="txt" x="96" y="28" font-size="14" font-weight="800" fill="#0f172a">123</text>
+      <rect x="686" y="10" width="84" height="26" rx="13" fill="#fee2e2"/>
+      <text class="txt" x="728" y="27" text-anchor="middle" font-size="11" font-weight="800" fill="#dc2626">✕ 未繳交</text>
+    </g>
+  </g>
+
+  <!-- 下方班級聯絡簿卡片 -->
+  <g transform="translate(32, 380)">
+    <rect width="836" height="270" rx="20" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+
+    <!-- 標題與日期選取 -->
+    <text class="txt" x="24" y="38" font-size="18" font-weight="900" fill="#0f172a">📖 班級聯絡簿</text>
+    <text class="txt" x="24" y="60" font-size="11" font-weight="500" fill="#64748b">每日交代事項與功課清單</text>
+    <text class="txt" x="800" y="38" text-anchor="end" font-size="11" font-weight="600" fill="#64748b">選取日期：2026-09-05 (週六)</text>
+
+    <!-- 7 個橫向日期切換藥丸 -->
+    <g transform="translate(24, 80)">
+      <!-- 週日 8/30 (帶小綠點) -->
+      <rect x="0" y="0" width="102" height="38" rx="19" fill="#f8fafc" stroke="#cbd5e1"/>
+      <circle cx="20" cy="19" r="3" fill="#10b981"/>
+      <text class="txt" x="58" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#475569">週日 8/30</text>
+
+      <!-- 週一 8/31 -->
+      <rect x="114" y="0" width="102" height="38" rx="19" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text class="txt" x="165" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#475569">週一 8/31</text>
+
+      <!-- 週二 9/1 -->
+      <rect x="228" y="0" width="102" height="38" rx="19" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text class="txt" x="279" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#475569">週二 9/1</text>
+
+      <!-- 週三 9/2 -->
+      <rect x="342" y="0" width="102" height="38" rx="19" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text class="txt" x="393" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#475569">週三 9/2</text>
+
+      <!-- 週四 9/3 -->
+      <rect x="456" y="0" width="102" height="38" rx="19" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text class="txt" x="507" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#475569">週四 9/3</text>
+
+      <!-- 週五 9/4 -->
+      <rect x="570" y="0" width="102" height="38" rx="19" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text class="txt" x="621" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#475569">週五 9/4</text>
+
+      <!-- 今天 9/5 (選中藍紫色) -->
+      <rect x="684" y="0" width="102" height="38" rx="19" fill="#4f46e5"/>
+      <text class="txt" x="735" y="24" text-anchor="middle" font-size="12" font-weight="800" fill="#ffffff">今天 9/5</text>
+    </g>
+
+    <!-- 聯絡簿內容區塊 (無事項提示) -->
+    <g transform="translate(24, 140)">
+      <rect width="786" height="106" rx="14" fill="#f8fafc" stroke="#e2e8f0"/>
+      <text class="txt" x="393" y="44" text-anchor="middle" font-size="18">📄</text>
+      <text class="txt" x="393" y="68" text-anchor="middle" font-size="13" font-weight="800" fill="#334155">本日無聯絡簿登記事項</text>
+      <text class="txt" x="393" y="88" text-anchor="middle" font-size="11" font-weight="500" fill="#94a3b8">老師可能尚未填寫，或今日無特別交代事項</text>
+    </g>
+  </g>
+</svg>

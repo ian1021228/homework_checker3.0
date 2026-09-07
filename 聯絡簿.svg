@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 620" width="100%" height="100%">
+  <defs>
+    <style>
+      .txt { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", sans-serif; }
+      .chalk { font-family: "PingFang TC", "DFKai-SB", "BiauKai", "Kaiti TC", "Comic Sans MS", cursive, sans-serif; }
+    </style>
+    <!-- 木紋邊框漸層 -->
+    <linearGradient id="woodBevel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9a5826"/>
+      <stop offset="50%" stop-color="#78350f"/>
+      <stop offset="100%" stop-color="#451a03"/>
+    </linearGradient>
+    <linearGradient id="blackboardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1f362b"/>
+      <stop offset="100%" stop-color="#14261e"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- 外部淺灰底 -->
+  <rect width="960" height="620" fill="#f8fafc"/>
+
+  <!-- 頂部返回列 -->
+  <g transform="translate(32, 20)">
+    <rect width="130" height="30" rx="15" fill="#ffffff" stroke="#e2e8f0"/>
+    <text class="txt" x="16" y="20" font-size="12" font-weight="700" fill="#64748b">← 返回作業列表</text>
+  </g>
+
+  <!-- 標題列與工具列 -->
+  <g transform="translate(32, 60)">
+    <text class="txt" x="0" y="26" font-size="24" font-weight="900" fill="#4f46e5">602 聯絡簿</text>
+    <text class="txt" x="0" y="48" font-size="12" font-weight="600" fill="#64748b">2026/9/5</text>
+
+    <!-- 右側工具按鈕群 -->
+    <!-- 字體縮放按鈕群 [A-] [A+] [↕-] [↕+] -->
+    <g transform="translate(290, 8)">
+      <rect width="140" height="34" rx="8" fill="#f1f5f9" stroke="#cbd5e1"/>
+      <text class="txt" x="18" y="22" font-size="12" font-weight="800" fill="#475569">A-</text>
+      <text class="txt" x="52" y="22" font-size="12" font-weight="800" fill="#475569">A+</text>
+      <text class="txt" x="86" y="22" font-size="12" font-weight="800" fill="#475569">↕-</text>
+      <text class="txt" x="116" y="22" font-size="12" font-weight="800" fill="#475569">↕+</text>
+    </g>
+
+    <!-- 水藍按鈕：套用昨日 -->
+    <g transform="translate(440, 8)">
+      <rect width="100" height="34" rx="8" fill="#0284c7"/>
+      <text class="txt" x="50" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="#ffffff">📋 套用昨日</text>
+    </g>
+
+    <!-- 深灰藍按鈕：選擇日期 -->
+    <g transform="translate(548, 8)">
+      <rect width="104" height="34" rx="8" fill="#334155"/>
+      <text class="txt" x="52" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="#ffffff">📅 選擇日期</text>
+    </g>
+
+    <!-- 淺紅按鈕：清空本日 -->
+    <g transform="translate(660, 8)">
+      <rect width="90" height="34" rx="8" fill="#ffffff" stroke="#fca5a5"/>
+      <text class="txt" x="45" y="22" text-anchor="middle" font-size="12" font-weight="700" fill="#ef4444">清空本日</text>
+    </g>
+
+    <!-- 淺紅按鈕：清空全部記錄 -->
+    <g transform="translate(758, 8)">
+      <rect width="138" height="34" rx="8" fill="#ffffff" stroke="#fca5a5"/>
+      <text class="txt" x="69" y="22" text-anchor="middle" font-size="12" font-weight="700" fill="#ef4444">清空全部記錄</text>
+    </g>
+  </g>
+
+  <!-- 黑板主體 (高擬真木框與墨綠黑板) -->
+  <g transform="translate(32, 126)">
+    <!-- 木紋外框 (厚 18) -->
+    <rect width="896" height="460" rx="16" fill="url(#woodBevel)" filter="url(#shadow)"/>
+    <!-- 木框內邊亮金屬倒角線 -->
+    <rect x="12" y="12" width="872" height="436" rx="8" fill="none" stroke="#d97706" stroke-width="1.5" opacity="0.6"/>
+
+    <!-- 墨綠色黑板板面 -->
+    <rect x="18" y="18" width="860" height="424" rx="6" fill="url(#blackboardGrad)"/>
+
+    <!-- 粉筆字條目 (楷書/手寫粉筆質感) -->
+    <!-- 第 1 條: 1. 國習p1-3 -->
+    <g transform="translate(48, 70)">
+      <text class="chalk" x="0" y="0" font-size="30" font-weight="900" fill="#ffffff" letter-spacing="2">1. 國習p1-3</text>
+    </g>
+
+    <!-- 第 2 條: 2. 數習p2~5 -->
+    <g transform="translate(48, 130)">
+      <text class="chalk" x="0" y="0" font-size="30" font-weight="900" fill="#ffffff" letter-spacing="2">2. 數習p2~5</text>
+    </g>
+
+    <!-- 下方半透明輸入框與寫上黑板按鈕 (內嵌於黑板底部) -->
+    <g transform="translate(38, 380)">
+      <rect width="700" height="44" rx="10" fill="#ffffff" opacity="0.95"/>
+      <text class="txt" x="18" y="28" font-size="14" font-weight="500" fill="#94a3b8">在此輸入聯絡事項...</text>
+
+      <rect x="712" y="0" width="108" height="44" rx="10" fill="#22c55e"/>
+      <text class="txt" x="766" y="28" text-anchor="middle" font-size="14" font-weight="800" fill="#ffffff">寫上黑板</text>
+    </g>
+  </g>
+</svg>
