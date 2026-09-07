@@ -290,25 +290,46 @@ export function showAlertModal(title, message, onOk) {
     confirmOk.addEventListener('click', okHandler);
 }
 
-export function showConfirmModal(title, message, onConfirm) {
-    document.getElementById('confirm-title').textContent = title; 
-    document.getElementById('confirm-message').textContent = message; 
+export function showConfirmModal(title, message, onConfirm, onCancel, options = {}) {
+    const confirmModal = document.getElementById('confirm-modal');
+    const confirmTitle = document.getElementById('confirm-title');
+    const confirmMessage = document.getElementById('confirm-message');
     const confirmCancel = document.getElementById('confirm-cancel');
     const confirmOk = document.getElementById('confirm-ok');
+    if (!confirmModal || !confirmOk || !confirmCancel) return;
+
+    confirmTitle.textContent = title; 
+    confirmMessage.textContent = message; 
+
+    const defaultOkClass = "bg-rose-500 text-white font-bold py-2.5 px-6 text-sm rounded-xl shadow-md hover:bg-rose-600 transition-colors";
+    const defaultCancelClass = "bg-slate-100 text-slate-600 font-bold py-2.5 px-5 text-sm rounded-xl hover:bg-slate-200 transition-colors";
+
+    confirmOk.textContent = options.okText || '確定執行';
+    confirmOk.className = options.okClass || defaultOkClass;
+
+    confirmCancel.textContent = options.cancelText || '取消';
+    confirmCancel.className = options.cancelClass || defaultCancelClass;
     confirmCancel.classList.remove('hidden');
-    openModal(document.getElementById('confirm-modal'));
+
+    openModal(confirmModal);
+
     const confirmHandler = () => { 
-        closeModal(document.getElementById('confirm-modal')); 
+        closeModal(confirmModal); 
         cleanup(); 
         if (onConfirm) onConfirm(); 
     };
     const cancelHandler = () => { 
-        closeModal(document.getElementById('confirm-modal')); 
+        closeModal(confirmModal); 
         cleanup(); 
+        if (onCancel) onCancel(); 
     };
     const cleanup = () => { 
         confirmOk.removeEventListener('click', confirmHandler); 
         confirmCancel.removeEventListener('click', cancelHandler); 
+        confirmOk.textContent = '確定執行';
+        confirmOk.className = defaultOkClass;
+        confirmCancel.textContent = '取消';
+        confirmCancel.className = defaultCancelClass;
     };
     confirmOk.addEventListener('click', confirmHandler);
     confirmCancel.addEventListener('click', cancelHandler);
@@ -373,3 +394,5 @@ window.showAlertModal = showAlertModal;
 window.showConfirmModal = showConfirmModal;
 window.showNamePromptModal = showNamePromptModal;
 window.safeCopyToClipboard = safeCopyToClipboard;
+
+

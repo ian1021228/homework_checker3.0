@@ -66,7 +66,8 @@ import {
     showHomeworkTypesPage,
     openPortalAuthModal,
     closePortalAuthModal,
-    proceedIntoSystem
+    proceedIntoSystem,
+    promptSystemUsageAndNavigate
 , fullRender } from './navigation.js';
 
 import { setupButtonEvents } from './events.js';
@@ -80,6 +81,7 @@ window.showNamePromptModal = showNamePromptModal;
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.isGoogleAdmin = isGoogleAdmin;
+window.promptSystemUsageAndNavigate = promptSystemUsageAndNavigate;
 window.getSvgIcon = getSvgIcon;
 
 // 滾動提示指示器

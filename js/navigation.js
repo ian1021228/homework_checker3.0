@@ -175,6 +175,20 @@ export function showHomeworkTypesPage(fromHistory = false) {
     restoreScroll('homework-types-page');
 }
 
+export function promptSystemUsageAndNavigate() {
+    if (state.currentUser) {
+        sessionStorage.removeItem('app_is_guest_mode');
+        proceedIntoSystem();
+        return;
+    }
+    const modal = document.getElementById('usage-inquiry-modal');
+    if (modal) {
+        openModal(modal);
+    } else {
+        openPortalAuthModal('signup');
+    }
+}
+
 export function openPortalAuthModal(defaultView = 'signin') {
     const modal = document.getElementById('portal-auth-modal');
     if (!modal) return;
@@ -194,17 +208,18 @@ export function openPortalAuthModal(defaultView = 'signin') {
         if (signupView) signupView.classList.toggle('hidden', defaultView !== 'signup');
         if (forgotView) forgotView.classList.toggle('hidden', defaultView !== 'forgot');
     }
-    modal.classList.remove('hidden');
+    openModal(modal);
 }
 
 export function closePortalAuthModal() {
     const modal = document.getElementById('portal-auth-modal');
-    if (modal) modal.classList.add('hidden');
+    if (modal) closeModal(modal);
 }
 
 export function proceedIntoSystem() {
     sessionStorage.setItem('has_passed_portal_in_session', 'true');
     closePortalAuthModal();
+    showMainPage();
     const portalEl = document.getElementById('portal-page');
     if (portalEl) portalEl.classList.add('hidden');
     
@@ -214,7 +229,6 @@ export function proceedIntoSystem() {
         openModal(welcomeModal);
         showWelcomeStep2();
     } else {
-        showMainPage();
         if (state.appData.classes.length === 0) openModal(document.getElementById('manage-classes-modal'));
     }
     updateGuestHomeBtnVisibility();

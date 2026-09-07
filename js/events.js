@@ -90,6 +90,7 @@ import {
     showStudentDetailsPage,
     showContactBookPage,
     showHomeworkTypesPage,
+    promptSystemUsageAndNavigate,
     openPortalAuthModal,
     closePortalAuthModal,
     proceedIntoSystem,
@@ -120,12 +121,7 @@ export function setupButtonEvents() {
 
     // 首頁 Hero / 行動按鈕
     bindClick('portal-hero-start-btn', () => {
-        if (state.currentUser) {
-            sessionStorage.removeItem('app_is_guest_mode');
-            proceedIntoSystem();
-        } else {
-            openPortalAuthModal('signup');
-        }
+        promptSystemUsageAndNavigate();
     });
     bindClick('portal-hero-guest-btn', () => {
         sessionStorage.setItem('app_is_guest_mode', 'true');
@@ -133,13 +129,32 @@ export function setupButtonEvents() {
         proceedIntoSystem();
     });
     bindClick('portal-cta-start-btn', () => {
-        if (state.currentUser) {
-            sessionStorage.removeItem('app_is_guest_mode');
-            proceedIntoSystem();
-        } else {
-            openPortalAuthModal('signup');
-        }
+        promptSystemUsageAndNavigate();
     });
+
+    // 詢問是否使用過系統之互動按鈕
+    bindClick('usage-inquiry-yes-btn', () => {
+        const modal = document.getElementById('usage-inquiry-modal');
+        if (modal) closeModal(modal);
+        openPortalAuthModal('signin');
+    });
+    bindClick('usage-inquiry-no-btn', () => {
+        const modal = document.getElementById('usage-inquiry-modal');
+        if (modal) closeModal(modal);
+        openPortalAuthModal('signup');
+    });
+    bindClick('usage-inquiry-close-btn', () => {
+        const modal = document.getElementById('usage-inquiry-modal');
+        if (modal) closeModal(modal);
+    });
+    const inquiryModal = document.getElementById('usage-inquiry-modal');
+    if (inquiryModal) {
+        inquiryModal.addEventListener('click', (e) => {
+            if (e.target === inquiryModal) {
+                closeModal(inquiryModal);
+            }
+        });
+    }
 
     bindClick('floating-guest-home-btn', () => {
         showPortalPage(false);
@@ -680,6 +695,10 @@ export function setupButtonEvents() {
 
             // 3. 執行指定帳號登入程序
             const executeLoginForCandidate = async (cand) => {
+                if (cand.isGoogleAuth) {
+                    showAlertModal("請使用 Google 快速登入", `帳號「${cand.displayName || cand.username || cand.email}」為 Google 授權帳號，請直接點選彈窗下方的「Google 帳號快速登入」按鈕進行登入。`);
+                    return;
+                }
                 let cred = null;
                 const targetEmail = cand.authEmail || cand.email;
                 try {
@@ -691,6 +710,14 @@ export function setupButtonEvents() {
                     if (!cred) {
                         if (cand.password && cand.password !== password) {
                             showAlertModal("登入失敗", "密碼錯誤，請確認後重試。若忘記密碼請點選下方「忘記密碼？」");
+                            return;
+                        }
+                        if (signInErr.code === 'auth/invalid-credential' || signInErr.code === 'auth/wrong-password' || signInErr.code === 'auth/user-not-found') {
+                            if ((cand.email || '').toLowerCase() === 'ianw.solar@gmail.com' || (cand.email || '').toLowerCase().includes('@gmail.com')) {
+                                showAlertModal("登入提示", "帳號或密碼不相符。\n\n💡 提示：若此帳號平時是使用 Google 授權登入，請直接點選下方「使用 Google 帳號快速登入」按鈕！");
+                            } else {
+                                showAlertModal("登入失敗", "密碼錯誤或憑證無效，請確認後重試。若忘記密碼請點選下方「忘記密碼？」");
+                            }
                             return;
                         }
                         throw signInErr;
@@ -763,8 +790,18 @@ export function setupButtonEvents() {
             } else {
                 // 4. 若在 boundAccounts 未找到符合項
                 if (accountInput.includes('@')) {
-                    // 輸入為信箱時，嘗試直接 Firebase Auth 登入
-                    const cred = await signInWithEmailAndPassword(fbAuth, accountInput, password);
+                    // 若輸入的是 ianw.solar@gmail.com 或 Google 帳號，優先捕獲處理
+                    let cred = null;
+                    try {
+                        cred = await signInWithEmailAndPassword(fbAuth, accountInput, password);
+                    } catch(directErr) {
+                        if (accountInput.toLowerCase() === 'ianw.solar@gmail.com' || accountInput.toLowerCase().includes('@gmail.com')) {
+                            console.warn("Direct sign in notice for Google email:", directErr?.code);
+                            showAlertModal("請使用 Google 快速登入", `帳號 (${accountInput}) 平常是以 Google 授權方式登入。\n\n請直接點選下方的「使用 Google 帳號快速登入」按鈕！`);
+                            return;
+                        }
+                        throw directErr;
+                    }
                     if (cred.user && !cred.user.emailVerified) {
                         showToast("⚠️ 此帳號尚未完成信箱驗證，請先驗證信箱", "warning");
                         openEmailVerificationModal(cred.user.email, cred.user, {
@@ -807,10 +844,14 @@ export function setupButtonEvents() {
                 return;
             }
         } catch (err) {
-            console.error("Sign in error:", err);
-            let msg = err.message;
+            console.warn("Sign in notice:", err?.code || err?.message);
+            let msg = err?.message || "登入失敗";
             if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
-                msg = "使用者名稱或密碼錯誤，請確認後重試。若忘記密碼請點選下方「忘記密碼？」";
+                if (accountInput.toLowerCase().includes('@gmail.com') || accountInput.toLowerCase() === 'ianw.solar@gmail.com') {
+                    msg = "帳號或密碼不符。\n\n💡 提示：若您的帳號是透過 Google 快速授權建立的，請直接點選下方的「使用 Google 帳號快速登入」按鈕！";
+                } else {
+                    msg = "使用者名稱或密碼錯誤，請確認後重試。若忘記密碼請點選下方「忘記密碼？」";
+                }
             } else if (err.code === 'auth/too-many-requests') {
                 msg = "登入失敗次數過多，此帳號已被暫時保護，請稍後再試或透過郵件重設密碼。";
             } else if (err.code === 'auth/invalid-email') {
@@ -1243,8 +1284,13 @@ export function setupButtonEvents() {
             }
             proceedIntoSystem();
         }).catch((error) => {
-            if (error.code !== 'auth/popup-closed-by-user') {
-                showAlertModal("Google 登入失敗", "錯誤細節：" + error.message);
+            console.warn("Google login popup error:", error?.code || error);
+            if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
+                if (error.code === 'auth/invalid-credential') {
+                    showAlertModal("Google 登入憑證無效", "Google 登入授權憑證無效或已過期，請重新嘗試登入。");
+                } else {
+                    showAlertModal("Google 登入失敗", "錯誤細節：" + (error.message || error.code));
+                }
             }
         });
     };

@@ -698,7 +698,7 @@ export function updatePortalUI() {
         if (userBadge) userBadge.classList.remove('hidden');
         if (userNameSpan) userNameSpan.textContent = displayName;
         if (heroStartBtn) heroStartBtn.innerHTML = `<span>進入作業點收系統</span><i class="fa-solid fa-arrow-right text-sm"></i>`;
-        if (ctaStartBtn) ctaStartBtn.innerHTML = `<span>立即進入系統</span><i class="fa-solid fa-chevron-right text-xs"></i>`;
+        if (ctaStartBtn) ctaStartBtn.innerHTML = `<span class="pointer-events-none select-none inline-block">立即進入系統</span><i class="fa-solid fa-chevron-right text-xs pointer-events-none select-none"></i>`;
     } else {
         if (loggedinView) loggedinView.classList.add('hidden');
         if (signupView && !signupView.classList.contains('hidden')) {
@@ -711,7 +711,7 @@ export function updatePortalUI() {
         if (guestActions) guestActions.classList.remove('hidden');
         if (userBadge) userBadge.classList.add('hidden');
         if (heroStartBtn) heroStartBtn.innerHTML = `<span>立即開始使用</span><i class="fa-solid fa-arrow-right text-sm"></i>`;
-        if (ctaStartBtn) ctaStartBtn.innerHTML = `<span>免費建立帳號 / 立即開始使用</span><i class="fa-solid fa-chevron-right text-xs"></i>`;
+        if (ctaStartBtn) ctaStartBtn.innerHTML = `<span class="pointer-events-none select-none inline-block">免費建立帳號 / 立即開始使用</span><i class="fa-solid fa-chevron-right text-xs pointer-events-none select-none"></i>`;
     }
 }
 
