@@ -13,7 +13,8 @@ import {
     reload,
     applyActionCode,
     updateProfile, 
-    updatePassword 
+    updatePassword,
+    signInAnonymously 
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { 
     getFirestore, 
@@ -43,6 +44,7 @@ export {
     createUserWithEmailAndPassword, 
     updateProfile, 
     signOut, 
+    signInAnonymously,
     sendPasswordResetEmail, 
     sendEmailVerification,
     reload,
@@ -98,6 +100,8 @@ if (fbAuth) {
                 if (cloudActions) cloudActions.classList.add('hidden');
                 if (storageContainer) storageContainer.classList.add('hidden');
             }
+            if (window.updateChatUnreadBadge) window.updateChatUnreadBadge();
+            if (state.isChatOpen && window.renderChatView) window.renderChatView();
         } catch(e) {}
     });
 }
@@ -111,6 +115,9 @@ export function isGoogleAuthUser(user) {
 }
 
 export function isGoogleAdmin(user) {
+    if (state?.isDevMode || sessionStorage.getItem('app_dev_mode') === 'true') {
+        return true;
+    }
     if (!user || !user.email) return false;
     if (user.email.toLowerCase() !== 'ianw.solar@gmail.com') return false;
     return isGoogleAuthUser(user);
@@ -173,6 +180,14 @@ export function listenToProfile() {
             }
 
             if (data.bannerActive && data.bannerMessage && data.bannerId) {
+                state.personalBanner = {
+                    id: data.bannerId,
+                    message: data.bannerMessage,
+                    createdAt: data.bannerTime || new Date().toISOString()
+                };
+                window.updateBellBadge?.();
+                if (state.isBellOpen) window.renderBroadcastPanel?.();
+
                 const dismissed = localStorage.getItem('dismissed_banner_' + data.bannerId);
                 if (!dismissed) {
                     const banner = document.getElementById('system-banner');
@@ -387,9 +402,15 @@ export function renderAdminUsersList() {
                 <button class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-colors force-reset-btn shadow-sm cursor-pointer" data-id="${id}">
                     ⚠️ 重置
                 </button>
-                <button class="bg-red-600 hover:bg-red-700 text-white border border-red-800 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-colors delete-user-btn shadow-sm cursor-pointer" data-id="${id}">
-                    🗑️ 刪除
-                </button>
+                ${(state?.isDevMode || sessionStorage.getItem('app_dev_mode') === 'true') ? `
+                    <button class="bg-stone-100 text-stone-400 border border-stone-200 px-2.5 py-1.5 rounded-lg text-[11px] font-bold cursor-not-allowed shadow-xs" disabled title="開發者模式已鎖定：無法刪除帳號">
+                        🚫 禁刪
+                    </button>
+                ` : `
+                    <button class="bg-red-600 hover:bg-red-700 text-white border border-red-800 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-colors delete-user-btn shadow-sm cursor-pointer" data-id="${id}">
+                        🗑️ 刪除
+                    </button>
+                `}
             </td>
         `;
         usersList.appendChild(tr);
@@ -460,6 +481,10 @@ export function renderAdminUsersList() {
         btn.addEventListener('click', async (e) => {
             const targetBtn = e.target.closest('.delete-user-btn');
             if (!targetBtn) return;
+            if (state?.isDevMode || sessionStorage.getItem('app_dev_mode') === 'true') {
+                showToast("⚠️ 開發者模式安全防護：無權限刪除帳戶", "warning");
+                return;
+            }
             const id = targetBtn.dataset.id;
             const pass = prompt("【危險操作】確定刪除該帳戶？此操作將不可逆。請輸入密鑰確認：");
             if (pass === "ianw0000") {
@@ -480,6 +505,15 @@ export async function loadAllUsersForAdmin(onViewDataCallback) {
     adminUsersCallback = onViewDataCallback;
     setupAdminFilterListeners();
     loadServerConfigForAdmin();
+
+    const devBadge = document.getElementById('admin-dev-badge');
+    if (devBadge) {
+        if (state?.isDevMode || sessionStorage.getItem('app_dev_mode') === 'true') {
+            devBadge.classList.remove('hidden');
+        } else {
+            devBadge.classList.add('hidden');
+        }
+    }
 
     const usersList = document.getElementById('admin-users-list');
     const countBadge = document.getElementById('admin-user-count-badge');

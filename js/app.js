@@ -72,6 +72,7 @@ import {
 
 import { setupButtonEvents } from './events.js';
 import { ICONS, getSvgIcon } from './icons.js';
+import { initSystemChat, updateChatVisibility, updateChatUnreadBadge, renderChatView, toggleChatPanel } from './chat.js';
 
 // 將核心全域輔助函式掛載至 window，確保相容性與無縫呼叫
 window.showToast = showToast;
@@ -83,6 +84,11 @@ window.closeModal = closeModal;
 window.isGoogleAdmin = isGoogleAdmin;
 window.promptSystemUsageAndNavigate = promptSystemUsageAndNavigate;
 window.getSvgIcon = getSvgIcon;
+window.initSystemChat = initSystemChat;
+window.updateChatVisibility = updateChatVisibility;
+window.updateChatUnreadBadge = updateChatUnreadBadge;
+window.renderChatView = renderChatView;
+window.toggleChatPanel = toggleChatPanel;
 
 // 滾動提示指示器
 let portalScrollDismissed = false;
@@ -162,6 +168,11 @@ async function init() {
         }
     } catch(e) {}
 
+    if (sessionStorage.getItem('app_dev_mode') === 'true') {
+        state.isDevMode = true;
+        if (state.currentUser) state.currentUser.isDevMode = true;
+    }
+
     const localData = localStorage.getItem('homeworkAppData');
     if (localData) {
         try {
@@ -215,6 +226,8 @@ async function init() {
     }
 
     initPortalScrollIndicator();
+    initSystemChat();
+    updateChatVisibility();
 
     // 6. 頁面導航初始化
     const hasPassedPortalInSession = sessionStorage.getItem('has_passed_portal_in_session') === 'true';

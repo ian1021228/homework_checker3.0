@@ -42,6 +42,12 @@ export function applyCheckMode(mode) {
         } else {
             scanContainer.classList.remove('hidden');
             scanContainer.classList.add('flex');
+            if (window.setScanActionMode) {
+                window.setScanActionMode(localStorage.getItem('scan_action_type') || 'assign');
+            }
+            setTimeout(() => {
+                document.getElementById('barcode-scan-input')?.focus();
+            }, 50);
         }
     }
     
@@ -100,6 +106,7 @@ export function hideAllPages() {
 export function restoreScroll(targetPageId) { 
     state.currentPage = targetPageId; 
     window.scrollTo({ top: state.scrollPositions[targetPageId] || 0, behavior: 'auto' }); 
+    updateGuestHomeBtnVisibility();
 }
 
 export function showPortalPage(fromHistory = false) {

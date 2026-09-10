@@ -1,7 +1,7 @@
 import { state } from './state.js';
 import { DEFAULT_TYPES } from './constants.js';
 import { formatDate, safeStringify, showToast, showConfirmModal, closeModal } from './utils.js';
-import { fbDb, fbAuth } from './firebase.js';
+import { fbDb, fbAuth, isGoogleAdmin } from './firebase.js';
 
 export function getHomeworkType(typeId) { 
     return state.appData.homeworkTypes.find(t => t.id === typeId) || state.appData.homeworkTypes.find(t => t.id === 'default') || DEFAULT_TYPES[0]; 
@@ -337,7 +337,12 @@ export function renderStudentGrid(homeworkId) {
     setTimeout(() => { 
         const scanContainer = document.getElementById('scan-mode-container'); 
         const scanInput = document.getElementById('barcode-scan-input'); 
-        if (scanContainer && !scanContainer.classList.contains('hidden') && scanInput) scanInput.focus(); 
+        if (scanContainer && !scanContainer.classList.contains('hidden')) {
+            if (scanInput) scanInput.focus(); 
+            if (window.setScanActionMode) {
+                window.setScanActionMode(localStorage.getItem('scan_action_type') || 'assign');
+            }
+        }
     }, 300);
 }
 
@@ -582,7 +587,7 @@ export function updateDataManagementUI(onRestoreBackup) {
 
     const adminEmail = 'ianw.solar@gmail.com';
     const userEmail = (state.currentUser?.email || '').toLowerCase();
-    const isCurrentUserAdmin = userEmail === adminEmail;
+    const isCurrentUserAdmin = isGoogleAdmin(state.currentUser) || userEmail === adminEmail;
     if (isCurrentUserAdmin) {
         document.getElementById('admin-modal-btn')?.classList.remove('hidden');
         document.getElementById('admin-btn')?.classList.remove('hidden');
@@ -636,13 +641,17 @@ export function updateDataManagementUI(onRestoreBackup) {
 
 export function updateGuestHomeBtnVisibility() {
     const btn = document.getElementById('floating-guest-home-btn');
-    if (!btn) return;
     const isGuest = sessionStorage.getItem('app_is_guest_mode') === 'true';
     const isPortalVisible = !document.getElementById('portal-page')?.classList.contains('hidden');
-    if (isGuest && !isPortalVisible) {
-        btn.classList.remove('hidden');
-    } else {
-        btn.classList.add('hidden');
+    if (btn) {
+        if (isGuest && !isPortalVisible) {
+            btn.classList.remove('hidden');
+        } else {
+            btn.classList.add('hidden');
+        }
+    }
+    if (window.updateChatVisibility) {
+        window.updateChatVisibility();
     }
 }
 

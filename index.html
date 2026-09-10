@@ -860,7 +860,7 @@
     </div>
 
     <!-- 訪客/免帳號體驗模式專用：右下角常態返回首頁懸浮按鈕 -->
-    <button id="floating-guest-home-btn" class="fixed bottom-6 right-6 z-40 hidden flex items-center gap-2 px-4 py-2.5 rounded-full bg-gradient-to-r from-amber-600 to-orange-600 text-white font-black text-xs sm:text-sm shadow-xl shadow-amber-600/30 hover:shadow-amber-600/50 hover:scale-105 active:scale-95 transition-all border border-amber-300/40 cursor-pointer group" title="返回網站首頁 (體驗模式)">
+    <button id="floating-guest-home-btn" class="fixed bottom-10 sm:bottom-12 right-20 sm:right-22 z-40 hidden flex items-center gap-2 px-4 py-2.5 rounded-full bg-gradient-to-r from-amber-600 to-orange-600 text-white font-black text-xs sm:text-sm shadow-xl shadow-amber-600/30 hover:shadow-amber-600/50 hover:scale-105 active:scale-95 transition-all border border-amber-300/40 cursor-pointer group" title="返回網站首頁 (體驗模式)">
         <i class="fa-solid fa-house text-xs group-hover:-translate-x-0.5 transition-transform"></i>
         <span>返回首頁</span>
         <span class="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-md font-bold tracking-wide">體驗中</span>
@@ -1318,12 +1318,29 @@
                 </div>
                 <!-- 掃描專屬設定區 (預設隱藏) -->
                 <div id="scan-mode-container" class="disable-on-admin-view hidden p-4 bg-indigo-50/30 flex-wrap items-center gap-3 border-t border-slate-100">
-                    <div class="flex items-center gap-2 w-full sm:w-auto">
-                        <span class="text-sm font-bold text-indigo-700 flex items-center gap-1.5 whitespace-nowrap">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-                            掃描後變更為：
-                        </span>
-                        <select id="scan-target-status-select" class="text-base font-bold rounded-2xl border-slate-200 p-2 focus:ring-indigo-500 focus:border-indigo-500 font-bold bg-white shadow-sm cursor-pointer"></select>
+                    <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+                        <!-- 方式一：指定狀態 -->
+                        <div id="scan-mode-assign-box" class="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-2xl border border-indigo-400 ring-2 ring-indigo-100 bg-indigo-50/30 shadow-xs transition-all">
+                            <label for="scan-mode-assign-checkbox" class="inline-flex items-center gap-1.5 cursor-pointer select-none">
+                                <input type="checkbox" id="scan-mode-assign-checkbox" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer" checked>
+                                <span class="text-sm font-bold text-indigo-700 flex items-center gap-1 whitespace-nowrap">
+                                    <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                                    掃描後變更為：
+                                </span>
+                            </label>
+                            <select id="scan-target-status-select" class="text-sm font-bold rounded-xl border-slate-200 py-1 px-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white shadow-xs cursor-pointer transition-all"></select>
+                        </div>
+
+                        <!-- 方式二：變更為下一個狀態 -->
+                        <div id="scan-mode-next-box" class="flex items-center bg-white px-3 py-1.5 rounded-2xl border border-slate-200/80 shadow-xs transition-all">
+                            <label for="scan-mode-next-checkbox" class="inline-flex items-center gap-1.5 cursor-pointer select-none">
+                                <input type="checkbox" id="scan-mode-next-checkbox" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer">
+                                <span class="text-sm font-bold text-slate-700 whitespace-nowrap flex items-center gap-1">
+                                    <span class="text-indigo-600 text-sm leading-none">🔄</span>
+                                    變更為下一個狀態
+                                </span>
+                            </label>
+                        </div>
                     </div>
                     <input type="text" id="barcode-scan-input" class="text-base font-bold rounded-2xl border-slate-200 p-2.5 focus:ring-indigo-500 focus:border-indigo-500 font-mono bg-white shadow-inner flex-grow transition-colors min-w-[200px]" placeholder="請將游標停在此處並掃描條碼..." autocomplete="off">
                 </div>
@@ -1435,6 +1452,7 @@
             <div class="bg-slate-900 px-6 py-4 flex justify-between items-center flex-shrink-0">
                 <h2 class="text-xl font-extrabold text-white flex items-center gap-3">
                     <span class="text-amber-400">🛡️</span> 系統管理中心
+                    <span id="admin-dev-badge" class="hidden text-xs bg-purple-600/90 text-purple-100 px-2.5 py-0.5 rounded-full font-bold border border-purple-400/40">🛠️ 開發者模式 (鎖定刪除)</span>
                 </h2>
                 <button class="cancel-btn text-slate-400 hover:text-white transition-colors bg-slate-800 p-2 rounded-full hover:bg-slate-700">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -2239,8 +2257,88 @@
         </div>
     </div>
 
+    <!-- 右下角可收合系統即時通訊訊息圖示 (Collapsible Admin Chat System) - 首頁不顯示，僅在系統中顯示 -->
+    <div id="system-chat-container" class="fixed bottom-10 sm:bottom-12 right-5 sm:right-6 z-[85] flex flex-col items-end select-none hidden">
+        <!-- 展開的即時通訊面板 -->
+        <div id="chat-panel" class="hidden w-[92vw] sm:w-[420px] h-[580px] max-h-[82vh] bg-white/98 backdrop-blur-2xl border border-stone-200/90 shadow-2xl rounded-3xl overflow-hidden flex flex-col mb-3 transition-all duration-300 transform origin-bottom-right scale-95 opacity-0">
+            <!-- 頂部標題列 -->
+            <div class="px-5 py-3.5 bg-gradient-to-r from-indigo-600 via-indigo-700 to-sky-600 text-white flex items-center justify-between shadow-xs">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <!-- 管理者返回按鈕 (僅在管理者點進某個房間時顯示) -->
+                    <button id="chat-admin-back-btn" type="button" class="hidden w-8 h-8 rounded-full hover:bg-white/20 active:scale-95 flex items-center justify-center text-white transition-all cursor-pointer flex-shrink-0" title="返回聊天室列表">
+                        <i class="fa-solid fa-arrow-left text-sm"></i>
+                    </button>
+
+                    <div class="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-sm shadow-inner flex-shrink-0">
+                        💬
+                    </div>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2">
+                            <h4 id="chat-header-title" class="font-black text-base text-white tracking-tight leading-tight truncate">聯絡系統管理員</h4>
+                            <span id="chat-header-admin-badge" class="hidden text-[10px] bg-sky-900/50 text-sky-100 font-bold px-2 py-0.5 rounded-full border border-sky-300/30 flex-shrink-0">
+                                🛡️ 管理者視角
+                            </span>
+                        </div>
+                        <p id="chat-header-subtitle" class="text-[11px] text-sky-100/90 font-medium truncate">管理員 ianw.solar@gmail.com 在線服務</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1 flex-shrink-0">
+                    <button id="chat-refresh-btn" type="button" class="w-8 h-8 rounded-full hover:bg-white/20 active:scale-95 flex items-center justify-center text-white/90 hover:text-white transition-all text-xs cursor-pointer" title="重新載入訊息">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                    </button>
+                    <button id="chat-close-btn" type="button" class="w-8 h-8 rounded-full hover:bg-white/20 active:scale-95 flex items-center justify-center text-white/90 hover:text-white transition-all text-sm cursor-pointer" title="收合訊息">
+                        ✕
+                    </button>
+                </div>
+            </div>
+
+            <!-- 管理者專屬：聊天室列表視圖 (Chat Rooms List View) -->
+            <div id="chat-rooms-list-view" class="hidden flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar bg-stone-50/50">
+                <div class="px-2 py-1 text-[11px] font-bold text-stone-500 flex items-center justify-between">
+                    <span>👥 使用者聊天室列表</span>
+                    <span class="text-[10px] text-stone-400">點擊卡片開啟對話</span>
+                </div>
+                <div id="chat-rooms-list" class="space-y-2">
+                    <!-- 由 chat.js 動態渲染房間清單 -->
+                </div>
+            </div>
+
+            <!-- 對話內容視圖 (Conversation View) -->
+            <div id="chat-conversation-view" class="flex-1 flex flex-col min-h-0 bg-stone-50/40">
+                <!-- 訊息氣泡滾動區域 -->
+                <div id="chat-messages-thread" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+                    <!-- 由 chat.js 動態渲染對話訊息 -->
+                </div>
+
+                <!-- 輸入列 -->
+                <div class="p-3 bg-white border-t border-stone-200/80 flex items-end gap-2 shadow-xs">
+                    <textarea id="chat-message-input" rows="1" class="flex-1 text-xs sm:text-sm px-3.5 py-2.5 bg-stone-100/80 border border-stone-200 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white outline-none resize-none max-h-24 transition-all" placeholder="輸入訊息... (Enter 發送)"></textarea>
+                    <button id="chat-send-btn" type="button" class="w-10 h-10 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white flex items-center justify-center transition-all shadow-md shadow-indigo-600/25 cursor-pointer flex-shrink-0" title="發送訊息">
+                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 底部連線狀態列 -->
+            <div class="px-4 py-1.5 bg-stone-100/90 border-t border-stone-200/60 text-[10px] text-stone-500 flex items-center justify-between">
+                <span class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="font-medium">即時通訊連線中</span>
+                </span>
+                <span class="text-stone-400 font-medium">支援 Shift+Enter 換行</span>
+            </div>
+        </div>
+
+        <!-- 懸浮訊息圖示按鈕 (Floating Message Trigger Button) -->
+        <button id="chat-toggle-btn" type="button" class="relative w-12 h-12 sm:w-13 sm:h-13 rounded-full bg-gradient-to-tr from-indigo-600 via-indigo-700 to-sky-600 text-white shadow-xl shadow-indigo-600/35 hover:shadow-indigo-600/50 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center border-2 border-white/90 cursor-pointer group select-none" title="與管理員傳送訊息">
+            <i id="chat-btn-icon" class="fa-solid fa-comment-dots text-xl group-hover:scale-110 transition-transform duration-200"></i>
+            <!-- 未讀訊息紅點/數字 Badge -->
+            <span id="chat-unread-badge" class="hidden absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 bg-rose-500 text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-md border-2 border-white ring-2 ring-rose-300/50">0</span>
+        </button>
+    </div>
+
     <!-- 頂級 Toast 氣泡提示容器 -->
-    <div id="toast-container" class="fixed bottom-6 right-6 flex flex-col gap-2 z-[110] pointer-events-none"></div>
+    <div id="toast-container" class="fixed bottom-24 sm:bottom-28 right-5 sm:right-6 flex flex-col gap-2 z-[110] pointer-events-none"></div>
 
     <footer class="fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-md border-t border-slate-200 text-slate-400 text-xs font-bold text-center py-2.5 z-20 select-none tracking-wide">
         Created by 王禹硯（ianw.solar@gmail.com）

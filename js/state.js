@@ -23,7 +23,22 @@ export const state = {
     pendingEmailVerification: null,
     unsubProfile: null,
     adminViewUnsubscribe: null,
-    unsubServerConfig: null
+    unsubServerConfig: null,
+    broadcasts: [],
+    broadcastReplies: [],
+    unsubBroadcasts: null,
+    unsubReplies: null,
+    isBellOpen: false,
+    activeBellTab: 'notices',
+    unreadRepliesCount: 0,
+    isChatOpen: false,
+    activeChatRoomId: null,
+    chatRooms: [],
+    activeRoomDetail: null,
+    myChatRoom: null,
+    unsubChat: null,
+    unsubChatRooms: null,
+    isDevMode: sessionStorage.getItem('app_dev_mode') === 'true'
 };
 
 // Also expose on window for legacy / event handler fallback if needed

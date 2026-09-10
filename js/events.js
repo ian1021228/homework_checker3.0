@@ -441,6 +441,7 @@ export function setupButtonEvents() {
         localStorage.removeItem('storageSelected');
         sessionStorage.clear();
         sessionStorage.setItem('is_explicit_logout', 'true');
+        state.isDevMode = false;
 
         if (fbAuth && state.currentUser) {
             try {
@@ -2035,6 +2036,38 @@ export function setupButtonEvents() {
         });
     }
 
+    // 條碼掃描模式切換與狀態初始化 (指定狀態 vs 變更為下一個狀態，兩者擇一)
+    const assignCheckbox = document.getElementById('scan-mode-assign-checkbox');
+    const nextCheckbox = document.getElementById('scan-mode-next-checkbox');
+    const targetSelect = document.getElementById('scan-target-status-select');
+
+    if (assignCheckbox) {
+        assignCheckbox.addEventListener('click', () => {
+            setScanActionMode('assign');
+            document.getElementById('barcode-scan-input')?.focus();
+        });
+    }
+
+    if (nextCheckbox) {
+        nextCheckbox.addEventListener('click', () => {
+            setScanActionMode('next');
+            document.getElementById('barcode-scan-input')?.focus();
+        });
+    }
+
+    if (targetSelect) {
+        targetSelect.addEventListener('change', () => {
+            setScanActionMode('assign');
+        });
+        targetSelect.addEventListener('focus', () => {
+            setScanActionMode('assign');
+        });
+    }
+
+    // 依據儲存偏好初始化掃描行為模式
+    const initialScanAction = localStorage.getItem('scan_action_type') || 'assign';
+    setScanActionMode(initialScanAction);
+
     // 條碼掃描輸入
     const scanInput = document.getElementById('barcode-scan-input');
     if (scanInput) {
@@ -2048,10 +2081,9 @@ export function setupButtonEvents() {
                       hw = state.appData.homeworks.find(h => h.id === state.currentHomeworkId);
                 if (!currentClass || !hw) return;
                 let foundSeat = null;
-                if (currentClass.studentBarcodes) {
-                    for (const [seat, code] of Object.entries(currentClass.studentBarcodes)) { 
-                        if (code === barcode) { foundSeat = parseInt(seat); break; } 
-                    }
+                const barcodeMap = currentClass.barcodes || currentClass.studentBarcodes || {};
+                for (const [seat, code] of Object.entries(barcodeMap)) { 
+                    if (code === barcode) { foundSeat = parseInt(seat); break; } 
                 }
                 if (!foundSeat) {
                     const parsedNum = parseInt(barcode, 10);
@@ -2064,8 +2096,23 @@ export function setupButtonEvents() {
                 if (studentIndex === -1) { showToast(`${foundSeat} 號不在作業名單中`, "error"); return; }
                 const student = hw.students[studentIndex]; 
                 const typeConfig = getHomeworkType(hw.typeId);
-                const targetStatusKey = document.getElementById('scan-target-status-select').value;
-                const oldStatus = student.status, newStatus = targetStatusKey;
+                
+                const isNextMode = document.getElementById('scan-mode-next-checkbox')?.checked;
+                const oldStatus = student.status;
+                let newStatus = '';
+
+                if (isNextMode) {
+                    // 變更為下一個狀態（每掃描一次循環切換到下一個狀態）
+                    let currentIndex = typeConfig.statuses.findIndex(s => s.key === student.status);
+                    if (currentIndex === -1) currentIndex = 0;
+                    const nextIndex = (currentIndex + 1) % typeConfig.statuses.length;
+                    newStatus = typeConfig.statuses[nextIndex].key;
+                } else {
+                    // 變更為選單指定之狀態
+                    const targetStatusKey = document.getElementById('scan-target-status-select')?.value;
+                    newStatus = targetStatusKey || typeConfig.statuses[0].key;
+                }
+
                 hw.students[studentIndex].status = newStatus;
                 updateSingleStudentUI(foundSeat, oldStatus, newStatus, typeConfig);
                 updateSummaryUI(hw);
@@ -2342,4 +2389,135 @@ export function setupButtonEvents() {
             }
         }, 100);
     });
+
+    // ============================================
+    // 秘技快捷鍵：在首頁依序按下 ianw0000 進入開發者模式
+    // ============================================
+    let devKeySequence = '';
+    const TARGET_DEV_CODE = 'ianw0000';
+    let devKeyTimer = null;
+
+    window.addEventListener('keydown', (e) => {
+        // 僅在首頁有效 (portal-page 未隱藏)
+        const portalEl = document.getElementById('portal-page');
+        if (!portalEl || portalEl.classList.contains('hidden')) {
+            devKeySequence = '';
+            return;
+        }
+
+        // 避免在表單輸入欄位 (例如帳號或密碼輸入框) 中打字時誤觸發
+        const activeTag = document.activeElement?.tagName?.toUpperCase();
+        if (activeTag === 'INPUT' || activeTag === 'TEXTAREA' || document.activeElement?.isContentEditable) {
+            return;
+        }
+
+        const key = (e.key || '').toLowerCase();
+        if (key.length === 1) {
+            devKeySequence += key;
+            if (devKeySequence.length > TARGET_DEV_CODE.length) {
+                devKeySequence = devKeySequence.slice(-TARGET_DEV_CODE.length);
+            }
+
+            if (devKeySequence === TARGET_DEV_CODE) {
+                devKeySequence = '';
+                e.preventDefault();
+                enterDeveloperMode();
+            }
+
+            clearTimeout(devKeyTimer);
+            devKeyTimer = setTimeout(() => {
+                devKeySequence = '';
+            }, 5000);
+        }
+    }, true);
 }
+
+export function enterDeveloperMode() {
+    state.isDevMode = true;
+    sessionStorage.setItem('app_dev_mode', 'true');
+    sessionStorage.setItem('has_passed_portal_in_session', 'true');
+    sessionStorage.removeItem('app_is_guest_mode');
+    localStorage.setItem('storageSelected', 'true');
+
+    if (!state.currentUser) {
+        state.currentUser = {
+            uid: 'dev_admin_' + (localStorage.getItem('visitor_id') || 'ianw'),
+            email: 'ianw.solar@gmail.com',
+            displayName: '開發者 (管理員模式)',
+            isDevMode: true
+        };
+        try {
+            localStorage.setItem('app_user_session', JSON.stringify(state.currentUser));
+        } catch(e) {}
+    } else {
+        state.currentUser.isDevMode = true;
+    }
+
+    // 關閉首頁認證相關彈窗
+    closePortalAuthModal();
+    
+    // 進入主系統
+    proceedIntoSystem();
+    const welcomeModal = document.getElementById('welcome-modal');
+    if (welcomeModal) closeModal(welcomeModal);
+
+    // 顯示管理員按鈕
+    document.getElementById('admin-modal-btn')?.classList.remove('hidden');
+    document.getElementById('admin-btn')?.classList.remove('hidden');
+
+    // 更新管理介面與狀態
+    updateDataManagementUI();
+    try { updatePortalUI(); } catch(e) {}
+    try {
+        if (window.updateChatVisibility) window.updateChatVisibility();
+        if (window.updateChatUnreadBadge) window.updateChatUnreadBadge();
+    } catch(e) {}
+
+    showToast("🛠️ 已進入開發者模式（管理員權限，已鎖定刪除帳號功能）", "success");
+}
+window.enterDeveloperMode = enterDeveloperMode;
+
+export function setScanActionMode(mode) {
+    const assignCheckbox = document.getElementById('scan-mode-assign-checkbox');
+    const nextCheckbox = document.getElementById('scan-mode-next-checkbox');
+    const assignBox = document.getElementById('scan-mode-assign-box');
+    const nextBox = document.getElementById('scan-mode-next-box');
+    const targetSelect = document.getElementById('scan-target-status-select');
+
+    if (mode === 'next') {
+        if (assignCheckbox) assignCheckbox.checked = false;
+        if (nextCheckbox) nextCheckbox.checked = true;
+        if (targetSelect) {
+            targetSelect.disabled = true;
+            targetSelect.classList.add('opacity-40', 'pointer-events-none', 'bg-slate-100');
+            targetSelect.classList.remove('bg-white');
+        }
+        if (nextBox) {
+            nextBox.classList.add('border-indigo-400', 'ring-2', 'ring-indigo-100', 'bg-indigo-50/30');
+            nextBox.classList.remove('border-slate-200/80');
+        }
+        if (assignBox) {
+            assignBox.classList.remove('border-indigo-400', 'ring-2', 'ring-indigo-100', 'bg-indigo-50/30');
+            assignBox.classList.add('border-slate-200/80');
+        }
+        localStorage.setItem('scan_action_type', 'next');
+    } else {
+        if (assignCheckbox) assignCheckbox.checked = true;
+        if (nextCheckbox) nextCheckbox.checked = false;
+        if (targetSelect) {
+            targetSelect.disabled = false;
+            targetSelect.classList.remove('opacity-40', 'pointer-events-none', 'bg-slate-100');
+            targetSelect.classList.add('bg-white');
+        }
+        if (assignBox) {
+            assignBox.classList.add('border-indigo-400', 'ring-2', 'ring-indigo-100', 'bg-indigo-50/30');
+            assignBox.classList.remove('border-slate-200/80');
+        }
+        if (nextBox) {
+            nextBox.classList.remove('border-indigo-400', 'ring-2', 'ring-indigo-100', 'bg-indigo-50/30');
+            nextBox.classList.add('border-slate-200/80');
+        }
+        localStorage.setItem('scan_action_type', 'assign');
+    }
+}
+window.setScanActionMode = setScanActionMode;
