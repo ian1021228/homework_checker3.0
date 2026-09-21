@@ -94,17 +94,32 @@ if (fbAuth) {
                     startRealtimeCloudSync();
                 }
             } else {
-                stopRealtimeCloudSync();
-                if (syncStatus) {
-                    if (state.currentUser) {
-                        syncStatus.innerHTML = `狀態：本地離線模式 <br><span class="text-slate-700 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-slate-200 text-[11px] tracking-wide">👤 ${state.currentUser.displayName || state.currentUser.email}</span><br><span class="text-[11px] text-sky-600 mt-1 inline-block">點擊下方按鈕登入 Google 帳號以啟用雲端同步</span>`;
-                    } else {
-                        syncStatus.innerHTML = "狀態：未登入，點擊下方按鈕登入以啟用雲端同步。";
+                const isQrAuth = Boolean(state.currentUser?.isQrAuthorized || sessionStorage.getItem('qr_authorized_session'));
+                if (isQrAuth && state.currentUser) {
+                    const isGoogle = isGoogleAuthUser(state.currentUser) || sessionStorage.getItem('auth_provider') === 'google';
+                    const badgeText = isGoogle ? 'Google 帳號掃碼授權同步中' : '跨裝置掃碼授權同步中';
+                    if (syncStatus) {
+                        syncStatus.innerHTML = `狀態：${badgeText} <br><span class="text-sky-900 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-sky-100 text-[11px] tracking-wide">👤 ${state.currentUser.displayName || state.currentUser.email}</span>`;
                     }
+                    if (loginBtn) loginBtn.classList.add('hidden');
+                    if (cloudActions) cloudActions.classList.remove('hidden');
+                    if (storageContainer) storageContainer.classList.remove('hidden');
+                    if (sessionStorage.getItem('app_is_guest_mode') !== 'true' && !state.adminViewModeUserId) {
+                        startRealtimeCloudSync();
+                    }
+                } else {
+                    stopRealtimeCloudSync();
+                    if (syncStatus) {
+                        if (state.currentUser) {
+                            syncStatus.innerHTML = `狀態：本地離線模式 <br><span class="text-slate-700 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-slate-200 text-[11px] tracking-wide">👤 ${state.currentUser.displayName || state.currentUser.email}</span><br><span class="text-[11px] text-sky-600 mt-1 inline-block">點擊下方按鈕登入 Google 帳號以啟用雲端同步</span>`;
+                        } else {
+                            syncStatus.innerHTML = "狀態：未登入，點擊下方按鈕登入以啟用雲端同步。";
+                        }
+                    }
+                    if (loginBtn) loginBtn.classList.remove('hidden');
+                    if (cloudActions) cloudActions.classList.add('hidden');
+                    if (storageContainer) storageContainer.classList.add('hidden');
                 }
-                if (loginBtn) loginBtn.classList.remove('hidden');
-                if (cloudActions) cloudActions.classList.add('hidden');
-                if (storageContainer) storageContainer.classList.add('hidden');
             }
         } catch(e) {}
     });
@@ -595,89 +610,108 @@ export function startRealtimeCloudSync() {
     if (state.adminViewModeUserId || sessionStorage.getItem('app_is_guest_mode') === 'true' || !fbDb) return;
     if (state.currentUser?.isDevMode) return;
     
-    // 必須在 Firebase Auth 驗證完成後且存在有效 UID 時才啟動即時監聽
+    // 必須在 Firebase Auth 驗證完成後或存在 QR 授權 Session 時才啟動即時監聽
+    const isQrAuth = Boolean(state.currentUser?.isQrAuthorized || sessionStorage.getItem('qr_authorized_session'));
     const authUser = fbAuth?.currentUser;
-    if (!authUser || !authUser.uid) return;
-    const targetUid = authUser.uid;
+    const targetUid = authUser?.uid || (isQrAuth ? state.currentUser?.uid : null);
+    if (!targetUid) return;
 
     if (unsubAppData) {
         try { unsubAppData(); } catch(e) {}
         unsubAppData = null;
     }
 
-    try {
-        const docRef = doc(fbDb, 'artifacts', globalAppId, 'users', targetUid, 'appData', 'mainDoc');
-        unsubAppData = onSnapshot(docRef, { includeMetadataChanges: false }, (docSnap) => {
-            if (state.adminViewModeUserId || sessionStorage.getItem('app_is_guest_mode') === 'true') return;
-            if (docSnap.metadata && docSnap.metadata.hasPendingWrites) return;
+    const applyIncomingData = (payload) => {
+        if (state.adminViewModeUserId || sessionStorage.getItem('app_is_guest_mode') === 'true') return;
+        if (!payload || !payload.data) return;
 
-            // 確保當前用戶仍是該 targetUid，若中途切換帳號則直接忽略舊監聽器回調
-            if (fbAuth?.currentUser?.uid !== targetUid) {
-                return;
-            }
+        const incomingStr = payload.data;
+        const currentStr = safeStringify(state.appData);
 
-            if (!docSnap.exists()) return;
-            const payload = docSnap.data();
-            if (!payload || !payload.data) return;
+        if (incomingStr === currentStr || incomingStr === lastSyncedDataStr) {
+            lastSyncedDataStr = incomingStr;
+            return;
+        }
 
-            const incomingStr = payload.data;
-            const currentStr = safeStringify(state.appData);
+        if (state.isSaving) {
+            return;
+        }
 
-            if (incomingStr === currentStr || incomingStr === lastSyncedDataStr) {
-                lastSyncedDataStr = incomingStr;
-                return;
-            }
+        try {
+            const cloudData = sanitizeAppData(JSON.parse(incomingStr));
+            fixDates(cloudData);
+            state.appData = cloudData;
+            lastSyncedDataStr = incomingStr;
+            const userKey = getUserStorageKey(state.currentUser);
+            localStorage.setItem('homeworkAppData_' + userKey, incomingStr);
+            localStorage.setItem('homeworkAppData', incomingStr);
 
-            if (state.isSaving) {
-                return;
-            }
-
-            try {
-                const cloudData = sanitizeAppData(JSON.parse(incomingStr));
-                fixDates(cloudData);
-                state.appData = cloudData;
-                lastSyncedDataStr = incomingStr;
-                const userKey = getUserStorageKey(state.currentUser);
-                localStorage.setItem('homeworkAppData_' + userKey, incomingStr);
-                localStorage.setItem('homeworkAppData', incomingStr);
-
-                if (state.currentClassId && !state.appData.classes.some(c => c.id === state.currentClassId)) {
-                    state.currentClassId = state.appData.classes[0]?.id || null;
-                    if (state.currentClassId) {
-                        localStorage.setItem('currentClassId_' + userKey, state.currentClassId);
-                        localStorage.setItem('currentClassId', state.currentClassId);
-                    } else {
-                        localStorage.removeItem('currentClassId_' + userKey);
-                        localStorage.removeItem('currentClassId');
-                    }
-                } else if (!state.currentClassId && state.appData.classes.length > 0) {
-                    state.currentClassId = state.appData.classes[0].id;
+            if (state.currentClassId && !state.appData.classes.some(c => c.id === state.currentClassId)) {
+                state.currentClassId = state.appData.classes[0]?.id || null;
+                if (state.currentClassId) {
                     localStorage.setItem('currentClassId_' + userKey, state.currentClassId);
                     localStorage.setItem('currentClassId', state.currentClassId);
+                } else {
+                    localStorage.removeItem('currentClassId_' + userKey);
+                    localStorage.removeItem('currentClassId');
                 }
-
-                if (window.fullRender) window.fullRender();
-                if (window.reRenderCurrentPage) window.reRenderCurrentPage();
-
-                const syncStatus = document.getElementById('cloud-sync-status');
-                if (syncStatus && (fbAuth?.currentUser || state.currentUser)) {
-                    const u = fbAuth?.currentUser || state.currentUser;
-                    const timeStr = new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                    syncStatus.innerHTML = `狀態：跨裝置即時同步中 <br><span class="text-sky-900 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-sky-100 text-[11px] tracking-wide">👤 ${u.displayName || u.email}</span><br><span class="text-[10px] text-emerald-600 font-bold mt-1 inline-block">● 於 ${timeStr} 接收跨裝置即時更新</span>`;
-                }
-            } catch (err) {
-                console.warn("Realtime cloud sync parse notice:", err);
+            } else if (!state.currentClassId && state.appData.classes.length > 0) {
+                state.currentClassId = state.appData.classes[0].id;
+                localStorage.setItem('currentClassId_' + userKey, state.currentClassId);
+                localStorage.setItem('currentClassId', state.currentClassId);
             }
-        }, (err) => {
-            if (err?.code === 'permission-denied') {
-                if (unsubAppData) {
-                    try { unsubAppData(); } catch(e) {}
-                    unsubAppData = null;
-                }
-                return;
+
+            if (window.fullRender) window.fullRender();
+            if (window.reRenderCurrentPage) window.reRenderCurrentPage();
+
+            const syncStatus = document.getElementById('cloud-sync-status');
+            if (syncStatus && (fbAuth?.currentUser || state.currentUser)) {
+                const u = fbAuth?.currentUser || state.currentUser;
+                const timeStr = new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                syncStatus.innerHTML = `狀態：跨裝置即時同步中 <br><span class="text-sky-900 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-sky-100 text-[11px] tracking-wide">👤 ${u.displayName || u.email}</span><br><span class="text-[10px] text-emerald-600 font-bold mt-1 inline-block">● 於 ${timeStr} 接收跨裝置即時更新</span>`;
             }
-            console.warn("Realtime cloud sync listen notice:", err?.message || err);
-        });
+        } catch (err) {
+            console.warn("Realtime cloud sync parse notice:", err);
+        }
+    };
+
+    const listenToSyncChannel = () => {
+        if (!targetUid) return;
+        try {
+            const syncDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', `sync_${targetUid}`);
+            unsubAppData = onSnapshot(syncDocRef, { includeMetadataChanges: false }, (docSnap) => {
+                if (docSnap.metadata && docSnap.metadata.hasPendingWrites) return;
+                if (!docSnap.exists()) return;
+                applyIncomingData(docSnap.data());
+            }, (e) => {
+                console.warn("Sync channel listen notice:", e?.message || e);
+            });
+        } catch (e) {}
+    };
+
+    try {
+        if (authUser?.uid) {
+            const docRef = doc(fbDb, 'artifacts', globalAppId, 'users', targetUid, 'appData', 'mainDoc');
+            unsubAppData = onSnapshot(docRef, { includeMetadataChanges: false }, (docSnap) => {
+                if (state.adminViewModeUserId || sessionStorage.getItem('app_is_guest_mode') === 'true') return;
+                if (docSnap.metadata && docSnap.metadata.hasPendingWrites) return;
+                if (fbAuth?.currentUser?.uid !== targetUid) return;
+                if (!docSnap.exists()) return;
+                applyIncomingData(docSnap.data());
+            }, (err) => {
+                if (err?.code === 'permission-denied') {
+                    if (unsubAppData) {
+                        try { unsubAppData(); } catch(e) {}
+                        unsubAppData = null;
+                    }
+                    listenToSyncChannel();
+                    return;
+                }
+                console.warn("Realtime cloud sync listen notice:", err?.message || err);
+            });
+        } else if (isQrAuth && targetUid) {
+            listenToSyncChannel();
+        }
     } catch(e) {
         console.warn("Start realtime sync failed:", e);
     }
@@ -704,19 +738,46 @@ if (typeof window !== 'undefined') {
 }
 
 export async function syncDataToCloud() {
-    if (state.adminViewModeUserId || sessionStorage.getItem('app_is_guest_mode') === 'true' || !state.currentUser || !fbDb || !fbAuth?.currentUser) return;
+    const isQrAuth = Boolean(state.currentUser?.isQrAuthorized || sessionStorage.getItem('qr_authorized_session'));
+    if (state.adminViewModeUserId || sessionStorage.getItem('app_is_guest_mode') === 'true' || !state.currentUser || !fbDb) return;
+    if (!fbAuth?.currentUser && !isQrAuth) return;
+
     try {
-        const targetUid = fbAuth.currentUser.uid;
+        const authUid = fbAuth?.currentUser?.uid;
+        const targetUid = authUid || (isQrAuth ? state.currentUser.uid : null);
+        if (!targetUid) return;
+
         // 嚴格身分校驗：防止切換帳號過渡期非同步調用導致前一帳號資料寫入新帳號之雲端
-        if (state.currentUser.uid && state.currentUser.uid !== targetUid && !state.currentUser.isDevMode) {
-            console.warn("UID mismatch in syncDataToCloud, aborting sync to prevent overwrite:", state.currentUser.uid, targetUid);
+        if (authUid && state.currentUser.uid && state.currentUser.uid !== authUid && !state.currentUser.isDevMode && !isQrAuth) {
+            console.warn("UID mismatch in syncDataToCloud, aborting sync to prevent overwrite:", state.currentUser.uid, authUid);
             return;
         }
 
-        const docRef = doc(fbDb, 'artifacts', globalAppId, 'users', targetUid, 'appData', 'mainDoc');
         const dataStr = safeStringify(state.appData);
         lastSyncedDataStr = dataStr;
-        await setDoc(docRef, { data: dataStr, updatedAt: new Date().toISOString() });
+
+        // 若具備 Firebase Auth 認證，同步寫入官方私有 mainDoc
+        if (authUid) {
+            try {
+                const docRef = doc(fbDb, 'artifacts', globalAppId, 'users', targetUid, 'appData', 'mainDoc');
+                await setDoc(docRef, { data: dataStr, updatedAt: new Date().toISOString() });
+            } catch (mainDocErr) {
+                console.warn("MainDoc write notice:", mainDocErr?.message || mainDocErr);
+            }
+        }
+
+        // 同步寫入跨設備快取通道 (保證跨裝置即時雙向互通)
+        try {
+            const syncDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', `sync_${targetUid}`);
+            await setDoc(syncDocRef, {
+                data: dataStr,
+                updatedAt: new Date().toISOString(),
+                userEmail: state.currentUser.email || '',
+                userDisplayName: state.currentUser.displayName || ''
+            });
+        } catch (syncChannelErr) {
+            console.warn("SyncChannel write notice:", syncChannelErr?.message || syncChannelErr);
+        }
 
         if (Array.isArray(state.appData.classes)) {
             for (const c of state.appData.classes) {
@@ -761,12 +822,35 @@ export async function syncDataToCloud() {
 }
 
 export async function loadDataFromCloud(silent = false, onLoadedCallback) {
-    if (!state.currentUser || !fbDb || !fbAuth?.currentUser) return false;
+    const isQrAuth = Boolean(state.currentUser?.isQrAuthorized || sessionStorage.getItem('qr_authorized_session'));
+    if (!state.currentUser || !fbDb) return false;
+    if (!fbAuth?.currentUser && !isQrAuth) return false;
+
     try {
         const isInspectingUser = Boolean(state.adminViewModeUserId);
-        let targetUid = state.adminViewModeUserId || fbAuth.currentUser.uid;
-        let docRef = doc(fbDb, 'artifacts', globalAppId, 'users', targetUid, 'appData', 'mainDoc');
-        let docSnap = await getDoc(docRef);
+        let targetUid = state.adminViewModeUserId || fbAuth?.currentUser?.uid || (isQrAuth ? state.currentUser?.uid : null);
+        if (!targetUid) return false;
+
+        let docSnap = null;
+        if (fbAuth?.currentUser?.uid || isInspectingUser) {
+            try {
+                let docRef = doc(fbDb, 'artifacts', globalAppId, 'users', targetUid, 'appData', 'mainDoc');
+                docSnap = await getDoc(docRef);
+            } catch (docErr) {
+                console.warn("MainDoc get notice:", docErr?.message || docErr);
+            }
+        }
+
+        // 若無 mainDoc 或權限限制，備援讀取跨設備同步通道
+        if ((!docSnap || !docSnap.exists()) && targetUid) {
+            try {
+                let syncDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', `sync_${targetUid}`);
+                let syncDocSnap = await getDoc(syncDocRef);
+                if (syncDocSnap.exists()) {
+                    docSnap = syncDocSnap;
+                }
+            } catch (e) {}
+        }
 
         if (docSnap.exists() && docSnap.data()?.data) {
             const rawStr = docSnap.data().data;

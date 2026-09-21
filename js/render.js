@@ -1,7 +1,7 @@
 import { state } from './state.js';
 import { DEFAULT_TYPES } from './constants.js';
 import { formatDate, safeStringify, showToast, showConfirmModal, closeModal } from './utils.js';
-import { fbDb, fbAuth, isGoogleAdmin } from './firebase.js';
+import { fbDb, fbAuth, isGoogleAdmin, isGoogleAuthUser } from './firebase.js';
 
 export function getHomeworkType(typeId) { 
     return state.appData.homeworkTypes.find(t => t.id === typeId) || state.appData.homeworkTypes.find(t => t.id === 'default') || DEFAULT_TYPES[0]; 
@@ -564,8 +564,11 @@ export function updateDataManagementUI(onRestoreBackup) {
     const loginBtn = document.getElementById('google-login-btn');
     const cloudActions = document.getElementById('cloud-actions');
     
-    if (state.currentUser && fbAuth?.currentUser) {
-        if (cloudStatus) cloudStatus.innerHTML = `狀態：已安全登入雲端 <br><span class="text-sky-900 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-sky-100 text-[11px] tracking-wide">👤 ${state.currentUser.displayName || state.currentUser.email}</span>`;
+    const isQrAuth = Boolean(state.currentUser?.isQrAuthorized || sessionStorage.getItem('qr_authorized_session'));
+    if ((state.currentUser && fbAuth?.currentUser) || (state.currentUser && isQrAuth)) {
+        const isGoogle = isGoogleAuthUser(state.currentUser) || sessionStorage.getItem('auth_provider') === 'google';
+        const badgeLabel = isGoogle ? '已登入 Google 雲端帳號' : '已安全登入雲端';
+        if (cloudStatus) cloudStatus.innerHTML = `狀態：${badgeLabel} <br><span class="text-sky-900 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-sky-100 text-[11px] tracking-wide">👤 ${state.currentUser.displayName || state.currentUser.email}</span>`;
         if (loginBtn) loginBtn.classList.add('hidden');
         if (cloudActions) cloudActions.classList.remove('hidden');
         const storageContainer = document.getElementById('cloud-storage-container'); 

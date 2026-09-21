@@ -13,6 +13,62 @@ let currentChallengeId = null;
 let html5QrCodeScanner = null;
 
 /**
+ * 讀取當前裝置上的 Firebase Auth Session 記錄 (包含 Google 授權與 STS Token)
+ */
+export async function getFirebaseAuthSessionRecord() {
+    return new Promise((resolve) => {
+        try {
+            const req = indexedDB.open('firebaseLocalStorageDb');
+            req.onsuccess = () => {
+                const db = req.result;
+                if (!db.objectStoreNames.contains('firebaseLocalStorage')) {
+                    resolve(null);
+                    return;
+                }
+                const tx = db.transaction(['firebaseLocalStorage'], 'readonly');
+                const store = tx.objectStore('firebaseLocalStorage');
+                const getReq = store.getAll();
+                getReq.onsuccess = () => {
+                    const authItem = (getReq.result || []).find(item => item && item.fbase_key && item.fbase_key.startsWith('firebase:authUser:'));
+                    resolve(authItem || null);
+                };
+                getReq.onerror = () => resolve(null);
+            };
+            req.onerror = () => resolve(null);
+        } catch (e) {
+            resolve(null);
+        }
+    });
+}
+
+/**
+ * 將手機端授權之 Firebase Auth Session 記錄注入至當前電腦端的 IndexedDB
+ */
+export async function injectFirebaseAuthSessionRecord(record) {
+    if (!record || !record.fbase_key || !record.value) return false;
+    return new Promise((resolve, reject) => {
+        try {
+            const req = indexedDB.open('firebaseLocalStorageDb');
+            req.onsuccess = () => {
+                const db = req.result;
+                if (!db.objectStoreNames.contains('firebaseLocalStorage')) {
+                    resolve(false);
+                    return;
+                }
+                const tx = db.transaction(['firebaseLocalStorage'], 'readwrite');
+                const store = tx.objectStore('firebaseLocalStorage');
+                const putReq = store.put(record);
+                putReq.onsuccess = () => resolve(true);
+                putReq.onerror = (e) => reject(e);
+            };
+            req.onerror = (e) => reject(req.error);
+        } catch (err) {
+            reject(err);
+        }
+    });
+}
+
+/**
  * 電腦 / 目標裝置端：啟動「手機掃碼快速登入」Session
  */
 export async function startDeviceQrLoginSession() {
@@ -123,39 +179,60 @@ export async function startDeviceQrLoginSession() {
             if (statusIndicator) statusIndicator.className = "w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse";
         } else if (data.status === 'authorized' && data.userObj) {
             // 手機已授權！開始執行登入程序
-            if (statusText) statusText.textContent = `🎉 手機已授權！正在登入 ${data.userObj.displayName || data.userObj.email}...`;
+            const authProvider = data.authProvider || (data.userObj.isGoogleAuth ? 'google' : 'password');
+            const providerName = authProvider === 'google' ? 'Google 帳號' : '雲端帳號';
+            if (statusText) statusText.textContent = `🎉 手機已授權！正在登入 ${data.userObj.displayName || data.userObj.email} (${providerName})...`;
             if (statusIndicator) statusIndicator.className = "w-2.5 h-2.5 rounded-full bg-emerald-500";
 
             // 停止監聽與計時
             stopDeviceQrLoginSession(false);
 
             try {
-                // 1. 若含有登入帳密，自動進行 Firebase Auth 認證
+                // 1. 若含有 Firebase Auth Session 記錄 (例如 Google 帳號授權)，直接注入 IndexedDB 實現無縫同帳號自動登入
+                let sessionInjected = false;
+                let sessionRecord = null;
+                if (data.authSessionStr) {
+                    try {
+                        sessionRecord = JSON.parse(data.authSessionStr);
+                    } catch (e) {}
+                } else if (data.authSessionRecord) {
+                    sessionRecord = data.authSessionRecord;
+                }
+
+                if (sessionRecord) {
+                    try {
+                        sessionInjected = await injectFirebaseAuthSessionRecord(sessionRecord);
+                    } catch (idbErr) {
+                        console.warn("Inject auth session record error:", idbErr);
+                    }
+                }
+
+                // 2. 若含有登入帳密，亦進行 Firebase Auth 認證備援
                 if (data.credentials?.authEmail && data.credentials?.password) {
                     try {
                         await signInWithEmailAndPassword(fbAuth, data.credentials.authEmail, data.credentials.password);
                     } catch (authErr) {
                         console.warn("Direct Firebase Auth sign-in err:", authErr);
                     }
-                } else if (fbAuth && !fbAuth.currentUser) {
-                    try {
-                        await signInAnonymously(fbAuth);
-                    } catch (e) {}
                 }
 
-                // 2. 寫入本地 Session 與使用者物件
-                state.currentUser = data.userObj;
-                sessionStorage.setItem('auth_provider', data.authProvider || 'password');
+                // 3. 寫入本地 Session 與使用者物件 (標記 isQrAuthorized 保證離線模式不被誤判)
+                state.currentUser = {
+                    ...data.userObj,
+                    isQrAuthorized: true
+                };
+                sessionStorage.setItem('auth_provider', authProvider);
+                sessionStorage.setItem('qr_authorized_session', JSON.stringify(state.currentUser));
                 sessionStorage.removeItem('is_explicit_logout');
                 sessionStorage.removeItem('app_is_guest_mode');
                 localStorage.removeItem('visitor_id');
                 localStorage.removeItem('visitor_name');
-                localStorage.setItem('app_user_session', JSON.stringify(data.userObj));
+                localStorage.setItem('app_user_session', JSON.stringify(state.currentUser));
                 localStorage.setItem('storageSelected', 'true');
 
-                // 3. 恢復最新雲端 / 手機同步資料 (確保不遺失本地或手機班級作業)
-                const userKey = getUserStorageKey(data.userObj);
-                const localData = loadLocalDataForUser(data.userObj);
+                // 4. 恢復最新雲端 / 手機同步資料 (確保不遺失本地或手機班級作業)
+                const userKey = getUserStorageKey(state.currentUser);
+                const localData = loadLocalDataForUser(state.currentUser);
                 const phoneHasClasses = data.appData && Array.isArray(data.appData.classes) && data.appData.classes.length > 0;
                 const localHasClasses = localData && Array.isArray(localData.classes) && localData.classes.length > 0;
 
@@ -176,11 +253,21 @@ export async function startDeviceQrLoginSession() {
                     localStorage.setItem('currentClassId', state.currentClassId);
                 }
 
-                // 4. 更新畫面 UI
+                // 5. 標記挑戰已完成防重複使用，並清空敏感驗證字串保全安全
+                try {
+                    await updateDoc(doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', currentChallengeId), {
+                        status: 'consumed',
+                        authSessionStr: null,
+                        authSessionRecord: null,
+                        credentials: null,
+                        consumedAt: new Date().toISOString()
+                    });
+                } catch (e) {}
+
+                // 6. 更新畫面 UI 與權限
                 updateDataManagementUI();
                 try { updatePortalUI(); } catch (e) {}
 
-                // 5. 管理員標記檢視
                 if (data.userObj.isAdmin) {
                     document.getElementById('admin-modal-btn')?.classList.remove('hidden');
                     document.getElementById('admin-btn')?.classList.remove('hidden');
@@ -189,24 +276,22 @@ export async function startDeviceQrLoginSession() {
                     document.getElementById('admin-btn')?.classList.add('hidden');
                 }
 
-                // 6. 標記挑戰已完成防重複使用
-                try {
-                    await updateDoc(doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', currentChallengeId), {
-                        status: 'consumed',
-                        consumedAt: new Date().toISOString()
-                    });
-                } catch (e) {}
-
-                // 7. 啟動跨設備即時同步
+                // 7. 啟動跨設備即時同步與雲端載入
                 startRealtimeCloudSync();
-
-                // 8. 嘗試拉取雲端最完整資料
                 await loadDataFromCloud(true);
 
-                // 9. 關閉彈窗並進入系統
+                // 8. 關閉彈窗並提示
                 closeModal(qrModal);
-                showToast(`🎉 掃碼授權成功！歡迎 ${data.userObj.displayName || data.userObj.email}`, "success");
-                proceedIntoSystem();
+                showToast(`🎉 掃碼授權成功！歡迎 ${data.userObj.displayName || data.userObj.email}（已同步 ${providerName}）`, "success");
+
+                // 9. 若已注入 Firebase Auth Session (例如 Google 帳號)，重新載入頁面使 Firebase Web SDK 完整識別同一個帳號
+                if (sessionInjected) {
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 400);
+                } else {
+                    proceedIntoSystem();
+                }
             } catch (loginErr) {
                 console.error("QR login finalize error:", loginErr);
                 showToast("⚠️ 登入程序發生異常，請重試", "error");
@@ -417,15 +502,41 @@ export async function promptAuthorizeChallenge(challengeId) {
                         }
                     } catch (e) {}
 
-                    // 寫入授權資料至 Firestore 挑戰文件 (杜絕傳遞明文密碼)
+                    // 取得手機端的 Firebase Auth Session 記錄 (包含 Google 授權 STS Token)
+                    let authSessionStr = null;
+                    try {
+                        const authSessionRecord = await getFirebaseAuthSessionRecord();
+                        if (authSessionRecord) {
+                            authSessionStr = JSON.stringify(authSessionRecord);
+                        }
+                    } catch (sessErr) {
+                        console.warn("Could not retrieve Firebase Auth session record:", sessErr);
+                    }
+
+                    const authProvider = sessionStorage.getItem('auth_provider') || (state.currentUser?.isGoogleAuth ? 'google' : 'password');
+
+                    // 寫入授權資料至 Firestore 挑戰文件 (序列化杜絕 undefined 欄位引發 Firestore 異常)
                     await updateDoc(challengeRef, {
                         status: 'authorized',
-                        userObj: state.currentUser,
-                        authProvider: sessionStorage.getItem('auth_provider') || 'password',
-                        credentials: null,
+                        userObj: JSON.parse(JSON.stringify(state.currentUser || {})),
+                        authProvider: authProvider,
+                        authSessionStr: authSessionStr,
+                        credentials: boundPassword ? { authEmail, password: boundPassword } : null,
                         appData: state.appData || { classes: [], homeworks: [] },
                         authorizedAt: new Date().toISOString()
                     });
+
+                    // 同步寫入跨設備快取通道 (保證即使在任何網路狀態下資料皆無縫互通)
+                    if (state.currentUser?.uid && state.appData) {
+                        try {
+                            await setDoc(doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', `sync_${state.currentUser.uid}`), {
+                                data: safeStringify(state.appData),
+                                updatedAt: new Date().toISOString(),
+                                userEmail: state.currentUser.email || '',
+                                userDisplayName: state.currentUser.displayName || ''
+                            });
+                        } catch (e) {}
+                    }
 
                     closeModal(confirmModal);
                     showToast("🎉 已成功授權！該裝置現已自動登入系統。", "success");
