@@ -1,8 +1,9 @@
-const CACHE_NAME = 'hw-checker-v3.1';
+const CACHE_NAME = 'hw-checker-v3.2';
 const urlsToCache = [
   './index.html',
   './manifest.json',
   './homework-checker-icon.png',
+  './homework-checker-icon.svg',
   './icon.png',
   './icon.svg'
 ];
