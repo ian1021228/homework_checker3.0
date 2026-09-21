@@ -53,7 +53,8 @@ import {
     renderCalendar,
     updateDataManagementUI,
     updatePortalUI,
-    } from './render.js';
+    reRenderCurrentPage
+} from './render.js';
 
 import {
     applyCheckMode,
@@ -67,12 +68,21 @@ import {
     openPortalAuthModal,
     closePortalAuthModal,
     proceedIntoSystem,
-    promptSystemUsageAndNavigate
-, fullRender } from './navigation.js';
+    promptSystemUsageAndNavigate,
+    fullRender
+} from './navigation.js';
 
 import { setupButtonEvents } from './events.js';
 import { ICONS, getSvgIcon } from './icons.js';
-import { initSystemChat, updateChatVisibility, updateChatUnreadBadge, renderChatView, toggleChatPanel } from './chat.js';
+import { startRealtimeCloudSync, stopRealtimeCloudSync } from './firebase.js';
+import {
+    setupQrLoginEvents,
+    checkUrlForQrLogin,
+    startDeviceQrLoginSession,
+    stopDeviceQrLoginSession,
+    openPhoneQrScannerModal,
+    closePhoneQrScannerModal
+} from './qrLogin.js';
 
 // 將核心全域輔助函式掛載至 window，確保相容性與無縫呼叫
 window.showToast = showToast;
@@ -84,11 +94,14 @@ window.closeModal = closeModal;
 window.isGoogleAdmin = isGoogleAdmin;
 window.promptSystemUsageAndNavigate = promptSystemUsageAndNavigate;
 window.getSvgIcon = getSvgIcon;
-window.initSystemChat = initSystemChat;
-window.updateChatVisibility = updateChatVisibility;
-window.updateChatUnreadBadge = updateChatUnreadBadge;
-window.renderChatView = renderChatView;
-window.toggleChatPanel = toggleChatPanel;
+window.fullRender = fullRender;
+window.reRenderCurrentPage = () => reRenderCurrentPage(showMainPage, showDetailPage);
+window.startRealtimeCloudSync = startRealtimeCloudSync;
+window.stopRealtimeCloudSync = stopRealtimeCloudSync;
+window.startDeviceQrLoginSession = startDeviceQrLoginSession;
+window.stopDeviceQrLoginSession = stopDeviceQrLoginSession;
+window.openPhoneQrScannerModal = openPhoneQrScannerModal;
+window.closePhoneQrScannerModal = closePhoneQrScannerModal;
 
 // 滾動提示指示器
 let portalScrollDismissed = false;
@@ -160,6 +173,18 @@ function replaceFaIconsWithSvg() {
 }
 
 async function init() {
+    // 0. 若重載前停留在管理員檢視模式備份中，主動還原管理員原本的真實本地資料
+    if (sessionStorage.getItem('admin_backup_appData')) {
+        try {
+            const adminData = JSON.parse(sessionStorage.getItem('admin_backup_appData'));
+            localStorage.setItem('homeworkAppData', safeStringify(adminData));
+            const adminClassId = sessionStorage.getItem('admin_backup_classId');
+            if (adminClassId) localStorage.setItem('currentClassId', adminClassId);
+            sessionStorage.removeItem('admin_backup_appData');
+            sessionStorage.removeItem('admin_backup_classId');
+        } catch(e) {}
+    }
+
     // 1. 初始化資料與用戶階段
     try {
         const savedSession = localStorage.getItem('app_user_session');
@@ -195,6 +220,8 @@ async function init() {
 
     // 3. 綁定所有互動事件
     setupButtonEvents(); 
+    setupQrLoginEvents();
+    checkUrlForQrLogin();
     updateDataManagementUI();
     document.getElementById('loading-page')?.classList.add('hidden');
 
@@ -226,8 +253,9 @@ async function init() {
     }
 
     initPortalScrollIndicator();
-    initSystemChat();
-    updateChatVisibility();
+    if (state.currentUser && fbDb && sessionStorage.getItem('app_is_guest_mode') !== 'true') {
+        startRealtimeCloudSync();
+    }
 
     // 6. 頁面導航初始化
     const hasPassedPortalInSession = sessionStorage.getItem('has_passed_portal_in_session') === 'true';

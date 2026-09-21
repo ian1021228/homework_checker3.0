@@ -52,7 +52,9 @@ import {
     loadDataFromCloud,
     syncUserProfile,
     deleteCloudParentClass,
-    syncDataToCloud
+    syncDataToCloud,
+    startRealtimeCloudSync,
+    stopRealtimeCloudSync
 } from './firebase.js';
 
 import {
@@ -125,6 +127,12 @@ export function setupButtonEvents() {
     });
     bindClick('portal-hero-guest-btn', () => {
         sessionStorage.setItem('app_is_guest_mode', 'true');
+        state.currentUser = null;
+        localStorage.removeItem('app_user_session');
+        state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
+        state.currentClassId = null;
+        localStorage.removeItem('homeworkAppData');
+        localStorage.removeItem('currentClassId');
         showToast("已進入免帳號快速體驗模式（本地暫存，不寫入雲端）", "info");
         proceedIntoSystem();
     });
@@ -435,10 +443,22 @@ export function setupButtonEvents() {
 
     // 登出邏輯
     const performFullLogout = async () => {
+        stopRealtimeCloudSync();
+        // 先完全退出可能存在的管理員檢視模式
+        state.adminViewModeUserId = null;
+        state.adminViewModeUserEmail = null;
+        state.adminOriginalAppData = null;
+        state.adminOriginalClassId = null;
+        sessionStorage.removeItem('admin_backup_appData');
+        sessionStorage.removeItem('admin_backup_classId');
+        try { updateAdminInspectionUI(); } catch(e) {}
+
         localStorage.removeItem('app_user_session');
         localStorage.removeItem('localAdminSession');
         localStorage.removeItem('adminPassword');
         localStorage.removeItem('storageSelected');
+        localStorage.removeItem('visitor_id');
+        localStorage.removeItem('visitor_name');
         sessionStorage.clear();
         sessionStorage.setItem('is_explicit_logout', 'true');
         state.isDevMode = false;
@@ -451,7 +471,7 @@ export function setupButtonEvents() {
             }
         }
         state.currentUser = null;
-        state.appData = { classes: [], homeworks: [], homeworkTypes: JSON.parse(safeStringify(DEFAULT_TYPES)) };
+        state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
         state.currentClassId = null;
         localStorage.removeItem('homeworkAppData');
         localStorage.removeItem('currentClassId');
@@ -507,6 +527,9 @@ export function setupButtonEvents() {
         state.currentUser = userObj;
         sessionStorage.setItem('auth_provider', 'password');
         sessionStorage.removeItem('is_explicit_logout');
+        sessionStorage.removeItem('app_is_guest_mode');
+        localStorage.removeItem('visitor_id');
+        localStorage.removeItem('visitor_name');
         localStorage.setItem('app_user_session', JSON.stringify(userObj));
         localStorage.setItem('storageSelected', 'true');
         updateDataManagementUI();
@@ -518,6 +541,12 @@ export function setupButtonEvents() {
             document.getElementById('admin-modal-btn')?.classList.add('hidden');
             document.getElementById('admin-btn')?.classList.add('hidden');
         }
+
+        // 清理任何上一帳號或訪客體驗之資料
+        state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
+        state.currentClassId = null;
+        localStorage.removeItem('homeworkAppData');
+        localStorage.removeItem('currentClassId');
 
         // 更新本地與雲端的 boundAccounts 記錄為 emailVerified: true (適用所有使用者信箱)
         try {
@@ -725,18 +754,6 @@ export function setupButtonEvents() {
                     }
                 }
 
-                if (cred?.user && !cred.user.emailVerified) {
-                    showToast("⚠️ 此帳號尚未完成信箱驗證，請先驗證信箱", "warning");
-                    openEmailVerificationModal(cand.email || cred.user.email, cred.user, {
-                        displayEmail: cand.email || cred.user.email,
-                        authEmail: targetEmail,
-                        name: cand.displayName || cand.username || cand.accountName,
-                        username: cand.username || cand.accountName,
-                        isIanw: (cand.email || '').toLowerCase() === 'ianw.solar@gmail.com'
-                    });
-                    return;
-                }
-
                 const isUserAdmin = (cand.email || cred.user.email).toLowerCase() === 'ianw.solar@gmail.com';
                 const userObj = {
                     uid: cred ? cred.user.uid : (cand.uid || cand.id),
@@ -751,6 +768,9 @@ export function setupButtonEvents() {
                 state.currentUser = userObj;
                 sessionStorage.setItem('auth_provider', 'password');
                 sessionStorage.removeItem('is_explicit_logout');
+                sessionStorage.removeItem('app_is_guest_mode');
+                localStorage.removeItem('visitor_id');
+                localStorage.removeItem('visitor_name');
                 localStorage.setItem('app_user_session', JSON.stringify(userObj));
                 localStorage.setItem('storageSelected', 'true');
                 updateDataManagementUI();
@@ -764,8 +784,8 @@ export function setupButtonEvents() {
                 }
                 showToast(`✅ 登入成功！歡迎 ${userObj.displayName}`, "success");
 
-                // 清除上一帳號的暫存資料，再載入此帳號專屬之雲端資料
-                state.appData = { classes: [], homeworks: [], homeworkTypes: JSON.parse(safeStringify(DEFAULT_TYPES)) };
+                // 清除上一帳號或訪客體驗的暫存資料，保證快速體驗資料不殘留
+                state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
                 state.currentClassId = null;
                 localStorage.removeItem('homeworkAppData');
                 localStorage.removeItem('currentClassId');
@@ -803,17 +823,11 @@ export function setupButtonEvents() {
                         }
                         throw directErr;
                     }
-                    if (cred.user && !cred.user.emailVerified) {
-                        showToast("⚠️ 此帳號尚未完成信箱驗證，請先驗證信箱", "warning");
-                        openEmailVerificationModal(cred.user.email, cred.user, {
-                            displayEmail: cred.user.email,
-                            name: cred.user.displayName || cred.user.email.split('@')[0],
-                            isIanw: cred.user.email.toLowerCase() === 'ianw.solar@gmail.com'
-                        });
-                        return;
-                    }
                     sessionStorage.setItem('auth_provider', 'password');
                     sessionStorage.removeItem('is_explicit_logout');
+                    sessionStorage.removeItem('app_is_guest_mode');
+                    localStorage.removeItem('visitor_id');
+                    localStorage.removeItem('visitor_name');
                     const isUserAdmin = cred.user.email.toLowerCase() === 'ianw.solar@gmail.com';
                     const userObj = {
                         uid: cred.user.uid,
@@ -834,6 +848,13 @@ export function setupButtonEvents() {
                         document.getElementById('admin-modal-btn')?.classList.add('hidden');
                         document.getElementById('admin-btn')?.classList.add('hidden');
                     }
+
+                    // 清除上一帳號或訪客體驗的暫存資料，保證快速體驗資料不殘留
+                    state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
+                    state.currentClassId = null;
+                    localStorage.removeItem('homeworkAppData');
+                    localStorage.removeItem('currentClassId');
+
                     showToast(`✅ 登入成功！歡迎 ${userObj.displayName}`, "success");
                     showToast("⏳ 正在同步雲端資料...", "info");
                     await loadDataFromCloud(true);
@@ -1001,8 +1022,11 @@ export function setupButtonEvents() {
                 localStorage.setItem('bound_accounts_ianw', JSON.stringify(localBounds));
             }
 
-            // 為新建立帳號初始化獨立乾淨的本地狀態 (不殘留舊帳號資料)
-            state.appData = { classes: [], homeworks: [], homeworkTypes: JSON.parse(safeStringify(DEFAULT_TYPES)) };
+            // 清除訪客體驗模式旗標與暫存，為新建立帳號初始化獨立乾淨的本地狀態 (不殘留舊帳號或訪客體驗資料)
+            sessionStorage.removeItem('app_is_guest_mode');
+            localStorage.removeItem('visitor_id');
+            localStorage.removeItem('visitor_name');
+            state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
             state.currentClassId = null;
             localStorage.setItem('homeworkAppData', safeStringify(state.appData));
             localStorage.removeItem('currentClassId');
@@ -1255,6 +1279,11 @@ export function setupButtonEvents() {
         signInWithPopup(fbAuth, new GoogleAuthProvider()).then(async (cred) => {
             sessionStorage.setItem('auth_provider', 'google');
             sessionStorage.removeItem('is_explicit_logout');
+            // ✨ 清除訪客體驗模式旗標與暫存，防止快速體驗帳號殘留到登入後帳戶
+            sessionStorage.removeItem('app_is_guest_mode');
+            localStorage.removeItem('visitor_id');
+            localStorage.removeItem('visitor_name');
+
             const userObj = {
                 uid: cred.user.uid,
                 email: cred.user.email,
@@ -1278,11 +1307,14 @@ export function setupButtonEvents() {
                 showToast("✅ Google 帳號登入成功！", "success");
             }
 
-            if (state.isLocalEmptyOnBoot) {
-                showToast("⏳ 登入成功！正在檢查雲端資料...", "info");
-                const hasData = await loadDataFromCloud(true);
-                if (hasData) state.isLocalEmptyOnBoot = false;
-            }
+            // 清理訪客體驗/上一帳號的本地資料，保證快速體驗帳號資料不殘留
+            state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
+            state.currentClassId = null;
+            localStorage.removeItem('homeworkAppData');
+            localStorage.removeItem('currentClassId');
+
+            showToast("⏳ 登入成功！正在檢查雲端資料...", "info");
+            await loadDataFromCloud(true);
             proceedIntoSystem();
         }).catch((error) => {
             console.warn("Google login popup error:", error?.code || error);
@@ -1445,21 +1477,114 @@ export function setupButtonEvents() {
         showToast("已切換為「條碼掃描」模式", "success");
     });
 
+    // ✨ 管理員檢視模式 UI 狀態更新
+    function updateAdminInspectionUI() {
+        const topBanner = document.getElementById('admin-viewing-banner');
+        const modalBanner = document.getElementById('admin-modal-active-inspection-banner');
+        const targetNameEl = document.getElementById('admin-viewing-target-name');
+        const modalEmailEl = document.getElementById('admin-modal-inspecting-email');
+
+        if (state.adminViewModeUserId) {
+            const displayName = state.adminViewModeUserEmail || state.adminViewModeUserId;
+            if (topBanner) {
+                topBanner.classList.remove('hidden');
+                topBanner.classList.add('flex');
+            }
+            if (targetNameEl) targetNameEl.textContent = displayName;
+            if (modalBanner) {
+                modalBanner.classList.remove('hidden');
+                modalBanner.classList.add('flex');
+            }
+            if (modalEmailEl) modalEmailEl.textContent = displayName;
+        } else {
+            if (topBanner) {
+                topBanner.classList.add('hidden');
+                topBanner.classList.remove('flex');
+            }
+            if (modalBanner) {
+                modalBanner.classList.add('hidden');
+                modalBanner.classList.remove('flex');
+            }
+        }
+    }
+
+    // ✨ 管理員進入檢視模式
+    async function enterAdminViewMode(targetId, targetEmail) {
+        stopRealtimeCloudSync();
+        if (!state.adminViewModeUserId) {
+            // 完整備份管理員本機自己的資料 (RAM + SessionStorage 防刷新遺失)
+            state.adminOriginalAppData = safeClone(state.appData);
+            state.adminOriginalClassId = state.currentClassId;
+            try {
+                sessionStorage.setItem('admin_backup_appData', safeStringify(state.appData));
+                sessionStorage.setItem('admin_backup_classId', state.currentClassId || '');
+            } catch(e) {}
+        }
+        state.adminViewModeUserId = targetId;
+        state.adminViewModeUserEmail = targetEmail;
+        updateAdminInspectionUI();
+        showToast(`已切換為「${targetEmail}」之唯讀檢視模式`, "info");
+        await loadDataFromCloud(true);
+        fullRender();
+    }
+
+    // ✨ 管理員退出檢視模式，回到管理員自己的資料
+    async function exitAdminViewMode() {
+        if (!state.adminViewModeUserId && !sessionStorage.getItem('admin_backup_appData')) return;
+        showToast("⏳ 正在退出檢視模式並還原您的資料...", "info");
+        state.adminViewModeUserId = null;
+        state.adminViewModeUserEmail = null;
+        updateAdminInspectionUI();
+
+        let restored = false;
+        try {
+            if (state.adminOriginalAppData) {
+                state.appData = safeClone(state.adminOriginalAppData);
+                state.currentClassId = state.adminOriginalClassId || state.appData.classes?.[0]?.id || null;
+                restored = true;
+            } else {
+                const saved = sessionStorage.getItem('admin_backup_appData');
+                if (saved) {
+                    state.appData = sanitizeAppData(JSON.parse(saved));
+                    fixDates(state.appData);
+                    state.currentClassId = sessionStorage.getItem('admin_backup_classId') || state.appData.classes?.[0]?.id || null;
+                    restored = true;
+                }
+            }
+        } catch(e) {
+            console.warn("Restore admin local data error:", e);
+        }
+
+        sessionStorage.removeItem('admin_backup_appData');
+        sessionStorage.removeItem('admin_backup_classId');
+        state.adminOriginalAppData = null;
+        state.adminOriginalClassId = null;
+
+        if (restored) {
+            localStorage.setItem('homeworkAppData', safeStringify(state.appData));
+            if (state.currentClassId) localStorage.setItem('currentClassId', state.currentClassId);
+        }
+
+        // 重新同步回管理員自身的雲端資料
+        await loadDataFromCloud(true);
+        fullRender();
+        closeModal(document.getElementById('admin-modal'));
+        showToast("✅ 已成功退出檢視模式，恢復管理員帳號與作業資料！", "success");
+    }
+
     // 系統管理中心 (Admin) Modal 開啟
     const handleOpenAdminModal = () => {
         openModal(document.getElementById('admin-modal'));
+        updateAdminInspectionUI();
         loadAllUsersForAdmin((targetId, targetEmail) => {
             closeModal(document.getElementById('admin-modal'));
-            state.adminViewModeUserId = targetId;
-            state.adminViewModeUserEmail = targetEmail;
-            showToast(`已切換為「${targetEmail}」之唯讀檢視模式`, "info");
-            loadDataFromCloud(true).then(() => {
-                showToast(`已載入「${targetEmail}」之作業點收資料`, "success");
-            });
+            enterAdminViewMode(targetId, targetEmail);
         });
     };
     bindClick('admin-modal-btn', handleOpenAdminModal);
     bindClick('admin-btn', handleOpenAdminModal);
+    bindClick('admin-exit-view-btn', exitAdminViewMode);
+    bindClick('admin-modal-exit-view-btn', exitAdminViewMode);
 
     // 本地硬碟連結
     bindClick('portal-link-file-btn', async () => {
@@ -1495,6 +1620,12 @@ export function setupButtonEvents() {
         showNamePromptModal((name) => {
             if (name) {
                 sessionStorage.setItem('app_is_guest_mode', 'true');
+                state.currentUser = null;
+                localStorage.removeItem('app_user_session');
+                state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
+                state.currentClassId = null;
+                localStorage.removeItem('homeworkAppData');
+                localStorage.removeItem('currentClassId');
                 localStorage.setItem('visitor_name', name.trim());
                 localStorage.setItem('storageSelected', 'true');
                 showToast("已選擇瀏覽器暫存模式 (免帳號體驗，不寫入雲端)", "info");

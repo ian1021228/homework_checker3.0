@@ -38,6 +38,7 @@ import { safeStringify, safeClone, sanitizeAppData, fixDates, showToast, showAle
 export let fbApp, fbAuth, fbDb;
 
 export {
+    globalAppId,
     signInWithPopup, 
     GoogleAuthProvider, 
     signInWithEmailAndPassword, 
@@ -82,13 +83,17 @@ if (fbAuth) {
 
             if (user) {
                 if (syncStatus) {
-                    syncStatus.innerHTML = `狀態：已安全登入雲端 <br><span class="text-sky-900 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-sky-100 text-[11px] tracking-wide">👤 ${user.displayName || user.email}</span>`;
+                    syncStatus.innerHTML = `狀態：跨裝置即時同步中 <br><span class="text-sky-900 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-sky-100 text-[11px] tracking-wide">👤 ${user.displayName || user.email}</span>`;
                 }
                 if (loginBtn) loginBtn.classList.add('hidden');
                 if (cloudActions) cloudActions.classList.remove('hidden');
                 if (storageContainer) storageContainer.classList.remove('hidden');
                 syncUserProfile();
+                if (sessionStorage.getItem('app_is_guest_mode') !== 'true' && !state.adminViewModeUserId) {
+                    startRealtimeCloudSync();
+                }
             } else {
+                stopRealtimeCloudSync();
                 if (syncStatus) {
                     if (state.currentUser) {
                         syncStatus.innerHTML = `狀態：本地離線模式 <br><span class="text-slate-700 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-slate-200 text-[11px] tracking-wide">👤 ${state.currentUser.displayName || state.currentUser.email}</span><br><span class="text-[11px] text-sky-600 mt-1 inline-block">點擊下方按鈕登入 Google 帳號以啟用雲端同步</span>`;
@@ -100,8 +105,6 @@ if (fbAuth) {
                 if (cloudActions) cloudActions.classList.add('hidden');
                 if (storageContainer) storageContainer.classList.add('hidden');
             }
-            if (window.updateChatUnreadBadge) window.updateChatUnreadBadge();
-            if (state.isChatOpen && window.renderChatView) window.renderChatView();
         } catch(e) {}
     });
 }
@@ -587,12 +590,106 @@ export async function deleteCloudParentClass(code) {
     }
 }
 
-export async function syncDataToCloud() {
-    if (sessionStorage.getItem('app_is_guest_mode') === 'true' || !state.currentUser || !fbDb || !fbAuth?.currentUser) return;
+let unsubAppData = null;
+let lastSyncedDataStr = null;
+
+export function startRealtimeCloudSync() {
+    if (state.adminViewModeUserId || sessionStorage.getItem('app_is_guest_mode') === 'true' || !fbDb) return;
+    
+    const targetUid = fbAuth?.currentUser?.uid || state.currentUser?.uid;
+    if (!targetUid) return;
+
+    if (unsubAppData) {
+        try { unsubAppData(); } catch(e) {}
+        unsubAppData = null;
+    }
+
     try {
-        const targetUid = state.adminViewModeUserId || fbAuth.currentUser.uid;
         const docRef = doc(fbDb, 'artifacts', globalAppId, 'users', targetUid, 'appData', 'mainDoc');
-        await setDoc(docRef, { data: safeStringify(state.appData), updatedAt: new Date().toISOString() });
+        unsubAppData = onSnapshot(docRef, { includeMetadataChanges: false }, (docSnap) => {
+            if (state.adminViewModeUserId || sessionStorage.getItem('app_is_guest_mode') === 'true') return;
+            if (docSnap.metadata && docSnap.metadata.hasPendingWrites) return;
+
+            if (!docSnap.exists()) return;
+            const payload = docSnap.data();
+            if (!payload || !payload.data) return;
+
+            const incomingStr = payload.data;
+            const currentStr = safeStringify(state.appData);
+
+            if (incomingStr === currentStr || incomingStr === lastSyncedDataStr) {
+                lastSyncedDataStr = incomingStr;
+                return;
+            }
+
+            if (state.isSaving) {
+                return;
+            }
+
+            try {
+                const cloudData = sanitizeAppData(JSON.parse(incomingStr));
+                fixDates(cloudData);
+                state.appData = cloudData;
+                lastSyncedDataStr = incomingStr;
+                localStorage.setItem('homeworkAppData', incomingStr);
+
+                if (state.currentClassId && !state.appData.classes.some(c => c.id === state.currentClassId)) {
+                    state.currentClassId = state.appData.classes[0]?.id || null;
+                    if (state.currentClassId) localStorage.setItem('currentClassId', state.currentClassId);
+                    else localStorage.removeItem('currentClassId');
+                } else if (!state.currentClassId && state.appData.classes.length > 0) {
+                    state.currentClassId = state.appData.classes[0].id;
+                    localStorage.setItem('currentClassId', state.currentClassId);
+                }
+
+                if (window.fullRender) window.fullRender();
+                if (window.reRenderCurrentPage) window.reRenderCurrentPage();
+
+                const syncStatus = document.getElementById('cloud-sync-status');
+                if (syncStatus && (fbAuth?.currentUser || state.currentUser)) {
+                    const u = fbAuth?.currentUser || state.currentUser;
+                    const timeStr = new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    syncStatus.innerHTML = `狀態：跨裝置即時同步中 <br><span class="text-sky-900 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-sky-100 text-[11px] tracking-wide">👤 ${u.displayName || u.email}</span><br><span class="text-[10px] text-emerald-600 font-bold mt-1 inline-block">● 於 ${timeStr} 接收跨裝置即時更新</span>`;
+                }
+            } catch (err) {
+                console.warn("Realtime cloud sync parse notice:", err);
+            }
+        }, (err) => {
+            console.warn("Realtime cloud sync listen notice:", err?.message || err);
+        });
+    } catch(e) {
+        console.warn("Start realtime sync failed:", e);
+    }
+}
+
+export function stopRealtimeCloudSync() {
+    if (unsubAppData) {
+        try { unsubAppData(); } catch(e) {}
+        unsubAppData = null;
+    }
+}
+
+if (typeof window !== 'undefined') {
+    window.addEventListener('visibilitychange', () => {
+        if (!document.hidden && (fbAuth?.currentUser || state.currentUser) && !state.adminViewModeUserId && sessionStorage.getItem('app_is_guest_mode') !== 'true') {
+            startRealtimeCloudSync();
+        }
+    });
+    window.addEventListener('online', () => {
+        if ((fbAuth?.currentUser || state.currentUser) && !state.adminViewModeUserId && sessionStorage.getItem('app_is_guest_mode') !== 'true') {
+            startRealtimeCloudSync();
+        }
+    });
+}
+
+export async function syncDataToCloud() {
+    if (state.adminViewModeUserId || sessionStorage.getItem('app_is_guest_mode') === 'true' || !state.currentUser || !fbDb || !fbAuth?.currentUser) return;
+    try {
+        const targetUid = fbAuth.currentUser.uid;
+        const docRef = doc(fbDb, 'artifacts', globalAppId, 'users', targetUid, 'appData', 'mainDoc');
+        const dataStr = safeStringify(state.appData);
+        lastSyncedDataStr = dataStr;
+        await setDoc(docRef, { data: dataStr, updatedAt: new Date().toISOString() });
 
         if (Array.isArray(state.appData.classes)) {
             for (const c of state.appData.classes) {
@@ -639,6 +736,7 @@ export async function syncDataToCloud() {
 export async function loadDataFromCloud(silent = false, onLoadedCallback) {
     if (!state.currentUser || !fbDb || !fbAuth?.currentUser) return false;
     try {
+        const isInspectingUser = Boolean(state.adminViewModeUserId);
         let targetUid = state.adminViewModeUserId || fbAuth.currentUser.uid;
         let docRef = doc(fbDb, 'artifacts', globalAppId, 'users', targetUid, 'appData', 'mainDoc');
         let docSnap = await getDoc(docRef);
@@ -658,16 +756,27 @@ export async function loadDataFromCloud(silent = false, onLoadedCallback) {
             } catch(e) {}
         }
         if (docSnap.exists() && docSnap.data().data) {
-            const cloudData = sanitizeAppData(JSON.parse(docSnap.data().data));
-            if (silent) { 
+            const rawStr = docSnap.data().data;
+            lastSyncedDataStr = rawStr;
+            const cloudData = sanitizeAppData(JSON.parse(rawStr));
+            if (isInspectingUser) {
+                // 管理員檢視模式：純記憶體呈現，嚴禁覆蓋本機管理員自身之 localStorage
+                state.appData = cloudData;
+                fixDates(state.appData);
+                state.currentClassId = state.appData.classes?.[0]?.id || null;
+                if (onLoadedCallback) onLoadedCallback();
+                showToast(`✅ 已成功載入「${state.adminViewModeUserEmail || targetUid}」之點收資料（唯讀）`, 'success');
+                return true;
+            } else if (silent) { 
                 state.appData = cloudData; 
                 fixDates(state.appData); 
-                localStorage.setItem('homeworkAppData', safeStringify(state.appData)); 
+                localStorage.setItem('homeworkAppData', rawStr); 
                 if (!state.currentClassId && state.appData.classes.length > 0) {
                     state.currentClassId = state.appData.classes[0].id;
                     localStorage.setItem('currentClassId', state.currentClassId);
                 }
                 if (onLoadedCallback) onLoadedCallback();
+                startRealtimeCloudSync();
                 showToast('✅ 已從雲端自動還原您的資料！', 'success');
                 return true;
             } 
@@ -675,19 +784,36 @@ export async function loadDataFromCloud(silent = false, onLoadedCallback) {
                 showConfirmModal('發現雲端備份', '確定要將本地資料完全覆蓋為雲端上的最新紀錄嗎？這會清除未上傳的本地更動。', () => {
                     state.appData = cloudData; 
                     fixDates(state.appData); 
-                    localStorage.setItem('homeworkAppData', safeStringify(state.appData)); 
+                    localStorage.setItem('homeworkAppData', rawStr); 
                     if (!state.currentClassId && state.appData.classes.length > 0) {
                         state.currentClassId = state.appData.classes[0].id;
                         localStorage.setItem('currentClassId', state.currentClassId);
                     }
                     if (onLoadedCallback) onLoadedCallback();
+                    startRealtimeCloudSync();
                     showToast('已成功從雲端載入資料！', 'success');
                 });
                 return true;
             }
         } else {
-            if (!silent) showToast('在您的雲端帳戶中尚無備份資料。', 'info');
-            return false;
+            if (isInspectingUser) {
+                // 該用戶雲端無資料：給予乾淨空狀態以供檢視，不覆蓋管理員資料
+                state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
+                state.currentClassId = null;
+                if (onLoadedCallback) onLoadedCallback();
+                showToast(`用戶「${state.adminViewModeUserEmail || targetUid}」在雲端尚無備份資料`, 'info');
+                return true;
+            } else {
+                // 一般登入用戶雲端無資料時，初始化純淨空帳號，避免殘留訪客/舊帳號資料
+                state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
+                state.currentClassId = null;
+                localStorage.setItem('homeworkAppData', safeStringify(state.appData));
+                localStorage.removeItem('currentClassId');
+                if (onLoadedCallback) onLoadedCallback();
+                startRealtimeCloudSync();
+                if (!silent) showToast('在您的雲端帳戶中尚無備份資料（已建立全新空白作業本）。', 'info');
+                return false;
+            }
         }
     } catch(e) { 
         console.error(e); 

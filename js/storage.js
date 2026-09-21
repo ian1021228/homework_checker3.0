@@ -87,7 +87,7 @@ export function saveData() {
         } finally { 
             state.isSaving = false; 
         }
-    }, 600);
+    }, 300);
 
     return Promise.resolve();
 }
@@ -318,3 +318,5 @@ export async function executeCopyClassData(sourceClass, targetClass, { syncHw, s
     closeModal(document.getElementById('settings-modal'));
     showToast(`✅ 資料同步完成！${syncHw ? ` (新增 ${hwAddedCount} 項作業)` : ''}`, 'success');
 }
+
+export { updateDataManagementUI } from './render.js';

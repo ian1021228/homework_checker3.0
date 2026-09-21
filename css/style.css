@@ -181,3 +181,31 @@ html.dark .modal-content, html.dark .confirm-modal-content { background-color: #
 
 .admin-viewing .hide-on-admin-view { display: none !important; pointer-events: none; }
 .admin-viewing .disable-on-admin-view { pointer-events: none !important; opacity: 0.7; }
+
+/* 📱 手機與各尺寸螢幕深度相容性優化 (Mobile & Responsive Adaptations) */
+@media (max-width: 640px) {
+    /* 確保彈窗在窄螢幕手機上左右預留安全間隙，不被切邊 */
+    .modal-content, .confirm-modal-content {
+        max-width: calc(100vw - 20px) !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    /* 確保功能按鈕橫向捲動列在 iOS / Android 上具備原生動量滑動 */
+    .overflow-x-auto {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* 學生號碼方塊在手機上維持 44px 以上舒適觸控區 */
+    .student-btn {
+        min-height: 48px;
+        min-width: 44px;
+    }
+
+    /* 確保 QR 相機掃描視窗在手機螢幕完全置中且不變形 */
+    #qr-scanner-viewport video {
+        object-fit: cover !important;
+        border-radius: 1rem !important;
+    }
+}
+

@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == 'ianw.solar@gmail.com';
+    }
+
+    match /artifacts/{appId} {
+      match /public/data/serverConfig/main {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+      
+      // 允許任何人(包含未登入訪客)寫入自己的狀態，讓後台能追蹤線上人數
+      match /public/data/userProfiles/{userId} {
+        allow read: if true;
+        allow write: if true;
+      }
+
+      // ✨ 新增：家長端即時查詢班級資料
+      // 允許所有訪客(家長)讀取；僅登入教師端或管理員可寫入
+      match /public/data/parentClasses/{accessCode} {
+        allow read: if true;
+        allow write: if request.auth != null || isAdmin();
+      }
+
+      // 帳號綁定資料庫
+      match /public/data/boundAccounts/{accId} {
+        allow read: if true;
+        allow write: if request.auth != null || isAdmin();
+      }
+      
+      // 用戶私有資料庫：只允許本人登入後讀寫。但是「管理員(isAdmin)」擁有絕對讀寫權限！
+      match /users/{userId}/appData/mainDoc {
+        allow read, write: if (request.auth != null && request.auth.uid == userId) || isAdmin();
+      }
+    }
+  }
+}

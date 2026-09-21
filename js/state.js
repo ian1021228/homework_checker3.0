@@ -17,7 +17,9 @@ export const state = {
     saveTimeout: null,
     fileHandle: null,
     adminViewModeUserId: null,
+    adminViewModeUserEmail: null,
     adminOriginalAppData: null,
+    adminOriginalClassId: null,
     isLocalEmptyOnBoot: !localStorage.getItem('homeworkAppData'),
     lastCloudError: null,
     pendingEmailVerification: null,
@@ -31,13 +33,6 @@ export const state = {
     isBellOpen: false,
     activeBellTab: 'notices',
     unreadRepliesCount: 0,
-    isChatOpen: false,
-    activeChatRoomId: null,
-    chatRooms: [],
-    activeRoomDetail: null,
-    myChatRoom: null,
-    unsubChat: null,
-    unsubChatRooms: null,
     isDevMode: sessionStorage.getItem('app_dev_mode') === 'true'
 };
 
