@@ -40,6 +40,35 @@ export async function clearFileHandle() {
     }); 
 }
 
+export function getUserStorageKey(user = state.currentUser) {
+    if (!user) return 'guest';
+    return user.uid || (user.username ? 'user_' + String(user.username).trim().toLowerCase() : (user.email ? 'email_' + String(user.email).trim().toLowerCase() : 'guest'));
+}
+
+export function loadLocalDataForUser(user = state.currentUser) {
+    const userKey = getUserStorageKey(user);
+    const userSpecific = localStorage.getItem('homeworkAppData_' + userKey);
+    if (userSpecific) {
+        try {
+            const parsed = JSON.parse(userSpecific);
+            if (parsed && Array.isArray(parsed.classes) && parsed.classes.length > 0) {
+                return sanitizeAppData(parsed);
+            }
+        } catch(e) {}
+    }
+    // 檢查是否有訪客或前次作業本資料可供還原/繼承
+    const guestData = localStorage.getItem('homeworkAppData_guest') || localStorage.getItem('homeworkAppData') || localStorage.getItem('homeworkAppData_last');
+    if (guestData) {
+        try {
+            const parsed = JSON.parse(guestData);
+            if (parsed && Array.isArray(parsed.classes) && parsed.classes.length > 0) {
+                return sanitizeAppData(parsed);
+            }
+        } catch(e) {}
+    }
+    return null;
+}
+
 let lastBackupTime = 0;
 export function runAutoBackup() {
     const now = Date.now();
@@ -47,11 +76,45 @@ export function runAutoBackup() {
     lastBackupTime = now;
     try {
         const today = formatDate(new Date(), 'YYYY-MM-DD'); 
+        const userKey = getUserStorageKey(state.currentUser);
+        const dataStr = safeStringify(state.appData);
+        // 保存該帳號專屬備份
+        const userBackupKey = `hw_backup_${userKey}_${today}`;
+        localStorage.setItem(userBackupKey, dataStr);
+        // 亦保存通用日期備份
         const backupKey = `hw_backup_${today}`;
-        localStorage.setItem(backupKey, safeStringify(state.appData));
-        const keys = Object.keys(localStorage).filter(k => k.startsWith('hw_backup_')).sort();
-        if (keys.length > 3) keys.slice(0, keys.length - 3).forEach(k => localStorage.removeItem(k));
+        localStorage.setItem(backupKey, dataStr);
+
+        // 清理超過 5 個舊備份
+        const userKeys = Object.keys(localStorage).filter(k => k.startsWith(`hw_backup_${userKey}_`)).sort();
+        if (userKeys.length > 5) userKeys.slice(0, userKeys.length - 5).forEach(k => localStorage.removeItem(k));
     } catch (e) {}
+}
+
+export async function flushPendingSave() {
+    if (state.saveTimeout) {
+        clearTimeout(state.saveTimeout);
+        state.saveTimeout = null;
+    }
+    state.isSaving = false;
+    try {
+        const userKey = getUserStorageKey(state.currentUser);
+        const dataStr = safeStringify(state.appData);
+        localStorage.setItem('homeworkAppData_' + userKey, dataStr);
+        localStorage.setItem('homeworkAppData', dataStr);
+        if (state.appData && Array.isArray(state.appData.classes) && state.appData.classes.length > 0) {
+            localStorage.setItem('homeworkAppData_last', dataStr);
+        }
+        if (state.currentClassId) {
+            localStorage.setItem('currentClassId_' + userKey, state.currentClassId);
+            localStorage.setItem('currentClassId', state.currentClassId);
+        }
+        if (state.currentUser && sessionStorage.getItem('app_is_guest_mode') !== 'true') {
+            await syncDataToCloud();
+        }
+    } catch(e) {
+        console.warn("flushPendingSave notice:", e);
+    }
 }
 
 export function saveData() {
@@ -61,9 +124,19 @@ export function saveData() {
     }
     state.isLocalEmptyOnBoot = false; 
 
-    // ⚡ 1. 立即同步寫入 localStorage，客戶端 0 延遲與即時更新
+    // ⚡ 1. 立即同步寫入該帳號專屬之 localStorage 與全域快取，各帳號完全隔離
     try {
-        localStorage.setItem('homeworkAppData', safeStringify(state.appData));
+        const userKey = getUserStorageKey(state.currentUser);
+        const dataStr = safeStringify(state.appData);
+        localStorage.setItem('homeworkAppData_' + userKey, dataStr);
+        localStorage.setItem('homeworkAppData', dataStr);
+        if (state.appData && Array.isArray(state.appData.classes) && state.appData.classes.length > 0) {
+            localStorage.setItem('homeworkAppData_last', dataStr);
+        }
+        if (state.currentClassId) {
+            localStorage.setItem('currentClassId_' + userKey, state.currentClassId);
+            localStorage.setItem('currentClassId', state.currentClassId);
+        }
     } catch (err) {
         console.error("Local storage save error:", err);
     }
@@ -100,6 +173,8 @@ export async function syncFromFileHandle(onUpdateCallback) {
         if (text) { 
             state.appData = sanitizeAppData(JSON.parse(text)); 
             fixDates(state.appData); 
+            const userKey = getUserStorageKey(state.currentUser);
+            localStorage.setItem('homeworkAppData_' + userKey, safeStringify(state.appData));
             localStorage.setItem('homeworkAppData', safeStringify(state.appData)); 
             runAutoBackup(); 
             if (onUpdateCallback) onUpdateCallback();

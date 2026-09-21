@@ -12,26 +12,39 @@ service cloud.firestore {
         allow write: if isAdmin();
       }
       
-      // 允許任何人(包含未登入訪客)寫入自己的狀態，讓後台能追蹤線上人數
+      // 允許任何人(包含未登入訪客)寫入自己的狀態，讓後台能追蹤線上人數與掃碼挑戰
       match /public/data/userProfiles/{userId} {
         allow read: if true;
         allow write: if true;
       }
 
-      // ✨ 新增：家長端即時查詢班級資料
-      // 允許所有訪客(家長)讀取；僅登入教師端或管理員可寫入
-      match /public/data/parentClasses/{accessCode} {
+      // 1. 班級資料：家長公開讀取，老師認證寫入
+      match /public/data/parentClasses/{classCode} {
         allow read: if true;
         allow write: if request.auth != null || isAdmin();
       }
 
-      // 帳號綁定資料庫
-      match /public/data/boundAccounts/{accId} {
+      // 2. 帳號綁定比對：允許讀取已雜湊帳號以供比對登入
+      match /public/data/boundAccounts/{accountId} {
         allow read: if true;
         allow write: if request.auth != null || isAdmin();
       }
       
-      // 用戶私有資料庫：只允許本人登入後讀寫。但是「管理員(isAdmin)」擁有絕對讀寫權限！
+      // 3. 系統廣播小鈴鐺
+      match /public/data/systemBroadcasts/{docId} {
+        allow read: if true;
+        allow write: if request.auth != null || isAdmin();
+      }
+      match /public/data/systemBroadcasts/main/replies/{replyId} {
+        allow read, create: if true;
+        allow update, delete: if request.auth != null || isAdmin();
+      }
+      match /public/data/systemBroadcasts/{docId}/replies/{replyId} {
+        allow read, create: if true;
+        allow update, delete: if request.auth != null || isAdmin();
+      }
+
+      // 用戶私有資料庫：只允許本人登入後讀寫。管理員(isAdmin)擁有最高維護權限
       match /users/{userId}/appData/mainDoc {
         allow read, write: if (request.auth != null && request.auth.uid == userId) || isAdmin();
       }

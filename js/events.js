@@ -18,6 +18,7 @@ import {
     generateRandomAccessCode,
     sanitizeAppData,
     fixDates,
+    hashPassword,
     showToast,
     showAlertModal,
     showConfirmModal,
@@ -54,7 +55,8 @@ import {
     deleteCloudParentClass,
     syncDataToCloud,
     startRealtimeCloudSync,
-    stopRealtimeCloudSync
+    stopRealtimeCloudSync,
+    deleteMyAccount
 } from './firebase.js';
 
 import {
@@ -63,7 +65,10 @@ import {
     getFileHandle,
     clearFileHandle,
     syncFromFileHandle,
-    executeCopyClassData
+    executeCopyClassData,
+    flushPendingSave,
+    getUserStorageKey,
+    loadLocalDataForUser
 } from './storage.js';
 
 import {
@@ -205,9 +210,24 @@ export function setupButtonEvents() {
         openModal(document.getElementById('manage-classes-modal'));
     });
 
+    // 倒退還原備份資料處理器
+    const handleRestoreBackup = async (dataStr) => {
+        try {
+            const restored = sanitizeAppData(JSON.parse(dataStr));
+            fixDates(restored);
+            state.appData = restored;
+            state.currentClassId = state.appData.classes?.[0]?.id || null;
+            await saveData();
+            fullRender();
+            showToast("✅ 已成功倒退還原備份資料！", "success");
+        } catch(e) {
+            showAlertModal("還原失敗", "備份資料損壞或格式不符：" + (e.message || e));
+        }
+    };
+
     // 5. 系統設定按鈕
     bindClick('settings-btn', () => {
-        updateDataManagementUI();
+        updateDataManagementUI(handleRestoreBackup);
         openModal(document.getElementById('settings-modal'));
     });
 
@@ -436,14 +456,22 @@ export function setupButtonEvents() {
         proceedIntoSystem();
     });
 
-    bindClick('portal-switch-account-btn', () => {
+    bindClick('portal-switch-account-btn', async () => {
+        // 切換帳號前，先安全保存上一帳號資料並完整解除上一帳號狀態，徹底防止跨帳號資料覆蓋
+        await performFullLogout();
         document.getElementById('portal-view-loggedin')?.classList.add('hidden');
         document.getElementById('portal-view-signin')?.classList.remove('hidden');
     });
 
     // 登出邏輯
     const performFullLogout = async () => {
+        // 先完整保存當前帳號的最新修改至該用戶專屬之本地快取與雲端
+        await flushPendingSave();
         stopRealtimeCloudSync();
+
+        // 磁碟直接寫入控制權重置，嚴禁前一個帳號的磁碟檔案綁定外洩給下一位使用者
+        state.fileHandle = null;
+
         // 先完全退出可能存在的管理員檢視模式
         state.adminViewModeUserId = null;
         state.adminViewModeUserEmail = null;
@@ -473,6 +501,7 @@ export function setupButtonEvents() {
         state.currentUser = null;
         state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
         state.currentClassId = null;
+        // 清除全域暫存快取，但保留各帳號專屬之 homeworkAppData_${userKey}
         localStorage.removeItem('homeworkAppData');
         localStorage.removeItem('currentClassId');
 
@@ -483,7 +512,7 @@ export function setupButtonEvents() {
         closeModal(document.getElementById('account-picker-modal'));
         document.getElementById('admin-modal-btn')?.classList.add('hidden');
         document.getElementById('admin-btn')?.classList.add('hidden');
-        updateDataManagementUI();
+        updateDataManagementUI(handleRestoreBackup);
         updatePortalUI();
         showPortalPage(true);
         showToast("已成功登出並返回網站首頁", "info");
@@ -542,11 +571,21 @@ export function setupButtonEvents() {
             document.getElementById('admin-btn')?.classList.add('hidden');
         }
 
-        // 清理任何上一帳號或訪客體驗之資料
-        state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
-        state.currentClassId = null;
-        localStorage.removeItem('homeworkAppData');
-        localStorage.removeItem('currentClassId');
+        // 優先載入該帳號之本地資料；若目前記憶體有未綁定班級作業資料則予以綁定保留 (杜絕登入後資料消失)
+        const userKey = getUserStorageKey(userObj);
+        const userLocal = loadLocalDataForUser(userObj);
+        if (userLocal && Array.isArray(userLocal.classes) && userLocal.classes.length > 0) {
+            state.appData = userLocal;
+            state.currentClassId = localStorage.getItem('currentClassId_' + userKey) || state.appData.classes[0]?.id || null;
+        } else if (state.appData && Array.isArray(state.appData.classes) && state.appData.classes.length > 0) {
+            localStorage.setItem('homeworkAppData_' + userKey, safeStringify(state.appData));
+            if (state.currentClassId) localStorage.setItem('currentClassId_' + userKey, state.currentClassId);
+        } else {
+            state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
+            state.currentClassId = null;
+        }
+        localStorage.setItem('homeworkAppData', safeStringify(state.appData));
+        if (state.currentClassId) localStorage.setItem('currentClassId', state.currentClassId);
 
         // 更新本地與雲端的 boundAccounts 記錄為 emailVerified: true (適用所有使用者信箱)
         try {
@@ -738,7 +777,10 @@ export function setupButtonEvents() {
                         try { cred = await signInWithEmailAndPassword(fbAuth, cand.email, password); } catch(e) {}
                     }
                     if (!cred) {
-                        if (cand.password && cand.password !== password) {
+                        const inputHash = await hashPassword(password);
+                        const isPasswordMatch = (cand.passwordHash && cand.passwordHash === inputHash) ||
+                                                (cand.password && (cand.password === inputHash || cand.password === password));
+                        if (!isPasswordMatch && (cand.password || cand.passwordHash)) {
                             showAlertModal("登入失敗", "密碼錯誤，請確認後重試。若忘記密碼請點選下方「忘記密碼？」");
                             return;
                         }
@@ -784,11 +826,21 @@ export function setupButtonEvents() {
                 }
                 showToast(`✅ 登入成功！歡迎 ${userObj.displayName}`, "success");
 
-                // 清除上一帳號或訪客體驗的暫存資料，保證快速體驗資料不殘留
-                state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
-                state.currentClassId = null;
-                localStorage.removeItem('homeworkAppData');
-                localStorage.removeItem('currentClassId');
+                // 優先載入該帳號之本地資料；若本地有未綁定班級作業資料則予以綁定保留 (杜絕登入後資料消失)
+                const userKey = getUserStorageKey(userObj);
+                const userLocal = loadLocalDataForUser(userObj);
+                if (userLocal && Array.isArray(userLocal.classes) && userLocal.classes.length > 0) {
+                    state.appData = userLocal;
+                    state.currentClassId = localStorage.getItem('currentClassId_' + userKey) || state.appData.classes[0]?.id || null;
+                } else if (state.appData && Array.isArray(state.appData.classes) && state.appData.classes.length > 0) {
+                    localStorage.setItem('homeworkAppData_' + userKey, safeStringify(state.appData));
+                    if (state.currentClassId) localStorage.setItem('currentClassId_' + userKey, state.currentClassId);
+                } else {
+                    state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
+                    state.currentClassId = null;
+                }
+                localStorage.setItem('homeworkAppData', safeStringify(state.appData));
+                if (state.currentClassId) localStorage.setItem('currentClassId', state.currentClassId);
 
                 showToast("⏳ 正在同步雲端資料...", "info");
                 await loadDataFromCloud(true);
@@ -799,7 +851,11 @@ export function setupButtonEvents() {
                 await executeLoginForCandidate(matchingCandidates[0]);
                 return;
             } else if (matchingCandidates.length > 1) {
-                const pwdMatches = matchingCandidates.filter(b => b.password === password);
+                const inputHash = await hashPassword(password);
+                const pwdMatches = matchingCandidates.filter(b => 
+                    (b.passwordHash && b.passwordHash === inputHash) ||
+                    (b.password && (b.password === inputHash || b.password === password))
+                );
                 if (pwdMatches.length === 1) {
                     await executeLoginForCandidate(pwdMatches[0]);
                     return;
@@ -849,11 +905,21 @@ export function setupButtonEvents() {
                         document.getElementById('admin-btn')?.classList.add('hidden');
                     }
 
-                    // 清除上一帳號或訪客體驗的暫存資料，保證快速體驗資料不殘留
-                    state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
-                    state.currentClassId = null;
-                    localStorage.removeItem('homeworkAppData');
-                    localStorage.removeItem('currentClassId');
+                    // 優先載入該帳號之本地資料；若本地有未綁定班級作業資料則予以綁定保留 (杜絕登入後資料消失)
+                    const userKey = getUserStorageKey(userObj);
+                    const userLocal = loadLocalDataForUser(userObj);
+                    if (userLocal && Array.isArray(userLocal.classes) && userLocal.classes.length > 0) {
+                        state.appData = userLocal;
+                        state.currentClassId = localStorage.getItem('currentClassId_' + userKey) || state.appData.classes[0]?.id || null;
+                    } else if (state.appData && Array.isArray(state.appData.classes) && state.appData.classes.length > 0) {
+                        localStorage.setItem('homeworkAppData_' + userKey, safeStringify(state.appData));
+                        if (state.currentClassId) localStorage.setItem('currentClassId_' + userKey, state.currentClassId);
+                    } else {
+                        state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
+                        state.currentClassId = null;
+                    }
+                    localStorage.setItem('homeworkAppData', safeStringify(state.appData));
+                    if (state.currentClassId) localStorage.setItem('currentClassId', state.currentClassId);
 
                     showToast(`✅ 登入成功！歡迎 ${userObj.displayName}`, "success");
                     showToast("⏳ 正在同步雲端資料...", "info");
@@ -993,7 +1059,8 @@ export function setupButtonEvents() {
                 }
             }
 
-            // 將使用者帳號與使用者名稱記錄至 boundAccounts (所有信箱帳號均同步記錄，支援日後以使用者名稱直接登入)
+            // 將使用者帳號與雜湊密碼安全記錄至 boundAccounts (杜絕明文密碼存儲)
+            const pwdHash = await hashPassword(password);
             const boundDoc = {
                 id: cred.user.uid,
                 uid: cred.user.uid,
@@ -1002,7 +1069,7 @@ export function setupButtonEvents() {
                 username: name,
                 displayName: name,
                 accountName: name,
-                password: password,
+                passwordHash: pwdHash,
                 emailVerified: false,
                 createdAt: new Date().toISOString()
             };
@@ -1022,14 +1089,23 @@ export function setupButtonEvents() {
                 localStorage.setItem('bound_accounts_ianw', JSON.stringify(localBounds));
             }
 
-            // 清除訪客體驗模式旗標與暫存，為新建立帳號初始化獨立乾淨的本地狀態 (不殘留舊帳號或訪客體驗資料)
+            // 清除訪客體驗模式旗標與暫存，將目前現有班級資料安全綁定至新帳號
             sessionStorage.removeItem('app_is_guest_mode');
             localStorage.removeItem('visitor_id');
             localStorage.removeItem('visitor_name');
-            state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
-            state.currentClassId = null;
-            localStorage.setItem('homeworkAppData', safeStringify(state.appData));
-            localStorage.removeItem('currentClassId');
+            const newUserKey = getUserStorageKey({ uid: cred.user.uid, email: email, authEmail: finalAuthEmail });
+            if (!state.appData || !Array.isArray(state.appData.classes) || state.appData.classes.length === 0) {
+                state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
+                state.currentClassId = null;
+            }
+            const serialized = safeStringify(state.appData);
+            localStorage.setItem('homeworkAppData_' + newUserKey, serialized);
+            localStorage.setItem('homeworkAppData', serialized);
+            localStorage.setItem('homeworkAppData_last', serialized);
+            if (state.currentClassId) {
+                localStorage.setItem('currentClassId_' + newUserKey, state.currentClassId);
+                localStorage.setItem('currentClassId', state.currentClassId);
+            }
 
             // 關閉註冊表單 Modal
             closeModal(document.getElementById('portal-auth-modal'));
@@ -1307,11 +1383,21 @@ export function setupButtonEvents() {
                 showToast("✅ Google 帳號登入成功！", "success");
             }
 
-            // 清理訪客體驗/上一帳號的本地資料，保證快速體驗帳號資料不殘留
-            state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
-            state.currentClassId = null;
-            localStorage.removeItem('homeworkAppData');
-            localStorage.removeItem('currentClassId');
+            // 優先載入該帳號之本地資料；若本地有未綁定班級作業資料則予以綁定保留 (杜絕登入後資料消失)
+            const userKey = getUserStorageKey(userObj);
+            const userLocal = loadLocalDataForUser(userObj);
+            if (userLocal && Array.isArray(userLocal.classes) && userLocal.classes.length > 0) {
+                state.appData = userLocal;
+                state.currentClassId = localStorage.getItem('currentClassId_' + userKey) || state.appData.classes[0]?.id || null;
+            } else if (state.appData && Array.isArray(state.appData.classes) && state.appData.classes.length > 0) {
+                localStorage.setItem('homeworkAppData_' + userKey, safeStringify(state.appData));
+                if (state.currentClassId) localStorage.setItem('currentClassId_' + userKey, state.currentClassId);
+            } else {
+                state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
+                state.currentClassId = null;
+            }
+            localStorage.setItem('homeworkAppData', safeStringify(state.appData));
+            if (state.currentClassId) localStorage.setItem('currentClassId', state.currentClassId);
 
             showToast("⏳ 登入成功！正在檢查雲端資料...", "info");
             await loadDataFromCloud(true);
@@ -1635,6 +1721,7 @@ export function setupButtonEvents() {
     });
 
     bindClick('google-logout-btn', performFullLogout);
+    bindClick('delete-my-account-btn', deleteMyAccount);
     bindClick('settings-exit-system-btn', performFullLogout);
     bindClick('cloud-load-btn', async () => { await loadDataFromCloud(false); });
     bindClick('link-file-btn', async () => { 
@@ -1972,7 +2059,9 @@ export function setupButtonEvents() {
             renderClassList(); 
             if(state.appData.classes.length === 1 || !state.currentClassId || !state.appData.classes.some(c=>c.id===state.currentClassId)) { 
                 state.currentClassId = state.appData.classes[0].id; 
-                localStorage.setItem('state.currentClassId', state.currentClassId); 
+                localStorage.setItem('currentClassId', state.currentClassId); 
+                const userKey = getUserStorageKey(state.currentUser);
+                localStorage.setItem('currentClassId_' + userKey, state.currentClassId);
                 renderHomeworkList(); 
             } 
             showToast(`新增班級「${className}」(權限碼：${accessCode})！`, "success"); 
@@ -2037,8 +2126,14 @@ export function setupButtonEvents() {
                     state.appData.homeworks = state.appData.homeworks.filter(h => h.classId !== classId);
                     if(state.currentClassId === classId) {
                         state.currentClassId = state.appData.classes.length > 0 ? state.appData.classes[0].id : null;
-                        if(state.currentClassId) localStorage.setItem('state.currentClassId', state.currentClassId);
-                        else localStorage.removeItem('state.currentClassId');
+                        const userKey = getUserStorageKey(state.currentUser);
+                        if(state.currentClassId) {
+                            localStorage.setItem('currentClassId', state.currentClassId);
+                            localStorage.setItem('currentClassId_' + userKey, state.currentClassId);
+                        } else {
+                            localStorage.removeItem('currentClassId');
+                            localStorage.removeItem('currentClassId_' + userKey);
+                        }
                     }
                     await saveData();
                     renderClassSelector();
@@ -2122,7 +2217,12 @@ export function setupButtonEvents() {
     }
 
     bindClick('copy-parent-link-btn', async () => {
-        await safeCopyToClipboard(PARENT_DASHBOARD_URL, "✅ 已複製家長端連結！");
+        const baseUrl = 'https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/';
+        const currentClass = state.appData.classes.find(c => c.id === state.currentClassId);
+        const code = (currentClass && currentClass.accessCode) ? encodeURIComponent(currentClass.accessCode) : '';
+        const url = code ? `${baseUrl}?code=${code}` : baseUrl;
+        const msg = code ? `✅ 已複製「${currentClass.name}」家長端專屬連結 (附帶班級代碼)！` : "✅ 已複製家長端通用連結！";
+        await safeCopyToClipboard(url, msg);
     });
 
     const studentDetailsList = document.getElementById('student-details-list');
@@ -2137,7 +2237,9 @@ export function setupButtonEvents() {
 
     bindChange('class-selector', (e) => { 
         state.currentClassId = e.target.value; 
-        localStorage.setItem('state.currentClassId', state.currentClassId); 
+        localStorage.setItem('currentClassId', state.currentClassId); 
+        const userKey = getUserStorageKey(state.currentUser);
+        localStorage.setItem('currentClassId_' + userKey, state.currentClassId);
         renderHomeworkList(); 
     });
 
@@ -2604,7 +2706,7 @@ export function enterDeveloperMode() {
         if (window.updateChatUnreadBadge) window.updateChatUnreadBadge();
     } catch(e) {}
 
-    showToast("🛠️ 已進入開發者模式（管理員權限，已鎖定刪除帳號功能）", "success");
+    showToast("🛠️ 已進入開發者模式（具備完整管理員與維護權限）", "success");
 }
 window.enterDeveloperMode = enterDeveloperMode;
 

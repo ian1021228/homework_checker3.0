@@ -138,7 +138,6 @@ export function showMainPage(fromHistory = false) {
     const detailPage = document.getElementById('detail-page');
     if (detailPage) detailPage.dataset.from = ''; 
     restoreScroll('main-page');
-    setTimeout(checkAutoArchive, 800);
 }
 
 export function showDetailPage(homeworkId, fromHistory = false) {
@@ -239,65 +238,6 @@ export function proceedIntoSystem() {
         if (state.appData.classes.length === 0) openModal(document.getElementById('manage-classes-modal'));
     }
     updateGuestHomeBtnVisibility();
-}
-
-export async function checkAutoArchive() {
-    if (localStorage.getItem('autoArchiveNeverRemind') === 'true') return;
-    if (!state.currentClassId || !state.appData || !state.appData.homeworks) return;
-
-    const threeDaysAgo = new Date();
-    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-
-    const hwToArchive = state.appData.homeworks.find(hw => {
-        if (hw.classId !== state.currentClassId) return false;
-        if (hw.archivePrompted) return false;
-        if (!hw.createdAt) return false;
-        const hwDate = new Date(hw.createdAt);
-        if (hwDate > threeDaysAgo) return false;
-        
-        const typeId = hw.typeId || 'default';
-        const students = hw.students || [];
-        if (students.length === 0) return false;
-        
-        return students.every(s => isStudentCompleted(s, typeId));
-    });
-
-    if (hwToArchive) {
-        const modal = document.getElementById('auto-archive-modal');
-        if (modal && modal.classList.contains('hidden')) {
-            document.getElementById('auto-archive-message').textContent = `作業「${hwToArchive.name}」已經全班完成滿 3 天，是否要將其刪除（封存）以保持畫面乾淨？`;
-            
-            const keepBtn = document.getElementById('auto-archive-keep');
-            const deleteBtn = document.getElementById('auto-archive-delete');
-            const neverRemindCheck = document.getElementById('auto-archive-never-remind');
-            
-            neverRemindCheck.checked = false;
-
-            const cleanup = () => { keepBtn.onclick = null; deleteBtn.onclick = null; };
-
-            keepBtn.onclick = () => {
-                if (neverRemindCheck.checked) localStorage.setItem('autoArchiveNeverRemind', 'true');
-                hwToArchive.archivePrompted = true;
-                saveData();
-                closeModal(modal);
-                cleanup();
-                setTimeout(checkAutoArchive, 500);
-            };
-
-            deleteBtn.onclick = async () => {
-                if (neverRemindCheck.checked) localStorage.setItem('autoArchiveNeverRemind', 'true');
-                state.appData.homeworks = state.appData.homeworks.filter(h => h.id !== hwToArchive.id);
-                await saveData();
-                showToast(`已刪除「${hwToArchive.name}」`, "success");
-                renderHomeworkList();
-                closeModal(modal);
-                cleanup();
-                setTimeout(checkAutoArchive, 500);
-            };
-
-            openModal(modal);
-        }
-    }
 }
 
 export function openCopyClassModal() {

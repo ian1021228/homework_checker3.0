@@ -253,7 +253,7 @@ async function init() {
     }
 
     initPortalScrollIndicator();
-    if (state.currentUser && fbDb && sessionStorage.getItem('app_is_guest_mode') !== 'true') {
+    if (fbAuth?.currentUser && fbDb && sessionStorage.getItem('app_is_guest_mode') !== 'true' && !state.currentUser?.isDevMode) {
         startRealtimeCloudSync();
     }
 

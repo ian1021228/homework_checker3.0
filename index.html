@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="google" content="notranslate">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>親師作業點收X聯絡簿系統 3.0</title>
     <meta name="description" content="親師作業點收X聯絡簿系統 3.0 - 支援實體條碼掃描槍、雲端備份與親師聯絡簿整合的全方位作業點收系統">
     <meta property="og:title" content="親師作業點收X聯絡簿系統 3.0">
@@ -11,12 +11,14 @@
     
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#4f46e5">
-    <link rel="icon" type="image/svg+xml" href="icon.svg">
-    <link class="rounded-2xl shadow-lg shadow-indigo-500/10" rel="apple-touch-icon" href="icon.svg">
+    <link rel="icon" type="image/png" href="homework-checker-icon.png">
+    <link class="rounded-2xl shadow-lg shadow-indigo-500/10" rel="apple-touch-icon" href="homework-checker-icon.png">
     <script>
-        tailwind.config = {
-            darkMode: "class",
-        }
+        window.tailwind = {
+            config: {
+                darkMode: "class"
+            }
+        };
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=M+PLUS+Rounded+1c:wght@400;500;700;800;900&family=Nunito:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
@@ -355,7 +357,7 @@
                             </ul>
                         </div>
                         <div class="lg:col-span-6">
-                            <div class="feature-screenshot-wrapper group relative rounded-2xl overflow-hidden border border-stone-200 shadow-sm bg-stone-50 cursor-pointer" data-title="點收畫面 — 座號矩陣與雙模式切換" data-src="點收畫面.svg" data-fallback="點收畫面.png">
+                            <div class="feature-screenshot-wrapper group relative rounded-2xl overflow-hidden border border-stone-200 shadow-sm bg-stone-50 cursor-pointer" data-title="點收畫面 — 座號矩陣與雙模式切換" data-src="點收畫面.svg" data-fallback="homework-checker-icon.png">
                                 <div class="bg-stone-200/80 px-4 py-2 border-b border-stone-300 flex items-center justify-between text-xs text-stone-500">
                                     <div class="flex items-center gap-1.5 flex-wrap">
                                         <span class="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block"></span>
@@ -369,7 +371,7 @@
                                     </span>
                                 </div>
                                 <div class="p-2 sm:p-3 bg-stone-100 flex items-center justify-center min-h-[260px]">
-                                    <img src="點收畫面.svg" onerror="this.onerror=null; this.src='點收畫面.png';" loading="lazy" decoding="async" alt="點收畫面（示意圖）" class="w-full h-auto rounded-lg shadow-xs group-hover:scale-[1.01] transition-transform duration-200" />
+                                    <img src="點收畫面.svg" onerror="this.onerror=null; this.src='homework-checker-icon.png';" loading="lazy" decoding="async" alt="點收畫面（示意圖）" class="w-full h-auto rounded-lg shadow-xs group-hover:scale-[1.01] transition-transform duration-200" />
                                 </div>
                             </div>
                             <p class="text-[11px] sm:text-xs text-stone-500 font-medium text-center mt-2.5 flex items-center justify-center gap-1.5">
@@ -382,7 +384,7 @@
                     <!-- 功能 2：支援條碼器 -->
                     <div class="feature-card-optimized bg-white rounded-3xl p-6 sm:p-10 border border-stone-200/80 shadow-md hover:shadow-xl transition-all duration-300 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                         <div class="lg:col-span-6 order-2 lg:order-1">
-                            <div class="feature-screenshot-wrapper group relative rounded-2xl overflow-hidden border border-stone-200 shadow-sm bg-stone-50 cursor-pointer" data-title="支援條碼器 — 學生條碼設定與智慧等差數列推算" data-src="支援條碼器.svg" data-fallback="支援條碼器.png">
+                            <div class="feature-screenshot-wrapper group relative rounded-2xl overflow-hidden border border-stone-200 shadow-sm bg-stone-50 cursor-pointer" data-title="支援條碼器 — 學生條碼設定與智慧等差數列推算" data-src="支援條碼器.svg" data-fallback="homework-checker-icon.png">
                                 <div class="bg-stone-200/80 px-4 py-2 border-b border-stone-300 flex items-center justify-between text-xs text-stone-500">
                                     <div class="flex items-center gap-1.5 flex-wrap">
                                         <span class="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block"></span>
@@ -396,7 +398,7 @@
                                     </span>
                                 </div>
                                 <div class="p-2 sm:p-3 bg-stone-100 flex items-center justify-center min-h-[260px]">
-                                    <img src="支援條碼器.svg" onerror="this.onerror=null; this.src='支援條碼器.png';" loading="lazy" decoding="async" alt="支援條碼器（示意圖）" class="w-full h-auto rounded-lg shadow-xs group-hover:scale-[1.01] transition-transform duration-200" />
+                                    <img src="支援條碼器.svg" onerror="this.onerror=null; this.src='homework-checker-icon.png';" loading="lazy" decoding="async" alt="支援條碼器（示意圖）" class="w-full h-auto rounded-lg shadow-xs group-hover:scale-[1.01] transition-transform duration-200" />
                                 </div>
                             </div>
                             <p class="text-[11px] sm:text-xs text-stone-500 font-medium text-center mt-2.5 flex items-center justify-center gap-1.5">
@@ -465,7 +467,7 @@
                             </ul>
                         </div>
                         <div class="lg:col-span-6">
-                            <div class="feature-screenshot-wrapper group relative rounded-2xl overflow-hidden border border-stone-200 shadow-sm bg-stone-50 cursor-pointer" data-title="作業種類 — 配置不同學科作業狀態與完成判定" data-src="作業種類.svg" data-fallback="作業種類.png">
+                            <div class="feature-screenshot-wrapper group relative rounded-2xl overflow-hidden border border-stone-200 shadow-sm bg-stone-50 cursor-pointer" data-title="作業種類 — 配置不同學科作業狀態與完成判定" data-src="作業種類.svg" data-fallback="homework-checker-icon.png">
                                 <div class="bg-stone-200/80 px-4 py-2 border-b border-stone-300 flex items-center justify-between text-xs text-stone-500">
                                     <div class="flex items-center gap-1.5 flex-wrap">
                                         <span class="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block"></span>
@@ -479,7 +481,7 @@
                                     </span>
                                 </div>
                                 <div class="p-2 sm:p-3 bg-stone-100 flex items-center justify-center min-h-[260px]">
-                                    <img src="作業種類.svg" onerror="this.onerror=null; this.src='作業種類.png';" loading="lazy" decoding="async" alt="作業種類（示意圖）" class="w-full h-auto rounded-lg shadow-xs group-hover:scale-[1.01] transition-transform duration-200" />
+                                    <img src="作業種類.svg" onerror="this.onerror=null; this.src='homework-checker-icon.png';" loading="lazy" decoding="async" alt="作業種類（示意圖）" class="w-full h-auto rounded-lg shadow-xs group-hover:scale-[1.01] transition-transform duration-200" />
                                 </div>
                             </div>
                             <p class="text-[11px] sm:text-xs text-stone-500 font-medium text-center mt-2.5 flex items-center justify-center gap-1.5">
@@ -492,7 +494,7 @@
                     <!-- 功能 4：科任老師也能用 -->
                     <div class="feature-card-optimized bg-white rounded-3xl p-6 sm:p-10 border border-stone-200/80 shadow-md hover:shadow-xl transition-all duration-300 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                         <div class="lg:col-span-6 order-2 lg:order-1">
-                            <div class="feature-screenshot-wrapper group relative rounded-2xl overflow-hidden border border-stone-200 shadow-sm bg-stone-50 cursor-pointer" data-title="科任老師也能用 — 多班級切換與家長專屬權限碼" data-src="科任老師也能用.svg" data-fallback="科任老師也能用.png">
+                            <div class="feature-screenshot-wrapper group relative rounded-2xl overflow-hidden border border-stone-200 shadow-sm bg-stone-50 cursor-pointer" data-title="科任老師也能用 — 多班級切換與家長專屬權限碼" data-src="科任老師也能用.svg" data-fallback="homework-checker-icon.png">
                                 <div class="bg-stone-200/80 px-4 py-2 border-b border-stone-300 flex items-center justify-between text-xs text-stone-500">
                                     <div class="flex items-center gap-1.5 flex-wrap">
                                         <span class="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block"></span>
@@ -506,7 +508,7 @@
                                     </span>
                                 </div>
                                 <div class="p-2 sm:p-3 bg-stone-100 flex items-center justify-center min-h-[260px]">
-                                    <img src="科任老師也能用.svg" onerror="this.onerror=null; this.src='科任老師也能用.png';" loading="lazy" decoding="async" alt="科任老師也能用（示意圖）" class="w-full h-auto rounded-lg shadow-xs group-hover:scale-[1.01] transition-transform duration-200" />
+                                    <img src="科任老師也能用.svg" onerror="this.onerror=null; this.src='homework-checker-icon.png';" loading="lazy" decoding="async" alt="科任老師也能用（示意圖）" class="w-full h-auto rounded-lg shadow-xs group-hover:scale-[1.01] transition-transform duration-200" />
                                 </div>
                             </div>
                             <p class="text-[11px] sm:text-xs text-stone-500 font-medium text-center mt-2.5 flex items-center justify-center gap-1.5">
@@ -575,7 +577,7 @@
                             </ul>
                         </div>
                         <div class="lg:col-span-6">
-                            <div class="feature-screenshot-wrapper group relative rounded-2xl overflow-hidden border border-stone-200 shadow-sm bg-stone-50 cursor-pointer" data-title="家長端 — 個人化作業進度概況與每日聯絡簿" data-src="家長端.svg" data-fallback="家長端.png">
+                            <div class="feature-screenshot-wrapper group relative rounded-2xl overflow-hidden border border-stone-200 shadow-sm bg-stone-50 cursor-pointer" data-title="家長端 — 個人化作業進度概況與每日聯絡簿" data-src="家長端.svg" data-fallback="homework-checker-icon.png">
                                 <div class="bg-stone-200/80 px-4 py-2 border-b border-stone-300 flex items-center justify-between text-xs text-stone-500">
                                     <div class="flex items-center gap-1.5 flex-wrap">
                                         <span class="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block"></span>
@@ -589,7 +591,7 @@
                                     </span>
                                 </div>
                                 <div class="p-2 sm:p-3 bg-stone-100 flex items-center justify-center min-h-[260px]">
-                                    <img src="家長端.svg" onerror="this.onerror=null; this.src='家長端.png';" loading="lazy" decoding="async" alt="家長端（示意圖）" class="w-full h-auto rounded-lg shadow-xs group-hover:scale-[1.01] transition-transform duration-200" />
+                                    <img src="家長端.svg" onerror="this.onerror=null; this.src='homework-checker-icon.png';" loading="lazy" decoding="async" alt="家長端（示意圖）" class="w-full h-auto rounded-lg shadow-xs group-hover:scale-[1.01] transition-transform duration-200" />
                                 </div>
                             </div>
                             <p class="text-[11px] sm:text-xs text-stone-500 font-medium text-center mt-2.5 flex items-center justify-center gap-1.5">
@@ -602,7 +604,7 @@
                     <!-- 功能 6：新增作業 -->
                     <div class="feature-card-optimized bg-white rounded-3xl p-6 sm:p-10 border border-stone-200/80 shadow-md hover:shadow-xl transition-all duration-300 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                         <div class="lg:col-span-6 order-2 lg:order-1">
-                            <div class="feature-screenshot-wrapper group relative rounded-2xl overflow-hidden border border-stone-200 shadow-sm bg-stone-50 cursor-pointer" data-title="新增作業 — 智慧座號生成與彈性缺號排除" data-src="新增作業.svg" data-fallback="新增作業.png">
+                            <div class="feature-screenshot-wrapper group relative rounded-2xl overflow-hidden border border-stone-200 shadow-sm bg-stone-50 cursor-pointer" data-title="新增作業 — 智慧座號生成與彈性缺號排除" data-src="新增作業.svg" data-fallback="homework-checker-icon.png">
                                 <div class="bg-stone-200/80 px-4 py-2 border-b border-stone-300 flex items-center justify-between text-xs text-stone-500">
                                     <div class="flex items-center gap-1.5 flex-wrap">
                                         <span class="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block"></span>
@@ -616,7 +618,7 @@
                                     </span>
                                 </div>
                                 <div class="p-2 sm:p-3 bg-stone-100 flex items-center justify-center min-h-[260px]">
-                                    <img src="新增作業.svg" onerror="this.onerror=null; this.src='新增作業.png';" loading="lazy" decoding="async" alt="新增作業（示意圖）" class="w-full h-auto rounded-lg shadow-xs group-hover:scale-[1.01] transition-transform duration-200" />
+                                    <img src="新增作業.svg" onerror="this.onerror=null; this.src='homework-checker-icon.png';" loading="lazy" decoding="async" alt="新增作業（示意圖）" class="w-full h-auto rounded-lg shadow-xs group-hover:scale-[1.01] transition-transform duration-200" />
                                 </div>
                             </div>
                             <p class="text-[11px] sm:text-xs text-stone-500 font-medium text-center mt-2.5 flex items-center justify-center gap-1.5">
@@ -685,7 +687,7 @@
                             </ul>
                         </div>
                         <div class="lg:col-span-6">
-                            <div class="feature-screenshot-wrapper group relative rounded-2xl overflow-hidden border border-stone-200 shadow-sm bg-stone-50 cursor-pointer" data-title="學生詳情 — 全班各座號未完成作業卡片矩陣" data-src="學生詳情.svg" data-fallback="學生詳情.png">
+                            <div class="feature-screenshot-wrapper group relative rounded-2xl overflow-hidden border border-stone-200 shadow-sm bg-stone-50 cursor-pointer" data-title="學生詳情 — 全班各座號未完成作業卡片矩陣" data-src="學生詳情.svg" data-fallback="homework-checker-icon.png">
                                 <div class="bg-stone-200/80 px-4 py-2 border-b border-stone-300 flex items-center justify-between text-xs text-stone-500">
                                     <div class="flex items-center gap-1.5 flex-wrap">
                                         <span class="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block"></span>
@@ -699,7 +701,7 @@
                                     </span>
                                 </div>
                                 <div class="p-2 sm:p-3 bg-stone-100 flex items-center justify-center min-h-[260px]">
-                                    <img src="學生詳情.svg" onerror="this.onerror=null; this.src='學生詳情.png';" loading="lazy" decoding="async" alt="學生詳情（示意圖）" class="w-full h-auto rounded-lg shadow-xs group-hover:scale-[1.01] transition-transform duration-200" />
+                                    <img src="學生詳情.svg" onerror="this.onerror=null; this.src='homework-checker-icon.png';" loading="lazy" decoding="async" alt="學生詳情（示意圖）" class="w-full h-auto rounded-lg shadow-xs group-hover:scale-[1.01] transition-transform duration-200" />
                                 </div>
                             </div>
                             <p class="text-[11px] sm:text-xs text-stone-500 font-medium text-center mt-2.5 flex items-center justify-center gap-1.5">
@@ -712,7 +714,7 @@
                     <!-- 功能 8：聯絡簿 -->
                     <div class="feature-card-optimized bg-white rounded-3xl p-6 sm:p-10 border border-stone-200/80 shadow-md hover:shadow-xl transition-all duration-300 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                         <div class="lg:col-span-6 order-2 lg:order-1">
-                            <div class="feature-screenshot-wrapper group relative rounded-2xl overflow-hidden border border-stone-200 shadow-sm bg-stone-50 cursor-pointer" data-title="聯絡簿 — 擬真粉筆黑板與一鍵套用昨日" data-src="聯絡簿.svg" data-fallback="聯絡簿.png">
+                            <div class="feature-screenshot-wrapper group relative rounded-2xl overflow-hidden border border-stone-200 shadow-sm bg-stone-50 cursor-pointer" data-title="聯絡簿 — 擬真粉筆黑板與一鍵套用昨日" data-src="聯絡簿.svg" data-fallback="homework-checker-icon.png">
                                 <div class="bg-stone-200/80 px-4 py-2 border-b border-stone-300 flex items-center justify-between text-xs text-stone-500">
                                     <div class="flex items-center gap-1.5 flex-wrap">
                                         <span class="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block"></span>
@@ -726,7 +728,7 @@
                                     </span>
                                 </div>
                                 <div class="p-2 sm:p-3 bg-stone-100 flex items-center justify-center min-h-[260px]">
-                                    <img src="聯絡簿.svg" onerror="this.onerror=null; this.src='聯絡簿.png';" loading="lazy" decoding="async" alt="聯絡簿（示意圖）" class="w-full h-auto rounded-lg shadow-xs group-hover:scale-[1.01] transition-transform duration-200" />
+                                    <img src="聯絡簿.svg" onerror="this.onerror=null; this.src='homework-checker-icon.png';" loading="lazy" decoding="async" alt="聯絡簿（示意圖）" class="w-full h-auto rounded-lg shadow-xs group-hover:scale-[1.01] transition-transform duration-200" />
                                 </div>
                             </div>
                             <p class="text-[11px] sm:text-xs text-stone-500 font-medium text-center mt-2.5 flex items-center justify-center gap-1.5">
@@ -1782,15 +1784,6 @@
                    <p class="text-[11px] text-slate-500 mt-2 font-medium relative z-10">切換日/夜間模式，降低刺眼感。</p>
                </div>
 
-               <!-- 自動封存設定區塊 -->
-               <div class="p-5 border border-emerald-100 rounded-xl bg-emerald-50/50 shadow-sm relative overflow-hidden">
-                   <h3 class="font-bold text-emerald-900 mb-3 flex items-center gap-1.5 relative z-10">📦 自動封存設定</h3>
-                   <div class="flex gap-2 relative z-10">
-                       <button id="setting-auto-archive-prompt-btn" class="flex-1 py-2 px-3 rounded-xl font-bold text-sm glass-card border border-white/60 text-slate-600 hover:bg-slate-50 transition-all">重設封存提示</button>
-                   </div>
-                   <p class="text-[11px] text-emerald-700 mt-2 font-medium relative z-10">當全班完成作業滿 3 天，系統會提示是否封存。若曾勾選「不再提醒」，可在此重設。</p>
-               </div>
-
                <!-- 點收模式設定區塊 -->
                <div class="p-5 border border-purple-100 rounded-xl bg-purple-50/50 shadow-sm relative overflow-hidden">
                    <h3 class="font-bold text-purple-900 mb-3 flex items-center gap-1.5 relative z-10">👆 點收模式設定</h3>
@@ -1815,7 +1808,13 @@
                    
                    <div id="cloud-actions" class="hidden flex flex-col gap-2 relative z-10">
                        <button id="cloud-load-btn" class="w-full bg-sky-600 text-white font-bold py-2.5 px-4 text-sm rounded-xl hover:bg-sky-700 shadow-sm transition-colors">從雲端下載並覆蓋本地</button>
-                       <button id="google-logout-btn" class="w-full bg-white text-rose-500 border border-rose-200 font-bold py-2 px-4 text-xs rounded-xl hover:bg-rose-50 transition-colors">登出帳號</button>
+                       <div class="grid grid-cols-2 gap-2">
+                           <button id="google-logout-btn" class="w-full bg-white text-slate-700 border border-slate-200 font-bold py-2 px-3 text-xs rounded-xl hover:bg-slate-50 transition-colors">登出帳號</button>
+                           <button id="delete-my-account-btn" type="button" class="w-full bg-rose-50 text-rose-600 border border-rose-200 font-bold py-2 px-3 text-xs rounded-xl hover:bg-rose-100 transition-colors flex items-center justify-center gap-1 cursor-pointer">
+                               <i class="fa-solid fa-trash-can text-[11px]"></i>
+                               <span>刪除帳號</span>
+                           </button>
+                       </div>
                    </div>
 
                    <!-- 📱 手機跨裝置掃碼快速登入卡片 -->
@@ -2212,22 +2211,6 @@
         </div>
     </div>
 
-    <!-- 自動封存提示 Modal -->
-    <div id="auto-archive-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center p-4 hidden modal z-[110]">
-        <div class="modal-content bg-white rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-sm transform scale-95 border border-emerald-100 transition-all">
-            <h2 class="text-2xl font-extrabold mb-3 text-emerald-600">📦 自動封存提示</h2>
-            <p id="auto-archive-message" class="text-slate-600 mb-6 text-sm font-medium leading-relaxed"></p>
-            <div class="mb-5 flex items-center gap-2">
-                <input type="checkbox" id="auto-archive-never-remind" class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">
-                <label for="auto-archive-never-remind" class="text-sm text-slate-500 font-medium cursor-pointer">不再提醒</label>
-            </div>
-            <div class="flex justify-end gap-3">
-                <button id="auto-archive-keep" class="px-5 py-2.5 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition-colors">保留</button>
-                <button id="auto-archive-delete" class="px-5 py-2.5 rounded-xl font-bold bg-emerald-600 text-white shadow-md hover:bg-emerald-700 transition-colors">刪除封存</button>
-            </div>
-        </div>
-    </div>
-
     <!-- 等待信箱驗證完成 Modal -->
     <div id="email-verify-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-md flex items-center justify-center p-4 hidden modal z-[120]">
         <div class="modal-content glass-card rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-md transform scale-95 border border-slate-100">
@@ -2464,9 +2447,9 @@
     </div>
 
     <!-- 頂級 Toast 氣泡提示容器 -->
-    <div id="toast-container" class="fixed bottom-24 sm:bottom-28 right-5 sm:right-6 flex flex-col gap-2 z-[110] pointer-events-none"></div>
+    <div id="toast-container" class="fixed bottom-[calc(6rem+env(safe-area-inset-bottom,0px))] sm:bottom-[calc(7rem+env(safe-area-inset-bottom,0px))] right-5 sm:right-6 flex flex-col gap-2 z-[110] pointer-events-none"></div>
 
-    <footer class="fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-md border-t border-slate-200 text-slate-400 text-xs font-bold text-center py-2.5 z-20 select-none tracking-wide">
+    <footer class="fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-md border-t border-slate-200 text-slate-400 text-xs font-bold text-center pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom,0px))] z-20 select-none tracking-wide">
         Created by 王禹硯（ianw.solar@gmail.com）
     </footer>
 

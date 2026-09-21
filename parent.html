@@ -732,11 +732,24 @@
 
     function parseMissingSeats(missingStr) {
       if (!missingStr) return new Set();
-      const parts = String(missingStr).split(/[,，\s]+/);
+      const parts = String(missingStr).split(/[,，、\s]+/);
       const set = new Set();
       parts.forEach(p => {
-        const n = parseInt(p.trim(), 10);
-        if (!isNaN(n)) set.add(n);
+        const item = p.trim();
+        if (!item) return;
+        const rangeMatch = item.match(/^(\d+)[-~–—](\d+)$/);
+        if (rangeMatch) {
+          const start = parseInt(rangeMatch[1], 10);
+          const end = parseInt(rangeMatch[2], 10);
+          const min = Math.min(start, end);
+          const max = Math.max(start, end);
+          for (let i = min; i <= max; i++) {
+            set.add(i);
+          }
+        } else {
+          const n = parseInt(item, 10);
+          if (!isNaN(n)) set.add(n);
+        }
       });
       return set;
     }

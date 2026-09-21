@@ -5,6 +5,7 @@ import { safeClone, safeStringify, sanitizeAppData, fixDates, showToast, showAle
 import { updateDataManagementUI, updatePortalUI } from './render.js';
 import { proceedIntoSystem } from './navigation.js';
 import { startRealtimeCloudSync, loadDataFromCloud } from './firebase.js';
+import { getUserStorageKey, loadLocalDataForUser } from './storage.js';
 
 let activeQrUnsubscribe = null;
 let activeQrCountdownInterval = null;
@@ -152,13 +153,27 @@ export async function startDeviceQrLoginSession() {
                 localStorage.setItem('app_user_session', JSON.stringify(data.userObj));
                 localStorage.setItem('storageSelected', 'true');
 
-                // 3. 恢復最新雲端 / 手機同步資料
-                if (data.appData && Array.isArray(data.appData.classes)) {
+                // 3. 恢復最新雲端 / 手機同步資料 (確保不遺失本地或手機班級作業)
+                const userKey = getUserStorageKey(data.userObj);
+                const localData = loadLocalDataForUser(data.userObj);
+                const phoneHasClasses = data.appData && Array.isArray(data.appData.classes) && data.appData.classes.length > 0;
+                const localHasClasses = localData && Array.isArray(localData.classes) && localData.classes.length > 0;
+
+                if (phoneHasClasses) {
                     state.appData = sanitizeAppData(data.appData);
                     fixDates(state.appData);
                     state.currentClassId = state.appData.classes?.[0]?.id || null;
-                    localStorage.setItem('homeworkAppData', safeStringify(state.appData));
-                    if (state.currentClassId) localStorage.setItem('currentClassId', state.currentClassId);
+                } else if (localHasClasses) {
+                    state.appData = localData;
+                    fixDates(state.appData);
+                    state.currentClassId = localStorage.getItem('currentClassId_' + userKey) || state.appData.classes[0]?.id || null;
+                }
+                const serialized = safeStringify(state.appData);
+                localStorage.setItem('homeworkAppData_' + userKey, serialized);
+                localStorage.setItem('homeworkAppData', serialized);
+                if (state.currentClassId) {
+                    localStorage.setItem('currentClassId_' + userKey, state.currentClassId);
+                    localStorage.setItem('currentClassId', state.currentClassId);
                 }
 
                 // 4. 更新畫面 UI
@@ -402,12 +417,12 @@ export async function promptAuthorizeChallenge(challengeId) {
                         }
                     } catch (e) {}
 
-                    // 寫入授權資料至 Firestore 挑戰文件
+                    // 寫入授權資料至 Firestore 挑戰文件 (杜絕傳遞明文密碼)
                     await updateDoc(challengeRef, {
                         status: 'authorized',
                         userObj: state.currentUser,
                         authProvider: sessionStorage.getItem('auth_provider') || 'password',
-                        credentials: boundPassword ? { authEmail, password: boundPassword } : null,
+                        credentials: null,
                         appData: state.appData || { classes: [], homeworks: [] },
                         authorizedAt: new Date().toISOString()
                     });

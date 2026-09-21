@@ -1,5 +1,23 @@
 import { DEFAULT_TYPES } from './constants.js';
 
+export async function hashPassword(password, salt = 'hw_checker_salt_2026') {
+    if (!password) return '';
+    const enc = new TextEncoder();
+    const data = enc.encode(password + salt);
+    const hashBuf = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+export function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 export function generateId() { 
     return Date.now().toString(36) + Math.random().toString(36).substr(2); 
 }

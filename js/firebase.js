@@ -34,6 +34,7 @@ import {
 import { firebaseConfig, globalAppId, DEFAULT_TYPES } from './constants.js';
 import { state } from './state.js';
 import { safeStringify, safeClone, sanitizeAppData, fixDates, showToast, showAlertModal, showConfirmModal, closeModal } from './utils.js';
+import { getUserStorageKey, loadLocalDataForUser } from './storage.js';
 
 export let fbApp, fbAuth, fbDb;
 
@@ -405,15 +406,9 @@ export function renderAdminUsersList() {
                 <button class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-colors force-reset-btn shadow-sm cursor-pointer" data-id="${id}">
                     ⚠️ 重置
                 </button>
-                ${(state?.isDevMode || sessionStorage.getItem('app_dev_mode') === 'true') ? `
-                    <button class="bg-stone-100 text-stone-400 border border-stone-200 px-2.5 py-1.5 rounded-lg text-[11px] font-bold cursor-not-allowed shadow-xs" disabled title="開發者模式已鎖定：無法刪除帳號">
-                        🚫 禁刪
-                    </button>
-                ` : `
-                    <button class="bg-red-600 hover:bg-red-700 text-white border border-red-800 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-colors delete-user-btn shadow-sm cursor-pointer" data-id="${id}">
-                        🗑️ 刪除
-                    </button>
-                `}
+                <button class="bg-red-600 hover:bg-red-700 text-white border border-red-800 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-colors delete-user-btn shadow-sm cursor-pointer" data-id="${id}" data-name="${u.displayName || u.email || id}">
+                    🗑️ 刪除
+                </button>
             </td>
         `;
         usersList.appendChild(tr);
@@ -484,20 +479,23 @@ export function renderAdminUsersList() {
         btn.addEventListener('click', async (e) => {
             const targetBtn = e.target.closest('.delete-user-btn');
             if (!targetBtn) return;
-            if (state?.isDevMode || sessionStorage.getItem('app_dev_mode') === 'true') {
-                showToast("⚠️ 開發者模式安全防護：無權限刪除帳戶", "warning");
+            const id = targetBtn.dataset.id;
+            const name = targetBtn.dataset.name || id;
+            if (!confirm(`【確定刪除帳號？】\n\n確定要刪除用戶「${name}」？此操作將永久清除該用戶的資料庫設定與雲端作業資料，且不可復原！`)) {
                 return;
             }
-            const id = targetBtn.dataset.id;
-            const pass = prompt("【危險操作】確定刪除該帳戶？此操作將不可逆。請輸入密鑰確認：");
-            if (pass === "ianw0000") {
+            try {
+                await deleteDoc(doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', id));
+                await deleteDoc(doc(fbDb, 'artifacts', globalAppId, 'users', id, 'appData', 'mainDoc'));
                 try {
-                    await deleteDoc(doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', id));
-                    await deleteDoc(doc(fbDb, 'artifacts', globalAppId, 'users', id, 'appData', 'mainDoc'));
-                    adminCachedUsers = adminCachedUsers.filter(u => u.id !== id);
-                    renderAdminUsersList();
-                    showToast("帳戶已刪除", "success");
-                } catch(err) { showToast("刪除失敗", "error"); }
+                    await deleteDoc(doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'boundAccounts', id));
+                } catch(e) {}
+                adminCachedUsers = adminCachedUsers.filter(u => u.id !== id);
+                renderAdminUsersList();
+                showToast(`用戶「${name}」帳戶已成功刪除`, "success");
+            } catch(err) {
+                console.error("Delete user failed:", err);
+                showToast("刪除失敗：" + (err?.message || "權限不足"), "error");
             }
         });
     });
@@ -595,9 +593,12 @@ let lastSyncedDataStr = null;
 
 export function startRealtimeCloudSync() {
     if (state.adminViewModeUserId || sessionStorage.getItem('app_is_guest_mode') === 'true' || !fbDb) return;
+    if (state.currentUser?.isDevMode) return;
     
-    const targetUid = fbAuth?.currentUser?.uid || state.currentUser?.uid;
-    if (!targetUid) return;
+    // 必須在 Firebase Auth 驗證完成後且存在有效 UID 時才啟動即時監聽
+    const authUser = fbAuth?.currentUser;
+    if (!authUser || !authUser.uid) return;
+    const targetUid = authUser.uid;
 
     if (unsubAppData) {
         try { unsubAppData(); } catch(e) {}
@@ -609,6 +610,11 @@ export function startRealtimeCloudSync() {
         unsubAppData = onSnapshot(docRef, { includeMetadataChanges: false }, (docSnap) => {
             if (state.adminViewModeUserId || sessionStorage.getItem('app_is_guest_mode') === 'true') return;
             if (docSnap.metadata && docSnap.metadata.hasPendingWrites) return;
+
+            // 確保當前用戶仍是該 targetUid，若中途切換帳號則直接忽略舊監聽器回調
+            if (fbAuth?.currentUser?.uid !== targetUid) {
+                return;
+            }
 
             if (!docSnap.exists()) return;
             const payload = docSnap.data();
@@ -631,14 +637,22 @@ export function startRealtimeCloudSync() {
                 fixDates(cloudData);
                 state.appData = cloudData;
                 lastSyncedDataStr = incomingStr;
+                const userKey = getUserStorageKey(state.currentUser);
+                localStorage.setItem('homeworkAppData_' + userKey, incomingStr);
                 localStorage.setItem('homeworkAppData', incomingStr);
 
                 if (state.currentClassId && !state.appData.classes.some(c => c.id === state.currentClassId)) {
                     state.currentClassId = state.appData.classes[0]?.id || null;
-                    if (state.currentClassId) localStorage.setItem('currentClassId', state.currentClassId);
-                    else localStorage.removeItem('currentClassId');
+                    if (state.currentClassId) {
+                        localStorage.setItem('currentClassId_' + userKey, state.currentClassId);
+                        localStorage.setItem('currentClassId', state.currentClassId);
+                    } else {
+                        localStorage.removeItem('currentClassId_' + userKey);
+                        localStorage.removeItem('currentClassId');
+                    }
                 } else if (!state.currentClassId && state.appData.classes.length > 0) {
                     state.currentClassId = state.appData.classes[0].id;
+                    localStorage.setItem('currentClassId_' + userKey, state.currentClassId);
                     localStorage.setItem('currentClassId', state.currentClassId);
                 }
 
@@ -655,6 +669,13 @@ export function startRealtimeCloudSync() {
                 console.warn("Realtime cloud sync parse notice:", err);
             }
         }, (err) => {
+            if (err?.code === 'permission-denied') {
+                if (unsubAppData) {
+                    try { unsubAppData(); } catch(e) {}
+                    unsubAppData = null;
+                }
+                return;
+            }
             console.warn("Realtime cloud sync listen notice:", err?.message || err);
         });
     } catch(e) {
@@ -686,6 +707,12 @@ export async function syncDataToCloud() {
     if (state.adminViewModeUserId || sessionStorage.getItem('app_is_guest_mode') === 'true' || !state.currentUser || !fbDb || !fbAuth?.currentUser) return;
     try {
         const targetUid = fbAuth.currentUser.uid;
+        // 嚴格身分校驗：防止切換帳號過渡期非同步調用導致前一帳號資料寫入新帳號之雲端
+        if (state.currentUser.uid && state.currentUser.uid !== targetUid && !state.currentUser.isDevMode) {
+            console.warn("UID mismatch in syncDataToCloud, aborting sync to prevent overwrite:", state.currentUser.uid, targetUid);
+            return;
+        }
+
         const docRef = doc(fbDb, 'artifacts', globalAppId, 'users', targetUid, 'appData', 'mainDoc');
         const dataStr = safeStringify(state.appData);
         lastSyncedDataStr = dataStr;
@@ -740,22 +767,8 @@ export async function loadDataFromCloud(silent = false, onLoadedCallback) {
         let targetUid = state.adminViewModeUserId || fbAuth.currentUser.uid;
         let docRef = doc(fbDb, 'artifacts', globalAppId, 'users', targetUid, 'appData', 'mainDoc');
         let docSnap = await getDoc(docRef);
-        if ((!docSnap.exists() || !docSnap.data()?.data) && targetUid === 'admin_ianw_solar') {
-            try {
-                const profilesSnap = await getDocs(collection(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles'));
-                for (const pDoc of profilesSnap.docs) {
-                    if (pDoc.data()?.email === 'ianw.solar@gmail.com' && pDoc.id !== 'admin_ianw_solar') {
-                        const altDoc = await getDoc(doc(fbDb, 'artifacts', globalAppId, 'users', pDoc.id, 'appData', 'mainDoc'));
-                        if (altDoc.exists() && altDoc.data()?.data) {
-                            docSnap = altDoc;
-                            targetUid = pDoc.id;
-                            break;
-                        }
-                    }
-                }
-            } catch(e) {}
-        }
-        if (docSnap.exists() && docSnap.data().data) {
+
+        if (docSnap.exists() && docSnap.data()?.data) {
             const rawStr = docSnap.data().data;
             lastSyncedDataStr = rawStr;
             const cloudData = sanitizeAppData(JSON.parse(rawStr));
@@ -770,9 +783,12 @@ export async function loadDataFromCloud(silent = false, onLoadedCallback) {
             } else if (silent) { 
                 state.appData = cloudData; 
                 fixDates(state.appData); 
+                const userKey = getUserStorageKey(state.currentUser);
+                localStorage.setItem('homeworkAppData_' + userKey, rawStr);
                 localStorage.setItem('homeworkAppData', rawStr); 
                 if (!state.currentClassId && state.appData.classes.length > 0) {
                     state.currentClassId = state.appData.classes[0].id;
+                    localStorage.setItem('currentClassId_' + userKey, state.currentClassId);
                     localStorage.setItem('currentClassId', state.currentClassId);
                 }
                 if (onLoadedCallback) onLoadedCallback();
@@ -784,9 +800,12 @@ export async function loadDataFromCloud(silent = false, onLoadedCallback) {
                 showConfirmModal('發現雲端備份', '確定要將本地資料完全覆蓋為雲端上的最新紀錄嗎？這會清除未上傳的本地更動。', () => {
                     state.appData = cloudData; 
                     fixDates(state.appData); 
+                    const userKey = getUserStorageKey(state.currentUser);
+                    localStorage.setItem('homeworkAppData_' + userKey, rawStr);
                     localStorage.setItem('homeworkAppData', rawStr); 
                     if (!state.currentClassId && state.appData.classes.length > 0) {
                         state.currentClassId = state.appData.classes[0].id;
+                        localStorage.setItem('currentClassId_' + userKey, state.currentClassId);
                         localStorage.setItem('currentClassId', state.currentClassId);
                     }
                     if (onLoadedCallback) onLoadedCallback();
@@ -804,15 +823,33 @@ export async function loadDataFromCloud(silent = false, onLoadedCallback) {
                 showToast(`用戶「${state.adminViewModeUserEmail || targetUid}」在雲端尚無備份資料`, 'info');
                 return true;
             } else {
-                // 一般登入用戶雲端無資料時，初始化純淨空帳號，避免殘留訪客/舊帳號資料
-                state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
-                state.currentClassId = null;
-                localStorage.setItem('homeworkAppData', safeStringify(state.appData));
-                localStorage.removeItem('currentClassId');
-                if (onLoadedCallback) onLoadedCallback();
-                startRealtimeCloudSync();
-                if (!silent) showToast('在您的雲端帳戶中尚無備份資料（已建立全新空白作業本）。', 'info');
-                return false;
+                const userKey = getUserStorageKey(state.currentUser);
+                // 檢查本地是否已有該用戶的資料（例如曾在此設備建立過但尚未同步或初次登入）
+                const localData = loadLocalDataForUser(state.currentUser);
+                if (localData && Array.isArray(localData.classes) && localData.classes.length > 0) {
+                    state.appData = localData;
+                    fixDates(state.appData);
+                    state.currentClassId = localStorage.getItem('currentClassId_' + userKey) || state.appData.classes[0]?.id || null;
+                    // 將本機資料同步上雲，絕對不覆蓋摧毀使用者的成果
+                    await syncDataToCloud();
+                    if (onLoadedCallback) onLoadedCallback();
+                    startRealtimeCloudSync();
+                    if (!silent) showToast('已從本機載入此帳號資料，並自動備份至雲端！', 'success');
+                    return true;
+                } else {
+                    // 全新空帳號初始化
+                    state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
+                    state.currentClassId = null;
+                    const emptyStr = safeStringify(state.appData);
+                    localStorage.setItem('homeworkAppData_' + userKey, emptyStr);
+                    localStorage.setItem('homeworkAppData', emptyStr);
+                    localStorage.removeItem('currentClassId_' + userKey);
+                    localStorage.removeItem('currentClassId');
+                    if (onLoadedCallback) onLoadedCallback();
+                    startRealtimeCloudSync();
+                    if (!silent) showToast('在您的雲端帳戶中尚無備份資料（已建立全新空白作業本）。', 'info');
+                    return false;
+                }
             }
         }
     } catch(e) { 
@@ -821,3 +858,80 @@ export async function loadDataFromCloud(silent = false, onLoadedCallback) {
         return false; 
     }
 }
+
+export async function deleteMyAccount() {
+    const user = fbAuth?.currentUser || state.currentUser;
+    if (!user) {
+        showToast("尚未登入帳號", "warning");
+        return;
+    }
+
+    const uid = fbAuth?.currentUser?.uid || state.currentUser?.uid;
+    const email = user.email || user.displayName || "目前登入的帳號";
+
+    const confirmed = confirm(`⚠️【確定註銷並刪除帳號？】\n\n您即將刪除帳號【${email}】。\n\n此操作將會：\n1. 永久刪除您在雲端保存的所有班級、學生與作業紀錄\n2. 刪除所有雲端備份與設定檔\n3. 清空本機暫存並登出系統\n\n此操作無法復原！是否確定要繼續刪除？`);
+    if (!confirmed) return;
+
+    try {
+        showToast("正在永久刪除雲端資料與註銷帳號...", "info");
+
+        // 1. 刪除雲端個人與作業資料
+        if (uid && fbDb) {
+            try {
+                await deleteDoc(doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', uid));
+            } catch(e) { console.warn("Failed to delete profile doc:", e); }
+
+            try {
+                await deleteDoc(doc(fbDb, 'artifacts', globalAppId, 'users', uid, 'appData', 'mainDoc'));
+            } catch(e) { console.warn("Failed to delete main doc:", e); }
+
+            try {
+                await deleteDoc(doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'boundAccounts', uid));
+            } catch(e) {}
+        }
+
+        // 2. 嘗試刪除 Firebase Auth 帳戶 (若權限許可)
+        let authDeleted = false;
+        if (fbAuth?.currentUser) {
+            try {
+                await fbAuth.currentUser.delete();
+                authDeleted = true;
+            } catch (authErr) {
+                console.warn("fbAuth delete error (token may require recent login):", authErr);
+            }
+        }
+
+        // 3. 清除本機快取
+        stopRealtimeCloudSync();
+        const userKey = getUserStorageKey(state.currentUser);
+        localStorage.removeItem('homeworkAppData_' + userKey);
+        localStorage.removeItem('currentClassId_' + userKey);
+        localStorage.removeItem('homeworkAppData');
+        localStorage.removeItem('currentClassId');
+        localStorage.removeItem('currentUser');
+        sessionStorage.clear();
+
+        state.currentUser = null;
+        if (window.cleanUpChatListeners) window.cleanUpChatListeners();
+
+        // 4. 登出
+        try {
+            await signOut(fbAuth);
+        } catch(e) {}
+
+        showToast(authDeleted ? "✅ 帳號與雲端資料已永久註銷並刪除！" : "✅ 雲端資料與帳戶紀錄已全數清空！", "success");
+
+        // 5. 關閉彈窗並返回入口頁
+        const settingsModal = document.getElementById('settings-modal');
+        if (settingsModal) closeModal(settingsModal);
+
+        setTimeout(() => {
+            window.location.hash = '#portal';
+            window.location.reload();
+        }, 1000);
+    } catch (err) {
+        console.error("Delete account error:", err);
+        showToast("刪除過程中發生錯誤：" + (err?.message || "請稍後再試"), "error");
+    }
+}
+
