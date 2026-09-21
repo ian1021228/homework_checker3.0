@@ -724,13 +724,15 @@ export function setupButtonEvents() {
         }
 
         try {
-            // 1. 取得所有綁定帳號記錄 (從本地與 Firestore boundAccounts 同步)
+            // 1. 取得所有綁定帳號記錄 (從本地與 Firestore boundAccounts 雙向同步)
             let boundList = [];
             try { boundList = JSON.parse(localStorage.getItem('bound_accounts_all') || localStorage.getItem('bound_accounts_ianw') || '[]'); } catch(e) {}
             if (fbDb) {
                 try {
                     const boundSnap = await getDocs(collection(fbDb, 'artifacts', globalAppId, 'public', 'data', 'boundAccounts'));
+                    const cloudDocIds = new Set();
                     boundSnap.forEach(d => {
+                        cloudDocIds.add(d.id);
                         const dData = d.data();
                         const existingIdx = boundList.findIndex(b => (b.id && b.id === dData.id) || (b.uid && b.uid === dData.uid));
                         if (existingIdx >= 0) {
@@ -739,6 +741,21 @@ export function setupButtonEvents() {
                             boundList.push(dData);
                         }
                     });
+
+                    // 雙向補傳：若本地有記錄但雲端尚無，自動上傳至雲端 boundAccounts
+                    for (const b of boundList) {
+                        const docId = b.id || b.uid;
+                        if (docId && !cloudDocIds.has(docId)) {
+                            try {
+                                await setDoc(doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'boundAccounts', docId), b, { merge: true });
+                                cloudDocIds.add(docId);
+                                console.log("Auto-synced local bound account to cloud:", b.username || b.email);
+                            } catch(syncErr) {
+                                console.warn("Auto-sync local bound account err:", syncErr);
+                            }
+                        }
+                    }
+
                     localStorage.setItem('bound_accounts_all', JSON.stringify(boundList));
                 } catch(e) {
                     console.warn("Fetch boundAccounts error:", e);
@@ -987,18 +1004,35 @@ export function setupButtonEvents() {
         const isIanw = email.toLowerCase() === 'ianw.solar@gmail.com';
 
         try {
-            // 檢查使用者名稱是否已被其他人註冊
+            // 檢查使用者名稱是否已被其他人註冊 (雙向同步 boundAccounts)
             let boundList = [];
             try { boundList = JSON.parse(localStorage.getItem('bound_accounts_all') || localStorage.getItem('bound_accounts_ianw') || '[]'); } catch(e) {}
             if (fbDb) {
                 try {
                     const boundSnap = await getDocs(collection(fbDb, 'artifacts', globalAppId, 'public', 'data', 'boundAccounts'));
+                    const cloudDocIds = new Set();
                     boundSnap.forEach(d => {
+                        cloudDocIds.add(d.id);
                         const dData = d.data();
                         if (!boundList.some(b => (b.id && b.id === dData.id) || (b.uid && b.uid === dData.uid))) {
                             boundList.push(dData);
                         }
                     });
+
+                    // 雙向補傳：若本地有記錄但雲端尚無，自動上傳至雲端 boundAccounts
+                    for (const b of boundList) {
+                        const docId = b.id || b.uid;
+                        if (docId && !cloudDocIds.has(docId)) {
+                            try {
+                                await setDoc(doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'boundAccounts', docId), b, { merge: true });
+                                cloudDocIds.add(docId);
+                                console.log("Auto-synced local bound account to cloud:", b.username || b.email);
+                            } catch(syncErr) {
+                                console.warn("Auto-sync local bound account err:", syncErr);
+                            }
+                        }
+                    }
+
                     localStorage.setItem('bound_accounts_all', JSON.stringify(boundList));
                 } catch(e) {
                     console.warn("Fetch bound accounts error:", e);
@@ -1013,9 +1047,14 @@ export function setupButtonEvents() {
             );
             if (existingUser) {
                 showAlertModal(
-                    "使用者名稱已被使用", 
-                    `使用者名稱「${name}」已經被註冊使用了。\n\n由於日後登入時只需輸入使用者名稱與密碼，為了確保系統能精確識別您的帳號，請換一個不同的專屬使用者名稱（例如加上班級、職稱或姓名）。`
+                    "此帳號已存在", 
+                    `使用者名稱「${name}」已經註冊過囉！\n\n系統已自動為您切換至【登入】分頁，請直接輸入密碼登入即可使用。\n\n若您要建立全新的不同帳號，請換一個專屬使用者名稱。`
                 );
+                document.getElementById('portal-view-signup')?.classList.add('hidden');
+                document.getElementById('portal-view-signin')?.classList.remove('hidden');
+                const signinEmail = document.getElementById('portal-signin-email');
+                if (signinEmail) signinEmail.value = name;
+                document.getElementById('portal-signin-password')?.focus();
                 return;
             }
 
