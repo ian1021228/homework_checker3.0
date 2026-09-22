@@ -2287,11 +2287,11 @@ export function setupButtonEvents() {
 
                 const originalHtml = nameContainer.innerHTML;
                 nameContainer.innerHTML = `
-                    <div class="flex items-center gap-1.5 flex-1 min-w-0">
+                    <div class="flex items-center gap-2 flex-1 min-w-0">
                         <span class="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0 animate-pulse"></span>
-                        <input type="text" class="inline-rename-input px-2 py-1 text-xs sm:text-sm font-bold border-2 border-indigo-500 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-300 w-full max-w-[140px] sm:max-w-[170px]" value="${cls.name}" maxlength="25">
-                        <button type="button" class="confirm-inline-rename-btn px-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-xs transition-colors shrink-0">儲存</button>
-                        <button type="button" class="cancel-inline-rename-btn px-1.5 py-1 text-slate-400 hover:text-slate-600 text-xs font-bold shrink-0">取消</button>
+                        <input type="text" class="inline-rename-input px-3 py-1.5 text-xs sm:text-sm font-bold border-2 border-indigo-500 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-300 w-full max-w-[180px] sm:max-w-[280px]" value="${cls.name}" maxlength="25">
+                        <button type="button" class="confirm-inline-rename-btn px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs transition-colors shrink-0">儲存</button>
+                        <button type="button" class="cancel-inline-rename-btn px-2 py-1.5 text-slate-400 hover:text-slate-600 text-xs font-bold shrink-0">取消</button>
                     </div>
                 `;
 

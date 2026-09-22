@@ -108,35 +108,36 @@ export function renderClassList() {
 
     state.appData.classes.forEach(c => {
         const classItem = document.createElement('div');
-        classItem.className = 'p-3 bg-white border border-slate-200/80 rounded-2xl mb-2.5 shadow-xs transition-all hover:border-indigo-200 group';
+        classItem.className = 'p-3.5 sm:p-4 bg-white border border-slate-200/80 rounded-2xl mb-3 shadow-xs transition-all hover:border-indigo-200 group';
         const code = c.accessCode || '';
         classItem.innerHTML = `
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                <div class="flex items-center gap-1.5 min-w-0 flex-1">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div class="flex items-center gap-2 min-w-0 flex-1">
                     <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 shrink-0"></span>
-                    <span class="class-name-text font-black text-slate-800 text-sm truncate cursor-pointer hover:text-indigo-600" data-class-id="${c.id}" title="點擊修改班級名稱：${c.name}">${c.name}</span>
-                    <button type="button" data-class-id="${c.id}" data-name="${c.name}" class="rename-class-btn text-slate-400 hover:text-indigo-600 px-1.5 py-1 rounded-lg hover:bg-indigo-50 transition-colors text-xs shrink-0" title="修改班級名稱">
+                    <span class="class-name-text font-black text-slate-800 text-sm sm:text-base truncate cursor-pointer hover:text-indigo-600" data-class-id="${c.id}" title="點擊修改班級名稱：${c.name}">${c.name}</span>
+                    <button type="button" data-class-id="${c.id}" data-name="${c.name}" class="rename-class-btn text-slate-400 hover:text-indigo-600 px-2 py-1 rounded-lg hover:bg-indigo-50 transition-colors text-xs shrink-0 flex items-center gap-1" title="修改班級名稱">
                         <i class="fa-solid fa-pen-to-square"></i>
+                        <span class="text-[11px] hidden sm:inline">改名</span>
                     </button>
                 </div>
-                <div class="flex items-center gap-1.5 flex-wrap sm:flex-nowrap">
-                    <div class="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1 focus-within:border-indigo-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
+                <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
+                    <div class="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 focus-within:border-indigo-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
                         <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider whitespace-nowrap">權限碼</span>
-                        <input type="text" data-class-id="${c.id}" class="class-code-input w-20 sm:w-24 bg-transparent text-xs font-mono font-black text-indigo-700 focus:outline-none uppercase" placeholder="未設定" value="${code}" maxlength="16">
-                        <button type="button" data-class-id="${c.id}" class="save-class-code-btn text-[11px] font-bold text-indigo-600 hover:text-indigo-800 px-1.5 py-0.5 rounded hover:bg-indigo-50 transition-colors whitespace-nowrap" title="儲存權限碼">儲存</button>
-                        <button type="button" data-class-id="${c.id}" class="regen-class-code-btn text-[11px] font-bold text-slate-400 hover:text-slate-700 px-1 py-0.5 rounded hover:bg-slate-200 transition-colors shrink-0" title="隨機產生權限碼">🎲</button>
+                        <input type="text" data-class-id="${c.id}" class="class-code-input w-24 sm:w-28 bg-transparent text-xs font-mono font-black text-indigo-700 focus:outline-none uppercase" placeholder="未設定" value="${code}" maxlength="16">
+                        <button type="button" data-class-id="${c.id}" class="save-class-code-btn text-xs font-bold text-indigo-600 hover:text-indigo-800 px-1.5 py-0.5 rounded hover:bg-indigo-50 transition-colors whitespace-nowrap" title="儲存權限碼">儲存</button>
+                        <button type="button" data-class-id="${c.id}" class="regen-class-code-btn text-xs font-bold text-slate-400 hover:text-slate-700 px-1 py-0.5 rounded hover:bg-slate-200 transition-colors shrink-0" title="隨機產生權限碼">🎲</button>
                     </div>
                     ${code ? `
-                        <button type="button" data-code="${code}" data-name="${c.name}" class="copy-class-code-btn px-2.5 py-1.5 text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl transition-colors font-bold flex items-center gap-1 shrink-0" title="複製此班級權限代碼">
+                        <button type="button" data-code="${code}" data-name="${c.name}" class="copy-class-code-btn px-3 py-1.5 text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl transition-colors font-bold flex items-center gap-1.5 shrink-0" title="複製此班級權限代碼">
                             <i class="fa-solid fa-copy"></i>
                             <span class="text-[11px] hidden sm:inline">複製代碼</span>
                         </button>
-                        <button type="button" data-code="${code}" data-name="${c.name}" class="copy-parent-link-btn px-2.5 py-1.5 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl transition-colors font-bold flex items-center gap-1 shrink-0 shadow-2xs" title="複製此班級專屬家長端連結（已包含此班級代碼）">
+                        <button type="button" data-code="${code}" data-name="${c.name}" class="copy-parent-link-btn px-3 py-1.5 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl transition-colors font-bold flex items-center gap-1.5 shrink-0 shadow-2xs" title="複製此班級專屬家長端連結（已包含此班級代碼）">
                             <i class="fa-solid fa-arrow-up-right-from-square"></i>
                             <span class="text-[11px] hidden sm:inline">複製專屬連結</span>
                         </button>
                     ` : ''}
-                    <button data-id="${c.id}" data-name="${c.name}" class="delete-class-btn text-slate-300 hover:text-rose-500 font-bold p-1.5 rounded-xl hover:bg-rose-50 transition-colors text-lg leading-none shrink-0" title="刪除班級">&times;</button>
+                    <button data-id="${c.id}" data-name="${c.name}" class="delete-class-btn text-slate-300 hover:text-rose-500 font-bold p-1.5 rounded-xl hover:bg-rose-50 transition-colors text-lg leading-none shrink-0 ml-0.5" title="刪除班級">&times;</button>
                 </div>
             </div>
         `;

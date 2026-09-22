@@ -228,13 +228,6 @@ async function init() {
     // 4. 恢復偏好設定
     const savedMode = localStorage.getItem('checkMode') || 'manual';
     applyCheckMode(savedMode);
-
-    if (!localStorage.getItem('hasSeenZoomPrompt')) { 
-        showAlertModal('提示', '請將分頁縮放調到100%', () => { 
-            document.body.style.zoom = '100%'; 
-        }); 
-        localStorage.setItem('hasSeenZoomPrompt', 'true'); 
-    }
     
     // 5. 檢查硬碟存取
     if (window.showSaveFilePicker) {

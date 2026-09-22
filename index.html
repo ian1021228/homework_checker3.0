@@ -227,7 +227,7 @@
                         <!-- 系統更新紀錄按鈕 -->
                         <button id="portal-hero-changelog-btn" class="px-5 py-3.5 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-300/90 font-bold text-sm shadow-xs hover:shadow transition-all flex items-center gap-2 cursor-pointer" title="查看系統版本演進與歷次更新紀錄">
                             <i class="fa-solid fa-clock-rotate-left text-amber-700"></i>
-                            <span>更新紀錄 <span class="bg-amber-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full ml-0.5">v3.3</span></span>
+                            <span>更新紀錄 <span class="bg-amber-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full ml-0.5">v3.4</span></span>
                         </button>
                         <!-- 提供意見 / 聯絡作者 -->
                         <button id="portal-hero-feedback-btn" class="px-4 py-3.5 rounded-full bg-stone-100/90 hover:bg-stone-200 text-stone-700 font-bold text-sm shadow-2xs hover:shadow transition-all flex items-center gap-1.5 cursor-pointer" title="寫信給作者 ianw.solar@gmail.com">
@@ -343,7 +343,7 @@
                                 </span>
                                 <div>
                                     <h3 class="font-black text-stone-900 text-lg">系統更新紀錄 (Changelog)</h3>
-                                    <span class="text-xs text-stone-400 font-bold">最新版本 v3.3 • 2026/09/22</span>
+                                    <span class="text-xs text-stone-400 font-bold">最新版本 v3.4 • 2026/09/22</span>
                                 </div>
                             </div>
                             <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-200">最新版本</span>
@@ -352,20 +352,20 @@
                         <div class="p-4 bg-amber-50/50 rounded-2xl border border-amber-100/80 space-y-2 text-xs sm:text-sm text-stone-700 font-medium">
                             <div class="font-bold text-amber-950 flex items-center gap-1.5">
                                 <i class="fa-solid fa-bullhorn text-amber-600"></i>
-                                <span>v3.3 核心功能更新亮點：</span>
+                                <span>v3.4 核心功能更新亮點：</span>
                             </div>
                             <ul class="space-y-1.5 text-xs text-stone-600 pl-2">
-                                <li>✏️ <b>班級自訂改名</b>：清單內隨時點擊鉛筆圖示即時改名與同步。</li>
-                                <li>🔗 <b>各班專屬連結一鍵複製</b>：自動帶入班級代碼，家長點開直達。</li>
-                                <li>👨‍👩‍👧‍👦 <b>家長端專區簡化優化</b>：獨立直連按鈕與複製專屬連結提示。</li>
-                                <li>🏷️ <b>系統頁尾身分更新</b>：Created by 七賢國中107 王禹硯。</li>
+                                <li>🏫 <b>寬版管理班級彈窗</b>：大幅加寬至 896px~1024px，權限碼與操作按鈕橫向清爽展開。</li>
+                                <li>⚡ <b>移除分頁縮放提示</b>：全面移除初次開啟時的縮放強制彈窗，開啟更順暢無阻。</li>
+                                <li>🎬 <b>全新高畫質教學影片</b>：導入完整真實範例資料演練，全方位直覺操作示範。</li>
+                                <li>✏️ <b>班級改名與專屬連結</b>：支援隨時改名，各班一鍵複製帶代碼家長端專屬連結。</li>
                             </ul>
                         </div>
 
                         <div class="flex items-center justify-between pt-1">
                             <button type="button" id="portal-card-changelog-btn" class="w-full py-2.5 px-4 bg-amber-100/80 hover:bg-amber-200/80 text-amber-950 font-bold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-clock-rotate-left text-amber-700"></i>
-                                <span>查看完整版本演進日誌 (v3.0 ~ v3.3)</span>
+                                <span>查看完整版本演進日誌 (v3.0 ~ v3.4)</span>
                             </button>
                         </div>
                     </div>
@@ -2135,34 +2135,37 @@
             </form>
         </div>
     </div>
-    <!-- 管理班級 Modal -->
+    <!-- 管理班級 Modal (寬版排版優化) -->
     <div id="manage-classes-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center p-4 hidden modal z-50">
-         <div class="modal-content glass-card rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-lg transform scale-95 border border-slate-100 max-h-[90vh] overflow-y-auto custom-scrollbar">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-600 drop-shadow-sm">管理班級</h2>
-                <span class="text-xs bg-indigo-50 text-indigo-700 font-bold px-2.5 py-1 rounded-lg border border-indigo-100">可設定家長權限碼</span>
+         <div class="modal-content glass-card rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10 w-full max-w-3xl lg:max-w-4xl xl:max-w-5xl transform scale-95 border border-slate-100 max-h-[92vh] overflow-y-auto custom-scrollbar">
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">🏫</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-600 drop-shadow-sm">管理班級</h2>
+                </div>
+                <span class="text-xs bg-indigo-50 text-indigo-700 font-bold px-3 py-1.5 rounded-xl border border-indigo-100">支援即時改名與家長專屬連結</span>
             </div>
 
-            <!-- 新增班級表單 -->
-            <form id="add-class-form" class="space-y-3 mb-6 bg-slate-50/80 p-4 rounded-2xl border border-slate-200/70">
-                <div class="flex flex-col sm:flex-row gap-2">
-                    <input type="text" id="class-name" class="flex-grow block w-full rounded-xl border-slate-200 bg-white shadow-xs p-2.5 text-sm font-bold text-slate-800 transition-colors" required placeholder="班級名稱，例：六年二班">
-                    <div class="flex gap-1.5 sm:w-44">
-                        <input type="text" id="class-access-code" class="w-full rounded-xl border-slate-200 bg-white shadow-xs p-2.5 text-xs font-mono font-bold text-indigo-700 transition-colors uppercase tracking-wider" placeholder="權限碼(選填)" maxlength="16">
-                        <button type="button" id="gen-code-btn" title="隨機產生權限碼" class="px-3 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold transition-colors shrink-0">🎲</button>
+            <!-- 新增班級表單 (寬版自適應) -->
+            <form id="add-class-form" class="space-y-3 mb-6 bg-slate-50/80 p-4 sm:p-5 rounded-2xl border border-slate-200/70 shadow-2xs">
+                <div class="flex flex-col sm:flex-row gap-2.5">
+                    <input type="text" id="class-name" class="flex-grow block w-full rounded-xl border-slate-200 bg-white shadow-xs p-3 text-sm font-bold text-slate-800 transition-colors placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" required placeholder="班級名稱，例：七賢107班">
+                    <div class="flex gap-1.5 sm:w-56 shrink-0">
+                        <input type="text" id="class-access-code" class="w-full rounded-xl border-slate-200 bg-white shadow-xs p-3 text-xs font-mono font-bold text-indigo-700 transition-colors uppercase tracking-wider placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" placeholder="權限碼(選填)" maxlength="16">
+                        <button type="button" id="gen-code-btn" title="隨機產生權限碼" class="px-3.5 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold transition-colors shrink-0">🎲</button>
                     </div>
+                    <button type="submit" class="w-full sm:w-auto bg-indigo-600 text-white font-bold py-3 px-6 text-sm rounded-xl shadow-md shadow-indigo-500/20 hover:bg-indigo-700 hover:shadow-indigo-500/30 transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0">新增班級</button>
                 </div>
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pt-1">
-                    <span class="text-[11px] text-slate-400 font-medium leading-tight">💡 家長在專屬家長端輸入此權限碼即可查看該班作業</span>
-                    <button type="submit" class="w-full sm:w-auto bg-indigo-600 text-white font-bold py-2.5 px-5 text-sm rounded-xl shadow-md shadow-indigo-500/20 hover:bg-indigo-700 hover:shadow-indigo-500/30 transition-all transform hover:-translate-y-0.5 whitespace-nowrap">新增班級</button>
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pt-0.5">
+                    <span class="text-[11px] text-slate-400 font-medium leading-tight">💡 家長在專屬家長端輸入此權限碼或點擊專屬連結，即可即時查看該班作業與聯絡簿</span>
                 </div>
             </form>
 
             <div class="flex items-center justify-between mb-3">
                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider font-black">現有班級與權限碼清單</h3>
-                <span class="text-[11px] text-slate-400 font-medium">支援隨時修改或產生</span>
+                <span class="text-[11px] text-slate-400 font-medium">支援隨時修改名稱、重產代碼或複製專屬連結</span>
             </div>
-            <div id="class-list" class="space-y-2.5 max-h-56 overflow-y-auto pr-1 custom-scrollbar mb-6"></div>
+            <div id="class-list" class="space-y-2.5 max-h-72 sm:max-h-80 overflow-y-auto pr-1 custom-scrollbar mb-6"></div>
 
             <!-- 家長端專區 -->
             <div class="p-4 bg-gradient-to-br from-indigo-50/90 via-purple-50/50 to-pink-50/40 rounded-2xl border border-indigo-100/80 shadow-xs mb-5">
@@ -2561,35 +2564,60 @@
 
                 <!-- 版本歷程時間軸 -->
                 <div class="space-y-6">
-                    <!-- v3.3 最新版本 -->
+                    <!-- v3.4 最新版本 -->
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/70 via-purple-50/50 to-pink-50/30 border border-indigo-200/80 shadow-xs relative">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                             <div class="flex items-center gap-2">
-                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v3.3 最新發布</span>
-                                <span class="text-xs font-bold text-indigo-900">班級改名與專屬家長端連結升級</span>
+                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v3.4 最新發布</span>
+                                <span class="text-xs font-bold text-indigo-900">寬版班級管理與真實範例教學影片上線</span>
                             </div>
                             <span class="text-xs font-mono font-bold text-slate-400">2026-09-22</span>
                         </div>
                         <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
                             <li class="flex items-start gap-2">
                                 <span class="text-emerald-500 font-bold shrink-0">✔</span>
-                                <span><b>班級可隨時改名</b>：班級清單新增改名按鈕（支援點擊名稱或鉛筆圖示即時編輯），修改後自動同步本地與雲端，並連動選單即時更新。</span>
+                                <span><b>寬版管理班級彈窗排版優化</b>：彈窗寬度大幅拓展至 896px~1024px（max-w-4xl），班級名稱、權限碼輸入框、儲存、🎲隨機、複製代碼、複製專屬連結及刪除按鈕全面橫向排列，徹底避免換行擁擠與破版。</span>
                             </li>
                             <li class="flex items-start gap-2">
                                 <span class="text-emerald-500 font-bold shrink-0">✔</span>
-                                <span><b>各班專屬家長端連結一鍵複製</b>：班級清單中各班專屬獨立複製按鈕，自動帶入該班代碼（<code>?code=...</code>），家長打開直連該班作業，解決多班代碼覆蓋問題。</span>
+                                <span><b>移除分頁縮放提示</b>：徹底移除系統冷啟動時跳出的「請將分頁縮放調到100%」強制提示彈窗，啟動流暢無干擾。</span>
                             </li>
                             <li class="flex items-start gap-2">
                                 <span class="text-emerald-500 font-bold shrink-0">✔</span>
-                                <span><b>家長端專區連結邏輯重構</b>：首頁與彈窗下方家長端專區簡化為「前往家長端」按鈕，並附帶各班專屬連結複製說明小字。</span>
+                                <span><b>全新高畫質教學影片（全面導入真實範例資料）</b>：教學示範影片全面納入七賢107班實測資料、多項科目作業點收、座號狀態快速切換、黑板聯絡簿管理與家長端專屬代碼直連查詢，提供最直覺詳盡的操作示範。</span>
                             </li>
                             <li class="flex items-start gap-2">
                                 <span class="text-emerald-500 font-bold shrink-0">✔</span>
-                                <span><b>系統常態頁尾更新</b>：更新身分標誌為「Created by 七賢國中107 王禹硯（ianw.solar@gmail.com）」。</span>
+                                <span><b>管理班級行內輸入擴展</b>：改名輸入框自適應加寬，更易於輸入長班級名稱。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- v3.3 版本 -->
+                    <div class="p-5 rounded-2xl bg-white border border-stone-200/90 shadow-2xs">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 text-xs font-black">v3.3</span>
+                                <span class="text-xs font-bold text-stone-800">班級改名與專屬家長端連結升級</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-stone-400">2026-09-22</span>
+                        </div>
+                        <ul class="space-y-1.5 text-xs sm:text-sm text-stone-600">
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>班級可隨時改名</b>：班級清單新增改名按鈕，支援即時編輯並連動下拉選單。</span>
                             </li>
                             <li class="flex items-start gap-2">
                                 <span class="text-emerald-500 font-bold shrink-0">✔</span>
-                                <span><b>完整使用教學影片與互動指南上線</b>：提供高畫質操作示範影片（MP4 下載與播放）與步驟指引。</span>
+                                <span><b>各班專屬家長端連結一鍵複製</b>：各班專屬獨立複製按鈕，自動帶入該班代碼（<code>?code=...</code>）。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>家長端專區連結邏輯重構</b>：簡化為「前往家長端」按鈕與專屬連結提示小字。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>系統常態頁尾更新</b>：身分標誌更新為「Created by 七賢國中107 王禹硯（ianw.solar@gmail.com）」。</span>
                             </li>
                         </ul>
                     </div>
