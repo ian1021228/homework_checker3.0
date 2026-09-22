@@ -370,36 +370,32 @@
                         </div>
                     </div>
 
-                    <!-- 完整使用教學影片卡片 -->
-                    <div class="lg:col-span-6 bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-7 shadow-xl shadow-indigo-950/20 space-y-4 relative overflow-hidden">
+                    <!-- 完整使用教學影片卡片 (籌備中・敬請期待) -->
+                    <div class="lg:col-span-6 bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-7 shadow-xl shadow-indigo-950/20 space-y-4 relative overflow-hidden flex flex-col justify-between">
                         <div class="absolute -right-10 -bottom-10 w-48 h-48 rounded-full bg-indigo-500/20 blur-2xl pointer-events-none"></div>
 
                         <div class="flex items-center justify-between relative z-10">
                             <div class="flex items-center gap-2.5">
                                 <span class="w-10 h-10 rounded-2xl bg-white/10 text-indigo-300 flex items-center justify-center text-lg border border-white/10">
-                                    <i class="fa-solid fa-circle-play"></i>
+                                    <i class="fa-solid fa-film"></i>
                                 </span>
                                 <div>
                                     <h3 class="font-black text-white text-lg">完整使用教學影片</h3>
-                                    <span class="text-xs text-indigo-200 font-medium">全流程實機錄製 • 輕鬆掌握所有功能</span>
+                                    <span class="text-xs text-indigo-200 font-medium">全新範例示範 • 重新製作中</span>
                                 </div>
                             </div>
-                            <span class="px-2.5 py-1 rounded-full bg-white/10 text-indigo-200 text-xs font-bold border border-white/10">高畫質 MP4</span>
+                            <span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30">敬請期待......</span>
                         </div>
 
                         <p class="text-xs sm:text-sm text-indigo-100/90 leading-relaxed relative z-10">
-                            包含從建立班級、隨時改名、設定權限碼、一鍵複製家長端專屬連結，到作業建立、切換點收與手機相機掃碼全功能完整動態示範。
+                            我們正在重新製作更詳盡、更清晰的高畫質實機教學影片，將包含完整的真實範例示範、班級改名、權限碼分享及作業點收全流程！
                         </p>
 
-                        <div class="flex flex-col sm:flex-row gap-3 pt-2 relative z-10">
-                            <button type="button" id="portal-card-tutorial-btn" class="flex-1 py-3 px-4 bg-white hover:bg-indigo-50 text-indigo-900 font-black text-xs sm:text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer">
-                                <i class="fa-solid fa-play text-indigo-600"></i>
-                                <span>播放完整教學影片</span>
+                        <div class="pt-2 relative z-10">
+                            <button type="button" id="portal-card-tutorial-btn" class="w-full py-3 px-4 bg-white hover:bg-indigo-50 text-indigo-900 font-black text-xs sm:text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fa-solid fa-sparkles text-amber-500"></i>
+                                <span>點選查看詳情（敬請期待......）</span>
                             </button>
-                            <a href="homework_checker_tutorial.mp4" download="homework_checker_tutorial.mp4" class="py-3 px-4 bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm rounded-xl border border-white/20 transition-all flex items-center justify-center gap-2 text-center">
-                                <i class="fa-solid fa-download"></i>
-                                <span>下載影片 (MP4)</span>
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -2584,7 +2580,7 @@
                             </li>
                             <li class="flex items-start gap-2">
                                 <span class="text-emerald-500 font-bold shrink-0">✔</span>
-                                <span><b>全新高畫質教學影片（全面導入真實範例資料）</b>：教學示範影片全面納入七賢107班實測資料、多項科目作業點收、座號狀態快速切換、黑板聯絡簿管理與家長端專屬代碼直連查詢，提供最直覺詳盡的操作示範。</span>
+                                <span><b>教學影片升級籌備中（敬請期待）</b>：教學影片暫時下架重新製作，點擊各處教學影片入口將顯示「敬請期待......」，全新完整範例影片錄製中。</span>
                             </li>
                             <li class="flex items-start gap-2">
                                 <span class="text-emerald-500 font-bold shrink-0">✔</span>
@@ -2711,76 +2707,46 @@
         </div>
     </div>
 
-    <!-- 🎬 系統完整教學影片與互動指南彈窗 (Tutorial Video Modal) -->
+    <!-- 🎬 系統完整教學影片彈窗 (Tutorial Video Modal - 敬請期待) -->
     <div id="tutorial-video-modal" class="fixed inset-0 z-[105] flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-md hidden modal transition-all duration-300">
-        <div class="modal-content w-full max-w-3xl relative my-auto max-h-[92vh] overflow-y-auto custom-scrollbar">
-            <div class="bg-white rounded-[2.25rem] border border-indigo-100 shadow-2xl p-6 sm:p-8 relative">
-                <div class="flex items-center justify-between pb-4 mb-5 border-b border-stone-100">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center text-xl shadow-lg shadow-indigo-500/20 shrink-0">
-                            <i class="fa-solid fa-circle-play"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl sm:text-2xl font-black text-stone-900 tracking-tight">系統完整使用教學影片</h3>
-                            <p class="text-xs text-stone-500 font-medium">全流程實機操作示範 • 班級改名 • 作業點收 • 家長端專屬連結 • 掃碼登入</p>
-                        </div>
+        <div class="modal-content w-full max-w-xl relative my-auto">
+            <div class="bg-white rounded-[2.25rem] border border-indigo-100 shadow-2xl p-7 sm:p-9 relative text-center">
+                <button type="button" id="close-tutorial-video-btn" class="cancel-btn absolute top-5 right-5 text-stone-400 hover:text-stone-700 p-2 rounded-xl hover:bg-stone-100 transition-colors text-xl leading-none" title="關閉">
+                    &times;
+                </button>
+
+                <!-- 敬請期待圖示與標題 -->
+                <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 text-white flex items-center justify-center text-3xl mx-auto shadow-xl shadow-indigo-500/25 mb-5 animate-pulse">
+                    <i class="fa-solid fa-film"></i>
+                </div>
+
+                <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-black mb-3">
+                    <i class="fa-solid fa-clock"></i>
+                    <span>內容重新製作中</span>
+                </div>
+
+                <h3 class="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight mb-3">敬請期待......</h3>
+                <p class="text-xs sm:text-sm text-stone-600 font-medium leading-relaxed max-w-md mx-auto mb-6">
+                    全新高畫質教學影片正在重新製作中，將全面導入最真實的示範資料，帶來更清楚直覺的操作流程，敬請期待！
+                </p>
+
+                <!-- 即將涵蓋的亮點指引 -->
+                <div class="p-4 bg-indigo-50/70 rounded-2xl border border-indigo-100 text-left space-y-2 mb-6">
+                    <div class="flex items-center gap-2 text-indigo-900 font-black text-xs">
+                        <i class="fa-solid fa-sparkles text-indigo-600"></i>
+                        <span>全新教學影片即將呈現重點：</span>
                     </div>
-                    <button type="button" id="close-tutorial-video-btn" class="cancel-btn text-stone-400 hover:text-stone-700 p-2 rounded-xl hover:bg-stone-100 transition-colors text-xl leading-none">
-                        &times;
-                    </button>
+                    <ul class="space-y-1.5 text-xs text-stone-600 font-medium pl-4 list-disc">
+                        <li><b>班級管理自訂改名</b>：隨時自訂修改班級名稱與雙向同步</li>
+                        <li><b>各班專屬家長端連結</b>：一鍵複製帶代碼連結，家長直連無負擔</li>
+                        <li><b>真實資料作業點收</b>：學生座號即時切換與全班完成統計</li>
+                        <li><b>擬真黑板聯絡簿</b>：深綠木框黑板粉筆風、字級縮放與套用昨日</li>
+                    </ul>
                 </div>
 
-                <!-- 影片播放容器 -->
-                <div class="relative bg-slate-950 rounded-2xl overflow-hidden shadow-xl mb-5 aspect-video flex items-center justify-center border border-slate-800">
-                    <video id="tutorial-video-player" controls preload="metadata" class="w-full h-full object-contain" poster="點收畫面.svg">
-                        <source src="homework_checker_tutorial.mp4" type="video/mp4">
-                        您的瀏覽器不支援 HTML5 影片播放。
-                    </video>
-                </div>
-
-                <!-- 影片下載與快速指引功能列 -->
-                <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-indigo-50/70 rounded-2xl border border-indigo-100 mb-6">
-                    <div class="flex items-center gap-2 text-xs text-indigo-900 font-bold">
-                        <i class="fa-solid fa-file-video text-indigo-600 text-sm"></i>
-                        <span>教學影片檔名：<code>homework_checker_tutorial.mp4</code></span>
-                    </div>
-                    <a href="homework_checker_tutorial.mp4" download="homework_checker_tutorial.mp4" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center gap-1.5">
-                        <i class="fa-solid fa-download"></i>
-                        <span>下載完整教學影片 (MP4)</span>
-                    </a>
-                </div>
-
-                <!-- 互動式五大步驟重點教學 -->
-                <div>
-                    <h4 class="font-black text-stone-900 text-sm sm:text-base mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-list-check text-indigo-600"></i>
-                        <span>核心操作步驟圖文導覽</span>
-                    </h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                        <div class="p-3.5 bg-stone-50 rounded-xl border border-stone-200">
-                            <span class="font-black text-indigo-600 block mb-1">步驟 1 • 登入系統與建立班級</span>
-                            <p class="text-stone-600 leading-relaxed">點擊首頁「立即開始使用」或右上角「登入」，可使用 Google 帳號或帳號密碼（如 <code>antigravity</code>）登入。</p>
-                        </div>
-                        <div class="p-3.5 bg-stone-50 rounded-xl border border-stone-200">
-                            <span class="font-black text-indigo-600 block mb-1">步驟 2 • 班級改名與權限碼</span>
-                            <p class="text-stone-600 leading-relaxed">在班級管理清單中，點擊班級名稱旁的鉛筆圖示即可隨時修改班級名稱，並可產生隨機 6 位權限碼。</p>
-                        </div>
-                        <div class="p-3.5 bg-stone-50 rounded-xl border border-stone-200">
-                            <span class="font-black text-emerald-600 block mb-1">步驟 3 • 複製專屬家長端連結</span>
-                            <p class="text-stone-600 leading-relaxed">點擊各班級後方的「複製專屬連結」，系統自動帶入該班代碼，家長點開即看該班點收狀態與聯絡簿。</p>
-                        </div>
-                        <div class="p-3.5 bg-stone-50 rounded-xl border border-stone-200">
-                            <span class="font-black text-indigo-600 block mb-1">步驟 4 • 作業點收與條碼辨識</span>
-                            <p class="text-stone-600 leading-relaxed">點擊座號可即時切換狀態，支援實體掃描槍秒速掃描，頁面下方即時計算完成名單與未交座號。</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-6 pt-4 border-t border-stone-100 flex justify-end">
-                    <button type="button" class="cancel-btn bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold py-2.5 px-6 text-xs sm:text-sm rounded-xl transition-colors">
-                        完成學習
-                    </button>
-                </div>
+                <button type="button" class="cancel-btn w-full py-3 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md shadow-indigo-600/25 transition-all cursor-pointer">
+                    我知道了
+                </button>
             </div>
         </div>
     </div>
