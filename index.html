@@ -136,7 +136,19 @@
                     <!-- 提供意見 / 聯絡作者按鈕 -->
                     <button id="portal-nav-feedback-btn" class="text-xs sm:text-sm font-bold text-amber-900 bg-amber-100/90 hover:bg-amber-200/90 border border-amber-300/80 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full transition-all flex items-center gap-1 shadow-xs cursor-pointer" title="聯絡作者：ianw.solar@gmail.com">
                         <i class="fa-solid fa-comment-dots text-amber-700"></i>
-                        <span class="hidden md:inline">提供意見</span>
+                        <span class="hidden lg:inline">提供意見</span>
+                    </button>
+
+                    <!-- 系統更新日誌按鈕 -->
+                    <button id="portal-nav-changelog-btn" class="text-xs sm:text-sm font-bold text-stone-700 hover:text-stone-950 px-2 sm:px-3 py-1.5 sm:py-2 rounded-full hover:bg-stone-200/60 transition-colors flex items-center gap-1 cursor-pointer" title="查看系統版本演進與更新紀錄">
+                        <i class="fa-solid fa-clock-rotate-left text-amber-600"></i>
+                        <span class="hidden md:inline">更新日誌</span>
+                    </button>
+
+                    <!-- 完整教學影片按鈕 -->
+                    <button id="portal-nav-tutorial-btn" class="text-xs sm:text-sm font-black text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full transition-all flex items-center gap-1 cursor-pointer shadow-2xs" title="觀看完整使用教學影片與步驟導覽">
+                        <i class="fa-solid fa-circle-play text-indigo-600 text-xs sm:text-sm"></i>
+                        <span class="hidden sm:inline">教學影片</span>
                     </button>
 
                     <!-- 未登入狀態 -->
@@ -207,10 +219,20 @@
                             <i class="fa-solid fa-laptop-code text-stone-500"></i>
                             <span>免帳號快速體驗</span>
                         </button>
+                        <!-- 完整教學影片按鈕 -->
+                        <button id="portal-hero-tutorial-btn" class="px-5 py-3.5 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-950 border border-indigo-200/90 font-bold text-sm shadow-xs hover:shadow transition-all flex items-center gap-2 cursor-pointer" title="觀看完整使用教學影片與步驟導覽">
+                            <i class="fa-solid fa-circle-play text-indigo-600 text-base"></i>
+                            <span>完整教學影片</span>
+                        </button>
+                        <!-- 系統更新紀錄按鈕 -->
+                        <button id="portal-hero-changelog-btn" class="px-5 py-3.5 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-300/90 font-bold text-sm shadow-xs hover:shadow transition-all flex items-center gap-2 cursor-pointer" title="查看系統版本演進與歷次更新紀錄">
+                            <i class="fa-solid fa-clock-rotate-left text-amber-700"></i>
+                            <span>更新紀錄 <span class="bg-amber-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full ml-0.5">v3.3</span></span>
+                        </button>
                         <!-- 提供意見 / 聯絡作者 -->
-                        <button id="portal-hero-feedback-btn" class="px-5 py-3.5 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-300/90 font-bold text-sm shadow-xs hover:shadow transition-all flex items-center gap-2 cursor-pointer" title="寫信給作者 ianw.solar@gmail.com">
-                            <i class="fa-solid fa-envelope text-amber-700"></i>
-                            <span>提供意見 / 聯絡作者</span>
+                        <button id="portal-hero-feedback-btn" class="px-4 py-3.5 rounded-full bg-stone-100/90 hover:bg-stone-200 text-stone-700 font-bold text-sm shadow-2xs hover:shadow transition-all flex items-center gap-1.5 cursor-pointer" title="寫信給作者 ianw.solar@gmail.com">
+                            <i class="fa-solid fa-envelope text-stone-500"></i>
+                            <span class="hidden sm:inline">聯絡作者</span>
                         </button>
                     </div>
 
@@ -304,6 +326,80 @@
                             <span class="text-indigo-600 font-bold bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100">
                                 聯絡簿同步中
                             </span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+ 
+            <!-- 🌟 系統最新更新日誌 (Changelog) & 完整使用教學專區 -->
+            <section class="max-w-7xl mx-auto px-6 sm:px-10 py-8 border-t border-stone-200/70">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- 最新更新紀錄卡片 -->
+                    <div class="lg:col-span-6 bg-white rounded-3xl p-6 sm:p-7 border border-stone-200/90 shadow-sm hover:shadow-md transition-all space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center text-lg border border-amber-200">
+                                    <i class="fa-solid fa-clock-rotate-left"></i>
+                                </span>
+                                <div>
+                                    <h3 class="font-black text-stone-900 text-lg">系統更新紀錄 (Changelog)</h3>
+                                    <span class="text-xs text-stone-400 font-bold">最新版本 v3.3 • 2026/09/22</span>
+                                </div>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-200">最新版本</span>
+                        </div>
+
+                        <div class="p-4 bg-amber-50/50 rounded-2xl border border-amber-100/80 space-y-2 text-xs sm:text-sm text-stone-700 font-medium">
+                            <div class="font-bold text-amber-950 flex items-center gap-1.5">
+                                <i class="fa-solid fa-bullhorn text-amber-600"></i>
+                                <span>v3.3 核心功能更新亮點：</span>
+                            </div>
+                            <ul class="space-y-1.5 text-xs text-stone-600 pl-2">
+                                <li>✏️ <b>班級自訂改名</b>：清單內隨時點擊鉛筆圖示即時改名與同步。</li>
+                                <li>🔗 <b>各班專屬連結一鍵複製</b>：自動帶入班級代碼，家長點開直達。</li>
+                                <li>👨‍👩‍👧‍👦 <b>家長端專區簡化優化</b>：獨立直連按鈕與複製專屬連結提示。</li>
+                                <li>🏷️ <b>系統頁尾身分更新</b>：Created by 七賢國中107 王禹硯。</li>
+                            </ul>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-1">
+                            <button type="button" id="portal-card-changelog-btn" class="w-full py-2.5 px-4 bg-amber-100/80 hover:bg-amber-200/80 text-amber-950 font-bold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fa-solid fa-clock-rotate-left text-amber-700"></i>
+                                <span>查看完整版本演進日誌 (v3.0 ~ v3.3)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 完整使用教學影片卡片 -->
+                    <div class="lg:col-span-6 bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-7 shadow-xl shadow-indigo-950/20 space-y-4 relative overflow-hidden">
+                        <div class="absolute -right-10 -bottom-10 w-48 h-48 rounded-full bg-indigo-500/20 blur-2xl pointer-events-none"></div>
+
+                        <div class="flex items-center justify-between relative z-10">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-10 h-10 rounded-2xl bg-white/10 text-indigo-300 flex items-center justify-center text-lg border border-white/10">
+                                    <i class="fa-solid fa-circle-play"></i>
+                                </span>
+                                <div>
+                                    <h3 class="font-black text-white text-lg">完整使用教學影片</h3>
+                                    <span class="text-xs text-indigo-200 font-medium">全流程實機錄製 • 輕鬆掌握所有功能</span>
+                                </div>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-full bg-white/10 text-indigo-200 text-xs font-bold border border-white/10">高畫質 MP4</span>
+                        </div>
+
+                        <p class="text-xs sm:text-sm text-indigo-100/90 leading-relaxed relative z-10">
+                            包含從建立班級、隨時改名、設定權限碼、一鍵複製家長端專屬連結，到作業建立、切換點收與手機相機掃碼全功能完整動態示範。
+                        </p>
+
+                        <div class="flex flex-col sm:flex-row gap-3 pt-2 relative z-10">
+                            <button type="button" id="portal-card-tutorial-btn" class="flex-1 py-3 px-4 bg-white hover:bg-indigo-50 text-indigo-900 font-black text-xs sm:text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fa-solid fa-play text-indigo-600"></i>
+                                <span>播放完整教學影片</span>
+                            </button>
+                            <a href="homework_checker_tutorial.mp4" download="homework_checker_tutorial.mp4" class="py-3 px-4 bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm rounded-xl border border-white/20 transition-all flex items-center justify-center gap-2 text-center">
+                                <i class="fa-solid fa-download"></i>
+                                <span>下載影片 (MP4)</span>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -864,7 +960,7 @@
                         <i class="fa-solid fa-copy text-stone-500"></i>
                         <span class="font-mono text-xs">ianw.solar@gmail.com</span>
                     </button>
-                    <p class="text-stone-400 text-xs w-full text-center md:w-auto">© 2026 親師作業點收X聯絡簿系統 3.0. All rights reserved.</p>
+                    <p class="text-stone-400 text-xs w-full text-center md:w-auto">Created by 七賢國中107 王禹硯（<a href="mailto:ianw.solar@gmail.com" class="hover:underline">ianw.solar@gmail.com</a>） • © 2026 親師作業點收X聯絡簿系統 3.0</p>
                 </div>
             </div>
         </footer>
@@ -2077,15 +2173,12 @@
                 <p class="text-xs text-slate-600 mb-3 leading-relaxed">
                     家長只需進入家長端並輸入對應班級的「班級權限碼」，即可即時查看該班的每日作業、點收狀態與聯絡簿。
                 </p>
-                <div class="flex flex-col sm:flex-row gap-2">
-                    <a id="goto-parent-dashboard-btn" href="https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/" target="_blank" rel="noopener noreferrer" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 text-xs rounded-xl shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-1.5 text-center">
+                <div>
+                    <a id="goto-parent-dashboard-btn" href="https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/" target="_blank" rel="noopener noreferrer" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 text-xs rounded-xl shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-1.5 text-center">
                         <span>前往家長端</span>
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
                     </a>
-                    <button type="button" id="copy-parent-link-btn" class="flex-1 bg-white hover:bg-slate-50 text-indigo-700 border border-indigo-200 font-bold py-2.5 px-4 text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-copy"></i>
-                        <span>複製家長端連結</span>
-                    </button>
+                    <p class="text-[11px] text-slate-400 mt-2 text-center font-medium">可以在班級清單的班級區塊後方複製專屬連結</p>
                 </div>
             </div>
 
@@ -2447,11 +2540,228 @@
         </div>
     </div>
 
+    <!-- 📜 系統版本更新紀錄彈窗 (Changelog Modal) -->
+    <div id="changelog-modal" class="fixed inset-0 z-[105] flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-md hidden modal transition-all duration-300">
+        <div class="modal-content w-full max-w-2xl relative my-auto max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div class="bg-white rounded-[2.25rem] border border-amber-100 shadow-2xl p-6 sm:p-8 relative">
+                <div class="flex items-center justify-between pb-4 mb-6 border-b border-stone-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center text-xl shadow-lg shadow-amber-500/20 shrink-0">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl sm:text-2xl font-black text-stone-900 tracking-tight">系統版本更新日誌 (Changelog)</h3>
+                            <p class="text-xs text-stone-500 font-medium">記錄親師作業點收系統的每一次進化與功能更新</p>
+                        </div>
+                    </div>
+                    <button type="button" class="cancel-btn text-stone-400 hover:text-stone-700 p-2 rounded-xl hover:bg-stone-100 transition-colors text-xl leading-none">
+                        &times;
+                    </button>
+                </div>
+
+                <!-- 版本歷程時間軸 -->
+                <div class="space-y-6">
+                    <!-- v3.3 最新版本 -->
+                    <div class="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/70 via-purple-50/50 to-pink-50/30 border border-indigo-200/80 shadow-xs relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v3.3 最新發布</span>
+                                <span class="text-xs font-bold text-indigo-900">班級改名與專屬家長端連結升級</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-400">2026-09-22</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>班級可隨時改名</b>：班級清單新增改名按鈕（支援點擊名稱或鉛筆圖示即時編輯），修改後自動同步本地與雲端，並連動選單即時更新。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>各班專屬家長端連結一鍵複製</b>：班級清單中各班專屬獨立複製按鈕，自動帶入該班代碼（<code>?code=...</code>），家長打開直連該班作業，解決多班代碼覆蓋問題。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>家長端專區連結邏輯重構</b>：首頁與彈窗下方家長端專區簡化為「前往家長端」按鈕，並附帶各班專屬連結複製說明小字。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>系統常態頁尾更新</b>：更新身分標誌為「Created by 七賢國中107 王禹硯（ianw.solar@gmail.com）」。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>完整使用教學影片與互動指南上線</b>：提供高畫質操作示範影片（MP4 下載與播放）與步驟指引。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- v3.2 版本 -->
+                    <div class="p-5 rounded-2xl bg-white border border-stone-200/90 shadow-2xs">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black">v3.2</span>
+                                <span class="text-xs font-bold text-stone-800">手機掃碼同帳號登入與雙向同步重大升級</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-stone-400">2026-09-21</span>
+                        </div>
+                        <ul class="space-y-1.5 text-xs sm:text-sm text-stone-600">
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>IndexedDB 工作階段原生跨端注入</b>：手機掃碼後電腦端自動登入為相同 Google 雲端帳號（UID 100% 一致），告別離線模式。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>Firestore 雙軌即時同步通道</b>：雙通道備援同步，讀寫順暢無阻。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>狀態連線即時燈號</b>：右上角明確提示「狀態：跨裝置即時同步中 👤 [使用者]」，自動隱藏 Google 登入按鈕。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- v3.1 版本 -->
+                    <div class="p-5 rounded-2xl bg-white border border-stone-200/90 shadow-2xs">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-xs font-black">v3.1</span>
+                                <span class="text-xs font-bold text-stone-800">圖標透明向量化與智慧登入導引</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-stone-400">2026-09-21</span>
+                        </div>
+                        <ul class="space-y-1.5 text-xs sm:text-sm text-stone-600">
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>圖標徹底去黑邊</b>：演算法精準重構向量 SVG（Squircle 透明裁切遮罩）與抗鋸齒透明 PNG，雙端完美融合。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>帳號註冊智慧防呆</b>：輸入已存在帳號時自動切換至【登入】分頁並帶入帳號聚焦密碼框。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>使用者名稱雲端自動補建檔</b>：本機帳號自動補傳 Firestore，支援無痕模式與跨裝置帳號登入。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- v3.0 版本 -->
+                    <div class="p-5 rounded-2xl bg-white border border-stone-200/90 shadow-2xs">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-700 text-xs font-black">v3.0</span>
+                                <span class="text-xs font-bold text-stone-800">全新架構重磅發布 (雲端 + 條碼 + 親師雙端)</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-stone-400">2026-09-15</span>
+                        </div>
+                        <ul class="space-y-1.5 text-xs sm:text-sm text-stone-600">
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>Google Firebase 雲端資料庫雙向即時同步</b>。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>親師雙端分離架構</b>（教師端點收管理系統 + 家長端聯絡簿即時查核看板）。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>實體 USB/藍牙條碼掃描槍與手機相機條碼辨識批次秒速點收</b>。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>多班級管理、自訂科目種類、未繳座號動態精算與聯絡簿日誌整合</b>。</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-4 border-t border-stone-100 flex justify-end">
+                    <button type="button" class="cancel-btn bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold py-2.5 px-6 text-xs sm:text-sm rounded-xl transition-colors">
+                        關閉日誌
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🎬 系統完整教學影片與互動指南彈窗 (Tutorial Video Modal) -->
+    <div id="tutorial-video-modal" class="fixed inset-0 z-[105] flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-md hidden modal transition-all duration-300">
+        <div class="modal-content w-full max-w-3xl relative my-auto max-h-[92vh] overflow-y-auto custom-scrollbar">
+            <div class="bg-white rounded-[2.25rem] border border-indigo-100 shadow-2xl p-6 sm:p-8 relative">
+                <div class="flex items-center justify-between pb-4 mb-5 border-b border-stone-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center text-xl shadow-lg shadow-indigo-500/20 shrink-0">
+                            <i class="fa-solid fa-circle-play"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl sm:text-2xl font-black text-stone-900 tracking-tight">系統完整使用教學影片</h3>
+                            <p class="text-xs text-stone-500 font-medium">全流程實機操作示範 • 班級改名 • 作業點收 • 家長端專屬連結 • 掃碼登入</p>
+                        </div>
+                    </div>
+                    <button type="button" id="close-tutorial-video-btn" class="cancel-btn text-stone-400 hover:text-stone-700 p-2 rounded-xl hover:bg-stone-100 transition-colors text-xl leading-none">
+                        &times;
+                    </button>
+                </div>
+
+                <!-- 影片播放容器 -->
+                <div class="relative bg-slate-950 rounded-2xl overflow-hidden shadow-xl mb-5 aspect-video flex items-center justify-center border border-slate-800">
+                    <video id="tutorial-video-player" controls preload="metadata" class="w-full h-full object-contain" poster="點收畫面.svg">
+                        <source src="homework_checker_tutorial.mp4" type="video/mp4">
+                        您的瀏覽器不支援 HTML5 影片播放。
+                    </video>
+                </div>
+
+                <!-- 影片下載與快速指引功能列 -->
+                <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-indigo-50/70 rounded-2xl border border-indigo-100 mb-6">
+                    <div class="flex items-center gap-2 text-xs text-indigo-900 font-bold">
+                        <i class="fa-solid fa-file-video text-indigo-600 text-sm"></i>
+                        <span>教學影片檔名：<code>homework_checker_tutorial.mp4</code></span>
+                    </div>
+                    <a href="homework_checker_tutorial.mp4" download="homework_checker_tutorial.mp4" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-download"></i>
+                        <span>下載完整教學影片 (MP4)</span>
+                    </a>
+                </div>
+
+                <!-- 互動式五大步驟重點教學 -->
+                <div>
+                    <h4 class="font-black text-stone-900 text-sm sm:text-base mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-indigo-600"></i>
+                        <span>核心操作步驟圖文導覽</span>
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <div class="p-3.5 bg-stone-50 rounded-xl border border-stone-200">
+                            <span class="font-black text-indigo-600 block mb-1">步驟 1 • 登入系統與建立班級</span>
+                            <p class="text-stone-600 leading-relaxed">點擊首頁「立即開始使用」或右上角「登入」，可使用 Google 帳號或帳號密碼（如 <code>antigravity</code>）登入。</p>
+                        </div>
+                        <div class="p-3.5 bg-stone-50 rounded-xl border border-stone-200">
+                            <span class="font-black text-indigo-600 block mb-1">步驟 2 • 班級改名與權限碼</span>
+                            <p class="text-stone-600 leading-relaxed">在班級管理清單中，點擊班級名稱旁的鉛筆圖示即可隨時修改班級名稱，並可產生隨機 6 位權限碼。</p>
+                        </div>
+                        <div class="p-3.5 bg-stone-50 rounded-xl border border-stone-200">
+                            <span class="font-black text-emerald-600 block mb-1">步驟 3 • 複製專屬家長端連結</span>
+                            <p class="text-stone-600 leading-relaxed">點擊各班級後方的「複製專屬連結」，系統自動帶入該班代碼，家長點開即看該班點收狀態與聯絡簿。</p>
+                        </div>
+                        <div class="p-3.5 bg-stone-50 rounded-xl border border-stone-200">
+                            <span class="font-black text-indigo-600 block mb-1">步驟 4 • 作業點收與條碼辨識</span>
+                            <p class="text-stone-600 leading-relaxed">點擊座號可即時切換狀態，支援實體掃描槍秒速掃描，頁面下方即時計算完成名單與未交座號。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-stone-100 flex justify-end">
+                    <button type="button" class="cancel-btn bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold py-2.5 px-6 text-xs sm:text-sm rounded-xl transition-colors">
+                        完成學習
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 頂級 Toast 氣泡提示容器 -->
     <div id="toast-container" class="fixed bottom-[calc(6rem+env(safe-area-inset-bottom,0px))] sm:bottom-[calc(7rem+env(safe-area-inset-bottom,0px))] right-5 sm:right-6 flex flex-col gap-2 z-[110] pointer-events-none"></div>
 
     <footer class="fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-md border-t border-slate-200 text-slate-400 text-xs font-bold text-center pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom,0px))] z-20 select-none tracking-wide">
-        Created by 王禹硯（ianw.solar@gmail.com）
+        Created by 七賢國中107 王禹硯（<a href="mailto:ianw.solar@gmail.com" class="hover:underline">ianw.solar@gmail.com</a>）
     </footer>
 
 <script>

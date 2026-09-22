@@ -126,6 +126,37 @@ export function setupButtonEvents() {
         proceedIntoSystem();
     });
 
+    // 系統更新日誌 (Changelog)
+    const openChangelog = () => {
+        const modal = document.getElementById('changelog-modal');
+        if (modal) openModal(modal);
+    };
+    bindClick('portal-nav-changelog-btn', openChangelog);
+    bindClick('portal-hero-changelog-btn', openChangelog);
+    bindClick('portal-card-changelog-btn', openChangelog);
+
+    // 完整教學影片 (Tutorial Video)
+    const openTutorialVideo = () => {
+        const modal = document.getElementById('tutorial-video-modal');
+        if (modal) {
+            openModal(modal);
+            const video = document.getElementById('tutorial-video-player');
+            if (video) {
+                video.currentTime = 0;
+                video.play().catch(() => {});
+            }
+        }
+    };
+    bindClick('portal-nav-tutorial-btn', openTutorialVideo);
+    bindClick('portal-hero-tutorial-btn', openTutorialVideo);
+    bindClick('portal-card-tutorial-btn', openTutorialVideo);
+    bindClick('close-tutorial-video-btn', () => {
+        const modal = document.getElementById('tutorial-video-modal');
+        if (modal) closeModal(modal);
+        const video = document.getElementById('tutorial-video-player');
+        if (video) video.pause();
+    });
+
     // 首頁 Hero / 行動按鈕
     bindClick('portal-hero-start-btn', () => {
         promptSystemUsageAndNavigate();
@@ -2227,6 +2258,105 @@ export function setupButtonEvents() {
                 const code = copyCodeBtn.dataset.code;
                 const name = copyCodeBtn.dataset.name;
                 await safeCopyToClipboard(code, `✅ 已複製「${name}」班級權限碼：${code}`);
+                return;
+            }
+
+            // 複製該班級專屬家長端連結（包含代碼參數）
+            const copyParentBtn = e.target.closest('.copy-parent-link-btn');
+            if (copyParentBtn) {
+                e.stopPropagation();
+                const code = copyParentBtn.dataset.code;
+                const name = copyParentBtn.dataset.name;
+                const parentUrl = `https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/?code=${encodeURIComponent(code)}`;
+                await safeCopyToClipboard(parentUrl, `✅ 已複製「${name}」專屬家長端連結（包含代碼）！`);
+                return;
+            }
+
+            // 班級改名按鈕或點擊班級名稱觸發 inline 編輯
+            const renameBtn = e.target.closest('.rename-class-btn');
+            const nameLabel = e.target.closest('.class-name-text');
+            if (renameBtn || nameLabel) {
+                e.stopPropagation();
+                const triggerEl = renameBtn || nameLabel;
+                const classId = triggerEl.dataset.classId;
+                const cls = state.appData.classes.find(c => c.id === classId);
+                if (!cls) return;
+
+                const nameContainer = triggerEl.closest('.flex-1');
+                if (!nameContainer || nameContainer.querySelector('.inline-rename-input')) return;
+
+                const originalHtml = nameContainer.innerHTML;
+                nameContainer.innerHTML = `
+                    <div class="flex items-center gap-1.5 flex-1 min-w-0">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0 animate-pulse"></span>
+                        <input type="text" class="inline-rename-input px-2 py-1 text-xs sm:text-sm font-bold border-2 border-indigo-500 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-300 w-full max-w-[140px] sm:max-w-[170px]" value="${cls.name}" maxlength="25">
+                        <button type="button" class="confirm-inline-rename-btn px-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-xs transition-colors shrink-0">儲存</button>
+                        <button type="button" class="cancel-inline-rename-btn px-1.5 py-1 text-slate-400 hover:text-slate-600 text-xs font-bold shrink-0">取消</button>
+                    </div>
+                `;
+
+                const input = nameContainer.querySelector('.inline-rename-input');
+                const confirmBtn = nameContainer.querySelector('.confirm-inline-rename-btn');
+                const cancelBtn = nameContainer.querySelector('.cancel-inline-rename-btn');
+
+                if (input) {
+                    input.focus();
+                    input.select();
+                }
+
+                const handleSave = async () => {
+                    const newName = input.value.trim();
+                    if (!newName) {
+                        showToast("⚠️ 班級名稱不能為空白！", "warning");
+                        input.focus();
+                        return;
+                    }
+                    if (newName === cls.name) {
+                        nameContainer.innerHTML = originalHtml;
+                        return;
+                    }
+                    const duplicate = state.appData.classes.some(c => c.id !== classId && c.name === newName);
+                    if (duplicate) {
+                        showToast("⚠️ 已存在相同名稱的班級！", "warning");
+                        input.focus();
+                        return;
+                    }
+                    const oldName = cls.name;
+                    cls.name = newName;
+
+                    await saveData();
+                    renderClassSelector();
+                    renderClassList();
+                    renderHomeworkList();
+                    showToast(`🎉 已成功將「${oldName}」更名為「${newName}」`, "success");
+                };
+
+                const handleCancel = () => {
+                    nameContainer.innerHTML = originalHtml;
+                };
+
+                confirmBtn.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    handleSave();
+                });
+
+                cancelBtn.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    handleCancel();
+                });
+
+                input.addEventListener('keydown', (ev) => {
+                    if (ev.key === 'Enter') {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        handleSave();
+                    } else if (ev.key === 'Escape') {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        handleCancel();
+                    }
+                });
+
                 return;
             }
         });
