@@ -639,14 +639,30 @@ export function updateDataManagementUI(onRestoreBackup) {
 
     if (backupList) {
         backupList.innerHTML = '';
-        const keys = Object.keys(localStorage).filter(k => k.startsWith('hw_backup_')).sort().reverse();
-        if (keys.length === 0) backupList.innerHTML = '<p class="text-[11px] font-bold text-slate-400 py-1">無自動備份快取。</p>';
-        else {
-            keys.forEach(k => {
-                const dateStr = k.replace('hw_backup_', ''); 
+        const allKeys = Object.keys(localStorage).filter(k => k.startsWith('hw_backup_')).sort().reverse();
+        const userKey = (state.currentUser?.uid || state.currentUser?.username || '').toLowerCase();
+        
+        // 依日期去重，消除帳號 UID 或隨機字串亂碼，僅保留純當天日期 (YYYY-MM-DD)
+        const dateKeyMap = new Map();
+        allKeys.forEach(k => {
+            const match = k.match(/(\d{4}-\d{2}-\d{2})/);
+            if (!match) return;
+            const pureDate = match[1];
+            // 若當天尚未有紀錄，或此 key 為目前使用者的專屬備份，則收錄
+            if (!dateKeyMap.has(pureDate) || (userKey && k.toLowerCase().includes(userKey))) {
+                dateKeyMap.set(pureDate, k);
+            }
+        });
+
+        const sortedDates = Array.from(dateKeyMap.keys()).sort().reverse();
+        if (sortedDates.length === 0) {
+            backupList.innerHTML = '<p class="text-[11px] font-bold text-slate-400 py-1">無自動備份快取。</p>';
+        } else {
+            sortedDates.forEach(dateStr => {
+                const k = dateKeyMap.get(dateStr);
                 const btn = document.createElement('button');
-                btn.className = 'w-full glass-card border border-white/60 text-slate-700 text-[11px] font-bold py-2 px-3 rounded-xl hover:bg-slate-50 transition-colors flex justify-between items-center shadow-sm';
-                btn.innerHTML = `<span class="flex items-center gap-1.5 text-slate-500">📅 ${dateStr}</span> <span class="bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded-lg text-[9px] shadow-sm transition-colors">倒退還原</span>`;
+                btn.className = 'w-full glass-card border border-white/60 text-slate-700 text-[11px] font-bold py-2 px-3 rounded-xl hover:bg-slate-50 transition-colors flex justify-between items-center shadow-sm cursor-pointer';
+                btn.innerHTML = `<span class="flex items-center gap-1.5 text-slate-600">📅 ${dateStr}</span> <span class="bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded-lg text-[9px] shadow-sm transition-colors">倒退還原</span>`;
                 btn.onclick = () => {
                     showConfirmModal('自動備份覆蓋還原', `確定要將所有班級與作業還原至 ${dateStr} 嗎？目前的修改將被完全洗掉！`, async () => {
                         const dataStr = localStorage.getItem(k);

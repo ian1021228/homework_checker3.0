@@ -1321,53 +1321,35 @@
                 <!-- 右側：功能按鈕列 (水平單排平行排列，放大按鈕，絕不換行至第二行) -->
                 <div class="w-full 2xl:w-auto overflow-x-auto no-scrollbar py-1 shrink-0">
                     <div class="flex flex-nowrap items-center gap-2 sm:gap-2.5 2xl:gap-3 shrink-0 min-w-max justify-start 2xl:justify-end">
-                         <button id="admin-btn" class="hidden glass-card border border-amber-300/80 bg-amber-50/80 hover:bg-amber-100 text-amber-800 hover:text-amber-900 font-black py-2.5 sm:py-3 px-4 sm:px-5 text-sm sm:text-base rounded-2xl shadow-xs transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer" title="系統管理後台">
-                             <span>🛡️ 管理後台</span>
-                         </button>
-
-                         <!-- 1. 點收方式切換按鈕 -->
-                         <button id="top-check-mode-btn" class="glass-card border border-indigo-200/80 bg-indigo-50/60 hover:bg-indigo-100/70 text-indigo-700 hover:text-indigo-900 font-black py-2.5 sm:py-3 px-4 sm:px-5 text-sm sm:text-base rounded-2xl shadow-xs transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer" title="切換作業點收方式 (手動點收 / 條碼掃描)">
-                             <span id="top-check-mode-label" class="flex items-center gap-1.5">
-                                 <span class="text-base">👆</span>
-                                 <span>點收方式</span>
-                             </span>
-                         </button>
-
-                         <!-- 2. 作業種類 -->
+                         <!-- 1. 作業種類 -->
                          <button id="show-types-modal-btn" class="glass-card border border-orange-200/80 bg-orange-50/40 text-orange-600 hover:text-orange-700 font-black py-2.5 sm:py-3 px-4 sm:px-5 text-sm sm:text-base rounded-2xl shadow-xs hover:bg-orange-50 hover:border-orange-300 transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 hide-on-admin-view flex items-center gap-1.5 cursor-pointer">
                              <span>作業種類</span>
                          </button>
                          
-                         <!-- 3. 聯絡簿 -->
+                         <!-- 2. 聯絡簿 -->
                          <button id="contact-book-btn" class="glass-card border border-purple-200/80 bg-purple-50/40 text-purple-600 hover:text-purple-700 font-black py-2.5 sm:py-3 px-4 sm:px-5 text-sm sm:text-base rounded-2xl shadow-xs hover:bg-purple-50 hover:border-purple-300 transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer">
                              <span>聯絡簿</span>
                          </button>
                          
-                         <!-- 4. 學生詳情 -->
+                         <!-- 3. 學生詳情 -->
                          <button id="student-details-btn" class="glass-card border border-emerald-200/80 bg-emerald-50/40 text-emerald-600 hover:text-emerald-700 font-black py-2.5 sm:py-3 px-4 sm:px-5 text-sm sm:text-base rounded-2xl shadow-xs hover:bg-emerald-50 hover:border-emerald-300 transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer">
                              <span>學生詳情</span>
                          </button>
                          
-                         <!-- 5. 🏷️ 條碼設定 -->
+                         <!-- 4. 🏷️ 條碼設定 -->
                          <button id="set-barcodes-btn" class="glass-card border border-blue-200/80 bg-blue-50/40 text-blue-600 hover:text-blue-700 font-black py-2.5 sm:py-3 px-4 sm:px-5 text-sm sm:text-base rounded-2xl shadow-xs hover:bg-blue-50 hover:border-blue-300 transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 hide-on-admin-view flex items-center gap-1.5 cursor-pointer">
                              <span>🏷️ 條碼設定</span>
                          </button>
                          
-                         <!-- 6. 管理班級 -->
+                         <!-- 5. 管理班級 -->
                          <button id="manage-classes-btn" class="glass-card border border-stone-200/90 text-stone-600 hover:text-stone-800 font-black py-2.5 sm:py-3 px-4 sm:px-5 text-sm sm:text-base rounded-2xl shadow-xs hover:bg-stone-50 hover:border-stone-300 transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 hide-on-admin-view flex items-center gap-1.5 cursor-pointer">
                              <span>管理班級</span>
                          </button>
 
-                         <!-- 📋 一鍵生成 LINE 家長群通報文案 -->
-                         <button id="copy-line-report-btn" class="glass-card border border-emerald-300/80 bg-emerald-50/80 hover:bg-emerald-100 text-emerald-800 font-black py-2.5 sm:py-3 px-3.5 sm:px-4 text-sm sm:text-base rounded-2xl shadow-xs transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer" title="一鍵複製今日作業與聯絡簿 LINE 家長群通報文案">
-                             <i class="fa-solid fa-clipboard-list text-emerald-600"></i>
-                             <span>📋 LINE 通報</span>
-                         </button>
-
-                         <!-- ⚡ 快速登入授權 (手機端掃碼或產生認證碼) -->
+                         <!-- 6. ⚡ 快速登入授權 (手機端掃碼或產生認證碼，單一閃電圖示) -->
                          <button id="main-qr-scan-btn" class="glass-card border border-emerald-300/80 bg-emerald-50/80 hover:bg-emerald-100 text-emerald-800 font-black py-2.5 sm:py-3 px-3.5 sm:px-4 text-sm sm:text-base rounded-2xl shadow-xs transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer" title="使用手機相機掃碼或認證碼授權其他電腦快速登入">
                              <i class="fa-solid fa-bolt text-amber-500"></i>
-                             <span>⚡ 快速授權</span>
+                             <span>快速授權</span>
                          </button>
                          
                          <!-- 7. 設定 -->
@@ -1413,21 +1395,23 @@
         </header>
 
         <!-- 作業列表與雙螢幕模式當日聯絡簿側邊欄 -->
-        <div class="relative flex items-start gap-4">
-            <!-- 主要作業卡片清單 -->
-            <div class="flex-1 min-w-0">
-                <div id="homework-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse-once relative z-10"></div>
+        <div id="main-homework-container" class="relative flex flex-col xl:flex-row items-start gap-5 w-full transition-all duration-300">
+            <!-- 主要作業卡片清單 (自適應 2/3 或全寬，兩邊排版不擠壓) -->
+            <div id="homework-list-wrapper" class="flex-1 min-w-0 w-full transition-all duration-300">
+                <div id="homework-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse-once relative z-10 transition-all"></div>
             </div>
 
-            <!-- 🖥️ 雙螢幕模式 (Beta版)：當日聯絡簿側邊欄 (由設定開啟，預設關閉) -->
-            <div id="dual-screen-sidebar-container" class="hidden shrink-0 relative transition-all duration-300">
-                <!-- 收合 / 展開按鈕 (展開時箭頭朝向左邊，收合時朝向右邊) -->
-                <button id="dual-screen-toggle-btn" type="button" class="absolute -left-7 top-6 z-20 w-7 h-12 bg-purple-600 hover:bg-purple-700 text-white rounded-l-xl shadow-md flex items-center justify-center cursor-pointer transition-all active:scale-95" title="收合/展開當日聯絡簿">
-                    <i id="dual-screen-toggle-icon" class="fa-solid fa-chevron-left text-xs transition-transform duration-300"></i>
+            <!-- 🖥️ 雙螢幕模式 (Beta版)：當日聯絡簿側邊欄 (佔畫面右側三分之一，由設定開啟) -->
+            <div id="dual-screen-sidebar-container" class="hidden shrink-0 relative transition-all duration-300 w-full xl:w-1/3 min-w-0 xl:min-w-[320px]">
+                <!-- 收合 / 展開按鈕 (展開時箭頭朝向右邊以向右收合，收合時朝向左邊以向左展開) -->
+                <button id="dual-screen-toggle-btn" type="button" class="absolute -left-7 top-6 z-20 w-7 h-12 bg-purple-600 hover:bg-purple-700 text-white rounded-l-xl shadow-md flex items-center justify-center cursor-pointer transition-all active:scale-95" title="收合當日聯絡簿">
+                    <svg class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
                 </button>
 
-                <!-- 側邊欄主體：當日黑板聯絡簿卡片 -->
-                <div id="dual-screen-sidebar-content" class="w-80 lg:w-96 rounded-2xl bg-[#1e3a2f] border-4 border-[#8B5A2B] shadow-2xl p-4 text-white custom-scrollbar overflow-y-auto max-h-[82vh] transition-all duration-300">
+                <!-- 側邊欄主體：當日黑板聯絡簿卡片 (佔滿 1/3 側邊欄) -->
+                <div id="dual-screen-sidebar-content" class="w-full rounded-2xl bg-[#1e3a2f] border-4 border-[#8B5A2B] shadow-2xl p-4 sm:p-5 text-white custom-scrollbar overflow-y-auto max-h-[82vh] transition-all duration-300">
                     <div class="flex items-center justify-between pb-2.5 mb-3 border-b border-emerald-800/80">
                         <div class="flex items-center gap-2">
                             <span class="text-xl">📋</span>
@@ -1445,7 +1429,7 @@
                     </div>
 
                     <!-- 聯絡事項列表 -->
-                    <div id="dual-screen-contact-list" class="space-y-2 text-xs font-medium">
+                    <div id="dual-screen-contact-list" class="space-y-2.5 text-xs font-medium">
                         <!-- 動態填入 -->
                     </div>
                 </div>
@@ -1601,6 +1585,12 @@
                         <button id="lineheight-decrease-btn" class="px-3.5 py-2 text-sm text-slate-500 hover:bg-slate-50 border-r border-slate-200 font-bold transition-colors" title="縮小行距">↕️-</button>
                         <button id="lineheight-increase-btn" class="px-3.5 py-2 text-sm text-slate-500 hover:bg-slate-50 font-bold transition-colors" title="加大行距">↕️+</button>
                     </div>
+
+                    <!-- 📋 一鍵生成 LINE 家長群通報文案 -->
+                    <button id="copy-line-report-btn" type="button" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black py-3 px-5 sm:px-6 text-base sm:text-lg rounded-3xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 whitespace-nowrap flex items-center gap-2 cursor-pointer active:scale-95" title="一鍵複製今日作業與聯絡簿 LINE 家長群通報文案">
+                        <i class="fa-solid fa-clipboard-list text-lg"></i>
+                        <span>複製 LINE 通報</span>
+                    </button>
 
                     <button id="apply-yesterday-btn" class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold py-3 px-6 text-lg font-black rounded-3xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 whitespace-nowrap hide-on-admin-view">📋 套用昨日</button>
                     <button id="open-date-picker-btn" class="bg-slate-800 text-white font-bold py-3 px-6 text-lg font-black rounded-3xl shadow-md hover:bg-slate-900 transition-all transform hover:-translate-y-0.5 whitespace-nowrap flex items-center gap-1.5">
@@ -1886,6 +1876,41 @@
            <h2 class="text-2xl font-extrabold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-600 drop-shadow-sm">系統設定</h2>
            
            <div class="space-y-4">
+               <!-- 🛡️ 管理員專用：系統管理後台 (僅限管理員顯示，置頂) -->
+               <button id="admin-btn" type="button" class="hidden w-full p-4 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-black rounded-2xl shadow-md shadow-amber-500/20 hover:shadow-lg transition-all flex items-center justify-between group cursor-pointer active:scale-98">
+                   <div class="flex items-center gap-3">
+                       <span class="text-2xl">🛡️</span>
+                       <div class="text-left">
+                           <span class="block text-sm sm:text-base font-black">進入系統管理中心 (Admin)</span>
+                           <span class="text-[11px] text-amber-100 font-medium">全域資料庫・用戶管理・全服維護</span>
+                       </div>
+                   </div>
+                   <span class="px-2.5 py-1 bg-white/20 rounded-full text-xs font-bold border border-white/30 group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
+                       <span>開啟後台</span>
+                       <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                   </span>
+               </button>
+
+               <!-- 👆 點收模式設定區塊 (手動點收 / 條碼掃描) -->
+               <div class="p-5 border border-indigo-200 rounded-2xl bg-gradient-to-br from-indigo-50/70 to-purple-50/50 shadow-sm relative overflow-hidden">
+                   <h3 class="font-extrabold text-indigo-950 mb-1.5 flex items-center justify-between relative z-10 text-sm sm:text-base">
+                       <span class="flex items-center gap-1.5">👆 點收模式設定</span>
+                       <span class="text-[10px] font-bold text-indigo-600 bg-indigo-100/90 px-2 py-0.5 rounded-full">主頁切換已整合至此</span>
+                   </h3>
+                   <p class="text-xs text-indigo-800/80 mb-3 font-medium relative z-10 leading-relaxed">
+                       選擇點收作業的方式，支援觸控手動切換與條碼掃描機快速錄入：
+                   </p>
+                   <div class="flex gap-2 relative z-10">
+                       <button id="setting-mode-manual-btn" type="button" class="flex-1 py-2.5 px-3 rounded-xl font-black text-sm glass-card border border-white/60 text-slate-700 hover:bg-slate-50 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs">
+                           <span>👆 手動點收</span>
+                       </button>
+                       <button id="setting-mode-scan-btn" type="button" class="flex-1 py-2.5 px-3 rounded-xl font-black text-sm glass-card border border-white/60 text-slate-700 hover:bg-slate-50 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs">
+                           <span>📠 條碼掃描</span>
+                       </button>
+                   </div>
+                   <p class="text-[11px] text-indigo-600 mt-2.5 font-semibold relative z-10">💡 提示：切換至手動點收將隱藏主頁上的條碼按鈕與輸入框，讓版面更清爽簡潔。</p>
+               </div>
+
                <!-- 下載 / 安裝 App 專用區塊 -->
                <div id="settings-pwa-container" class="p-5 border border-pink-100 rounded-2xl bg-gradient-to-br from-pink-50/80 via-rose-50/50 to-purple-50/40 shadow-xs relative overflow-hidden">
                    <div class="flex items-center justify-between mb-2">
@@ -1920,16 +1945,6 @@
                        <button id="setting-dark-mode-btn" class="flex-1 py-2 px-3 rounded-xl font-bold text-sm glass-card border border-white/60 text-slate-600 hover:bg-slate-50 transition-all">切換深色模式</button>
                    </div>
                    <p class="text-[11px] text-slate-500 mt-2 font-medium relative z-10">切換日/夜間模式，降低刺眼感。</p>
-               </div>
-
-               <!-- 點收模式設定區塊 -->
-               <div class="p-5 border border-purple-100 rounded-xl bg-purple-50/50 shadow-sm relative overflow-hidden">
-                   <h3 class="font-bold text-purple-900 mb-3 flex items-center gap-1.5 relative z-10">👆 點收模式設定</h3>
-                   <div class="flex gap-2 relative z-10">
-                       <button id="setting-mode-manual-btn" class="flex-1 py-2 px-3 rounded-xl font-bold text-sm glass-card border border-white/60 text-slate-600 hover:bg-slate-50 transition-all">手動點收</button>
-                       <button id="setting-mode-scan-btn" class="flex-1 py-2 px-3 rounded-xl font-bold text-sm glass-card border border-white/60 text-slate-600 hover:bg-slate-50 transition-all">條碼掃描</button>
-                   </div>
-                   <p class="text-[11px] text-purple-700 mt-2 font-medium relative z-10">切換至手動點收將隱藏畫面上的條碼按鈕與掃描輸入框，讓版面更清爽。</p>
                </div>
 
                <!-- 雲端同步區塊 -->
@@ -2703,19 +2718,56 @@
                             <p class="text-xs text-stone-500 font-medium">記錄親師作業點收系統的每一次進化與功能更新</p>
                         </div>
                     </div>
-                    <button type="button" class="cancel-btn text-stone-400 hover:text-stone-700 p-2 rounded-xl hover:bg-stone-100 transition-colors text-xl leading-none">
+                    <button id="close-changelog-modal-btn" type="button" class="cancel-btn text-stone-400 hover:text-stone-700 p-2 rounded-xl hover:bg-stone-100 transition-colors text-xl leading-none">
                         &times;
                     </button>
                 </div>
 
                 <!-- 版本歷程時間軸 -->
                 <div class="space-y-6">
-                    <!-- v3.5 最新發布 -->
+                    <!-- v3.6 最新發布 -->
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/70 via-purple-50/50 to-pink-50/30 border border-indigo-200/80 shadow-xs relative">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                             <div class="flex items-center gap-2">
-                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v3.5 最新發布</span>
-                                <span class="text-xs font-bold text-indigo-900">快速登入認證碼、手機原生App優化、雙螢幕模式與LINE通報</span>
+                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v3.6 最新發布</span>
+                                <span class="text-xs font-bold text-indigo-900">雙螢幕 1/3 黃金比例、LINE通報移至聯絡簿、點收方式與管理後台移至設定</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-400">2026-09-23</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>📋 LINE 通報按鈕移至聯絡簿頁面</b>：將「複製 LINE 通報」按鈕置於聯絡簿頁面頂端工具列，方便老師檢閱或填寫完聯絡簿時隨手一鍵產出通報文案。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>👆 點收方式整合至設定頁面</b>：主頁頂部導覽列移除點收方式按鈕，將「手動點收 / 條碼掃描」模式切換整合至「系統設定」專屬區塊，大幅簡化主頁視覺動線。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>⚡ 快速授權按鈕圖示精簡</b>：去除重複的閃電 Emoji，保留單一優雅閃電圖示，介面清爽俐落。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>📅 時光機備份還原純淨日期顯示</b>：自動備份快取清單全面過濾使用者 UID 等複雜前綴，乾淨顯示純「當天日期（YYYY-MM-DD）」，徹底消除亂碼雜訊。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>🖥️ 雙螢幕模式 1/3 黃金比例自適應</b>：右側聯絡簿寬度調整為畫面 1/3，左側作業卡片流暢兩欄/三欄自適應，兩邊排版皆寬敞舒適不擠壓；並修正收合與展開箭頭指示方向。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>🛡️ 管理員專用「系統管理中心」按鈕移入設定頁置頂</b>：管理員專用的管理後台按鈕移入系統設定彈窗最上方（僅限管理員顯示），非管理員自動隱藏。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- v3.5 版本 -->
+                    <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-slate-700 text-white text-xs font-black uppercase tracking-wider shadow-xs">v3.5 正式版</span>
+                                <span class="text-xs font-bold text-slate-800">快速登入認證碼、手機原生App優化、雙螢幕模式與LINE通報</span>
                             </div>
                             <span class="text-xs font-mono font-bold text-slate-400">2026-09-23</span>
                         </div>
@@ -2982,7 +3034,7 @@
             </div>
             
             <div class="grid grid-cols-2 gap-2.5">
-                <button <button id="mobile-sheet-line-report-btn" class="p-3 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-2xl flex items-center gap-2.5 font-bold text-xs text-emerald-800 active:scale-98 transition-all cursor-pointer">
+                <button id="mobile-sheet-line-report-btn" class="p-3 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-2xl flex items-center gap-2.5 font-bold text-xs text-emerald-800 active:scale-98 transition-all cursor-pointer">
                     <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0"><i class="fa-solid fa-clipboard-list"></i></div>
                     <div class="text-left"><span class="block text-emerald-950 font-extrabold">LINE 通報</span><span class="text-[10px] text-emerald-600 font-medium">一鍵產生文案</span></div>
                 </button>

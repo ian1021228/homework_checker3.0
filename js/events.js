@@ -1730,6 +1730,7 @@ export function setupButtonEvents() {
 
     // 系統管理中心 (Admin) Modal 開啟
     const handleOpenAdminModal = () => {
+        closeModal(document.getElementById('settings-modal'));
         openModal(document.getElementById('admin-modal'));
         updateAdminInspectionUI();
         loadAllUsersForAdmin((targetId, targetEmail) => {
@@ -3136,16 +3137,41 @@ let isDualScreenExpanded = true;
 export function updateDualScreenSidebar() {
     const isEnabled = localStorage.getItem('feature_dual_screen_enabled') === 'true';
     const container = document.getElementById('dual-screen-sidebar-container');
+    const content = document.getElementById('dual-screen-sidebar-content');
+    const btn = document.getElementById('dual-screen-toggle-btn');
     const chk = document.getElementById('toggle-dual-screen-mode');
+    const hwList = document.getElementById('homework-list');
     if (chk) chk.checked = isEnabled;
     if (!container) return;
 
     if (!isEnabled) {
         container.classList.add('hidden');
+        if (hwList) hwList.classList.remove('dual-screen-active');
         return;
     }
 
     container.classList.remove('hidden');
+    if (isDualScreenExpanded) {
+        if (content) content.classList.remove('hidden');
+        container.classList.remove('w-0', 'min-w-0');
+        container.classList.add('w-full', 'xl:w-1/3', 'xl:min-w-[320px]');
+        // 展開狀態：箭頭指向右邊 (點擊向右收合)
+        if (btn) {
+            btn.title = "收合當日聯絡簿";
+            btn.innerHTML = `<svg class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>`;
+        }
+        if (hwList) hwList.classList.add('dual-screen-active');
+    } else {
+        if (content) content.classList.add('hidden');
+        container.classList.remove('w-full', 'xl:w-1/3', 'xl:min-w-[320px]');
+        container.classList.add('w-0', 'min-w-0');
+        // 收合狀態：箭頭指向左邊 (點擊向左展開)
+        if (btn) {
+            btn.title = "展開當日聯絡簿";
+            btn.innerHTML = `<svg class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>`;
+        }
+        if (hwList) hwList.classList.remove('dual-screen-active');
+    }
     renderDualScreenContactBook();
 }
 
@@ -3180,19 +3206,38 @@ export function renderDualScreenContactBook() {
 }
 
 export function toggleDualScreenCollapse() {
+    const container = document.getElementById('dual-screen-sidebar-container');
     const content = document.getElementById('dual-screen-sidebar-content');
-    const icon = document.getElementById('dual-screen-toggle-icon');
-    if (!content || !icon) return;
+    const btn = document.getElementById('dual-screen-toggle-btn');
+    const hwList = document.getElementById('homework-list');
+    if (!content) return;
 
     isDualScreenExpanded = !isDualScreenExpanded;
     if (isDualScreenExpanded) {
         content.classList.remove('hidden');
-        // 展開時箭頭朝向左邊
-        icon.className = "fa-solid fa-chevron-left text-xs transition-transform duration-300";
+        if (container) {
+            container.classList.remove('w-0', 'min-w-0');
+            container.classList.add('w-full', 'xl:w-1/3', 'xl:min-w-[320px]');
+        }
+        // 展開模式：箭頭指向右邊 (向右收合)
+        if (btn) {
+            btn.title = "收合當日聯絡簿";
+            btn.innerHTML = `<svg class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>`;
+        }
+        if (hwList) hwList.classList.add('dual-screen-active');
     } else {
         content.classList.add('hidden');
-        // 收合時箭頭朝向右邊
-        icon.className = "fa-solid fa-chevron-right text-xs transition-transform duration-300";
+        if (container) {
+            container.classList.remove('w-full', 'xl:w-1/3', 'xl:min-w-[320px]');
+            container.classList.add('w-0', 'min-w-0');
+        }
+        // 收合模式：箭頭指向左邊 (向左展開)
+        if (btn) {
+            btn.title = "展開當日聯絡簿";
+            btn.innerHTML = `<svg class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>`;
+        }
+        if (hwList) hwList.classList.remove('dual-screen-active');
     }
 }
+
 
