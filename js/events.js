@@ -2617,6 +2617,40 @@ export function setupButtonEvents() {
                 openModal(modal);
                 return;
             }
+            const moveUpBtn = e.target.closest('.move-up-contact-btn');
+            if (moveUpBtn && !moveUpBtn.disabled) {
+                const index = parseInt(moveUpBtn.dataset.index);
+                const list = currentClass?.contactBook?.[dateString];
+                if (list && index > 0) {
+                    const temp = list[index];
+                    list[index] = list[index - 1];
+                    list[index - 1] = temp;
+                    await saveData();
+                    renderContactBookItems();
+                    if (typeof renderDualScreenContactBook === 'function') {
+                        renderDualScreenContactBook();
+                    }
+                    showToast("已向上調整順序", "info");
+                }
+                return;
+            }
+            const moveDownBtn = e.target.closest('.move-down-contact-btn');
+            if (moveDownBtn && !moveDownBtn.disabled) {
+                const index = parseInt(moveDownBtn.dataset.index);
+                const list = currentClass?.contactBook?.[dateString];
+                if (list && index < list.length - 1) {
+                    const temp = list[index];
+                    list[index] = list[index + 1];
+                    list[index + 1] = temp;
+                    await saveData();
+                    renderContactBookItems();
+                    if (typeof renderDualScreenContactBook === 'function') {
+                        renderDualScreenContactBook();
+                    }
+                    showToast("已向下調整順序", "info");
+                }
+                return;
+            }
             const toHwBtn = e.target.closest('.to-hw-btn'); 
             if (toHwBtn) { 
                 const index = parseInt(toHwBtn.dataset.index), 
@@ -2832,6 +2866,106 @@ export function setupButtonEvents() {
             }, 5000);
         }
     }, true);
+
+    // ==========================================
+    // 📋 LINE 班級家長群通報文案綁定
+    // ==========================================
+    document.getElementById('copy-line-report-btn')?.addEventListener('click', openLineReportModal);
+    document.getElementById('mobile-sheet-line-report-btn')?.addEventListener('click', () => {
+        closeModal(document.getElementById('mobile-more-sheet'));
+        openLineReportModal();
+    });
+    document.getElementById('copy-line-report-confirm-btn')?.addEventListener('click', () => {
+        const text = document.getElementById('line-report-textarea')?.value;
+        if (text) {
+            safeCopyToClipboard(text);
+            showToast("🎉 已複製到剪貼簿！", "success");
+        }
+    });
+    document.getElementById('close-line-report-modal-btn')?.addEventListener('click', () => {
+        closeModal(document.getElementById('line-report-modal'));
+    });
+    document.getElementById('close-line-report-btn')?.addEventListener('click', () => {
+        closeModal(document.getElementById('line-report-modal'));
+    });
+
+    // ==========================================
+    // 🖥️ 雙螢幕模式 (Beta版) 綁定
+    // ==========================================
+    document.getElementById('toggle-dual-screen-mode')?.addEventListener('change', (e) => {
+        localStorage.setItem('feature_dual_screen_enabled', e.target.checked ? 'true' : 'false');
+        updateDualScreenSidebar();
+        showToast(e.target.checked ? "🖥️ 已開啟雙螢幕模式 (Beta版)" : "🖥️ 已關閉雙螢幕模式", "info");
+    });
+    document.getElementById('dual-screen-toggle-btn')?.addEventListener('click', toggleDualScreenCollapse);
+    document.getElementById('dual-screen-refresh-btn')?.addEventListener('click', () => {
+        renderDualScreenContactBook();
+        showToast("🔄 當日聯絡簿已重新整理", "info");
+    });
+    // 初始化雙螢幕側邊欄狀態
+    updateDualScreenSidebar();
+
+    // ==========================================
+    // 📱 手機端原生 App 底部導航欄與 FAB 綁定
+    // ==========================================
+    document.getElementById('mobile-nav-homework')?.addEventListener('click', () => {
+        showMainPage();
+        document.querySelectorAll('.mobile-tab-btn').forEach(b => b.classList.remove('text-indigo-600'));
+        document.getElementById('mobile-nav-homework')?.classList.add('text-indigo-600');
+    });
+    document.getElementById('mobile-nav-contact')?.addEventListener('click', () => {
+        showContactBookPage();
+    });
+    document.getElementById('mobile-nav-stats')?.addEventListener('click', () => {
+        document.getElementById('history-stats-btn')?.click();
+    });
+    document.getElementById('mobile-nav-more')?.addEventListener('click', () => {
+        const sheet = document.getElementById('mobile-more-sheet');
+        if (sheet) openModal(sheet);
+    });
+    document.getElementById('mobile-more-sheet-close-btn')?.addEventListener('click', () => {
+        closeModal(document.getElementById('mobile-more-sheet'));
+    });
+    document.getElementById('mobile-fab-add')?.addEventListener('click', () => {
+        document.getElementById('show-add-modal-btn')?.click();
+    });
+
+    // 手機抽屜內部快捷按鈕
+    document.getElementById('mobile-sheet-manage-classes-btn')?.addEventListener('click', () => {
+        closeModal(document.getElementById('mobile-more-sheet'));
+        document.getElementById('manage-classes-btn')?.click();
+    });
+    document.getElementById('mobile-sheet-set-barcodes-btn')?.addEventListener('click', () => {
+        closeModal(document.getElementById('mobile-more-sheet'));
+        document.getElementById('set-barcodes-btn')?.click();
+    });
+    document.getElementById('mobile-sheet-student-details-btn')?.addEventListener('click', () => {
+        closeModal(document.getElementById('mobile-more-sheet'));
+        document.getElementById('student-details-btn')?.click();
+    });
+    document.getElementById('mobile-sheet-types-btn')?.addEventListener('click', () => {
+        closeModal(document.getElementById('mobile-more-sheet'));
+        document.getElementById('show-types-modal-btn')?.click();
+    });
+    document.getElementById('mobile-sheet-quick-auth-btn')?.addEventListener('click', () => {
+        closeModal(document.getElementById('mobile-more-sheet'));
+        document.getElementById('main-qr-scan-btn')?.click();
+    });
+    document.getElementById('mobile-sheet-settings-btn')?.addEventListener('click', () => {
+        closeModal(document.getElementById('mobile-more-sheet'));
+        document.getElementById('settings-btn')?.click();
+    });
+
+    // ==========================================
+    // 📴 離線優先 (Offline-First) 狀態監聽
+    // ==========================================
+    window.addEventListener('offline', () => {
+        showToast("📴 目前處於離線模式，所有作業與聯絡簿將極速儲存於本地！", "warning");
+    });
+    window.addEventListener('online', () => {
+        showToast("🌐 已恢復網路連線，正在自動同步雲端資料...", "success");
+        try { syncDataToCloud(true); } catch(e) {}
+    });
 }
 
 export function enterDeveloperMode() {
@@ -2923,3 +3057,142 @@ export function setScanActionMode(mode) {
     }
 }
 window.setScanActionMode = setScanActionMode;
+
+
+// ==========================================
+// 📋 1. 一鍵生成 LINE 班級家長群每日通報文案
+// ==========================================
+export function generateLineReportText() {
+    const curClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId) || state.appData?.classes?.[0];
+    const className = curClass?.name || '班級';
+    const classCode = curClass?.accessCode || '';
+    const now = new Date();
+    const days = ['日', '一', '二', '三', '四', '五', '六'];
+    const dateStr = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} (${days[now.getDay()]})`;
+
+    let text = `📅 【${className} 今日聯絡簿與作業點收】${dateStr}\n`;
+    text += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+
+    // 今日作業點收狀況
+    const curHws = (state.appData?.homeworks || []).filter(h => h.classId === (curClass?.id || state.currentClassId));
+    text += `📖 今日作業點收狀況：\n`;
+    if (curHws.length === 0) {
+        text += `（今日尚無登記作業）\n`;
+    } else {
+        curHws.forEach((hw, idx) => {
+            const missingSeats = [];
+            const seatStatus = hw.seatStatus || {};
+            for (let i = 1; i <= (curClass?.maxSeats || 30); i++) {
+                if (seatStatus[i] === 2) {
+                    missingSeats.push(`${i}號`);
+                }
+            }
+            if (missingSeats.length === 0) {
+                text += `${idx + 1}. ${hw.name}（🎉 全班已交齊）\n`;
+            } else {
+                text += `${idx + 1}. ${hw.name}（缺交：${missingSeats.join('、')}）\n`;
+            }
+        });
+    }
+
+    text += `\n📝 今日黑板聯絡事項：\n`;
+    const todayYMD = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    const cbItems = curClass?.contactBook?.[todayYMD] || state.appData?.contactBooks?.[curClass?.id || state.currentClassId]?.[todayYMD] || [];
+    if (cbItems.length === 0) {
+        text += `（今日暫無特殊聯絡事項，請隨時留意班級動態）\n`;
+    } else {
+        cbItems.forEach((item, idx) => {
+            text += `${idx + 1}. ${item.name || item}\n`;
+        });
+    }
+
+    text += `\n🔗 家長專屬即時查核連結（免密碼直達）：\n`;
+    const baseUrl = 'https://ian1021228.github.io/homework_checker3.0/';
+    text += classCode ? `${baseUrl}?code=${classCode}\n` : `${baseUrl}\n`;
+    text += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+    text += `七賢國中107 王禹硯 開發 • 親師作業點收系統`;
+
+    return text;
+}
+
+export function openLineReportModal() {
+    const reportText = generateLineReportText();
+    const textarea = document.getElementById('line-report-textarea');
+    if (textarea) textarea.value = reportText;
+    
+    // 自動複製進剪貼簿
+    safeCopyToClipboard(reportText);
+    showToast("🎉 已自動複製 LINE 家長群通報文案！", "success");
+
+    const modal = document.getElementById('line-report-modal');
+    if (modal) openModal(modal);
+}
+
+// ==========================================
+// 🖥️ 2. 雙螢幕模式 (Beta版) 當日聯絡簿側邊欄
+// ==========================================
+let isDualScreenExpanded = true;
+
+export function updateDualScreenSidebar() {
+    const isEnabled = localStorage.getItem('feature_dual_screen_enabled') === 'true';
+    const container = document.getElementById('dual-screen-sidebar-container');
+    const chk = document.getElementById('toggle-dual-screen-mode');
+    if (chk) chk.checked = isEnabled;
+    if (!container) return;
+
+    if (!isEnabled) {
+        container.classList.add('hidden');
+        return;
+    }
+
+    container.classList.remove('hidden');
+    renderDualScreenContactBook();
+}
+
+export function renderDualScreenContactBook() {
+    const dateText = document.getElementById('dual-screen-date-text');
+    const listEl = document.getElementById('dual-screen-contact-list');
+    if (!listEl) return;
+
+    const now = new Date();
+    const days = ['日', '一', '二', '三', '四', '五', '六'];
+    const todayYMD = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    if (dateText) {
+        dateText.textContent = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} (週${days[now.getDay()]})`;
+    }
+
+    const curClassId = state.currentClassId;
+    const curClass = (state.appData?.classes || []).find(c => c.id === curClassId);
+    const rawItems = curClass?.contactBook?.[todayYMD] || state.appData?.contactBooks?.[curClassId]?.[todayYMD] || [];
+    const items = rawItems.map(it => typeof it === 'string' ? { name: it } : it);
+
+    if (items.length === 0) {
+        listEl.innerHTML = `<div class="p-4 text-center text-emerald-200/60 font-bold text-xs bg-emerald-950/40 rounded-xl border border-emerald-800/40">今日黑板尚無聯絡事項</div>`;
+        return;
+    }
+
+    listEl.innerHTML = items.map((it, idx) => `
+        <div class="p-2.5 rounded-xl bg-emerald-950/60 border border-emerald-700/60 flex items-start gap-2 shadow-xs">
+            <span class="w-5 h-5 rounded-full bg-amber-400 text-stone-900 font-black text-[11px] flex items-center justify-center shrink-0 mt-0.5">${idx+1}</span>
+            <span class="text-xs font-bold text-stone-100 leading-snug">${it.name || it}</span>
+        </div>
+    `).join('');
+}
+
+export function toggleDualScreenCollapse() {
+    const content = document.getElementById('dual-screen-sidebar-content');
+    const icon = document.getElementById('dual-screen-toggle-icon');
+    if (!content || !icon) return;
+
+    isDualScreenExpanded = !isDualScreenExpanded;
+    if (isDualScreenExpanded) {
+        content.classList.remove('hidden');
+        // 展開時箭頭朝向左邊
+        icon.className = "fa-solid fa-chevron-left text-xs transition-transform duration-300";
+    } else {
+        content.classList.add('hidden');
+        // 收合時箭頭朝向右邊
+        icon.className = "fa-solid fa-chevron-right text-xs transition-transform duration-300";
+    }
+}
+

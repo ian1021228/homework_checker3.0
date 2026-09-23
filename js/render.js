@@ -485,12 +485,18 @@ export function renderContactBookItems() {
     items.forEach((item, index) => {
         const itemEl = document.createElement('div');
         itemEl.className = 'flex items-start justify-between group p-3 rounded-2xl hover:bg-white/5 transition-all border border-transparent hover:border-white/10';
+        
+        const isFirst = index === 0;
+        const isLast = index === items.length - 1;
+
         itemEl.innerHTML = `
             <div class="flex-grow pt-0.5"><span class="mr-2 font-bold opacity-60">${index + 1}.</span><span class="whitespace-pre-wrap">${item}</span></div>
             <div class="flex gap-1.5 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all ml-3 flex-shrink-0 bg-slate-900/60 backdrop-blur-md rounded-xl p-1 border border-white/10 shadow-xl">
-                <button class="to-hw-btn hide-on-admin-view w-7 h-7 flex items-center justify-center rounded-lg bg-teal-500/20 text-teal-300 hover:bg-teal-500 hover:text-white transition-all font-bold text-sm" data-index="${index}" title="轉為作業">📖</button>
-                <button class="edit-contact-btn hide-on-admin-view w-7 h-7 flex items-center justify-center rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500 hover:text-white transition-all font-bold text-sm" data-index="${index}" title="編輯內文">✏️</button>
-                <button class="delete-contact-item-btn w-7 h-7 flex items-center justify-center rounded-lg bg-rose-500/20 text-rose-300 hover:bg-rose-500 hover:text-white transition-all font-bold text-base leading-none" data-index="${index}" title="擦除">&times;</button>
+                <button class="move-up-contact-btn hide-on-admin-view w-7 h-7 flex items-center justify-center rounded-lg ${isFirst ? 'bg-white/5 text-white/20 cursor-not-allowed opacity-30' : 'bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500 hover:text-white cursor-pointer active:scale-90'} transition-all font-bold text-xs" data-index="${index}" ${isFirst ? 'disabled' : ''} title="向上移動"><i class="fa-solid fa-arrow-up text-xs"></i></button>
+                <button class="move-down-contact-btn hide-on-admin-view w-7 h-7 flex items-center justify-center rounded-lg ${isLast ? 'bg-white/5 text-white/20 cursor-not-allowed opacity-30' : 'bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500 hover:text-white cursor-pointer active:scale-90'} transition-all font-bold text-xs" data-index="${index}" ${isLast ? 'disabled' : ''} title="向下移動"><i class="fa-solid fa-arrow-down text-xs"></i></button>
+                <button class="to-hw-btn hide-on-admin-view w-7 h-7 flex items-center justify-center rounded-lg bg-teal-500/20 text-teal-300 hover:bg-teal-500 hover:text-white transition-all font-bold text-sm cursor-pointer" data-index="${index}" title="轉為作業">📖</button>
+                <button class="edit-contact-btn hide-on-admin-view w-7 h-7 flex items-center justify-center rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500 hover:text-white transition-all font-bold text-sm cursor-pointer" data-index="${index}" title="編輯內文">✏️</button>
+                <button class="delete-contact-item-btn w-7 h-7 flex items-center justify-center rounded-lg bg-rose-500/20 text-rose-300 hover:bg-rose-500 hover:text-white transition-all font-bold text-base leading-none cursor-pointer" data-index="${index}" title="擦除">&times;</button>
             </div>
         `;
         blackboard.appendChild(itemEl);

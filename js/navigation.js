@@ -109,6 +109,49 @@ export function restoreScroll(targetPageId) {
     updateGuestHomeBtnVisibility();
 }
 
+export function updateMobileNavVisibility(pageName) {
+    const bottomNav = document.getElementById('mobile-bottom-nav');
+    const fabAdd = document.getElementById('mobile-fab-add');
+    if (!bottomNav) return;
+
+    if (pageName === 'portal') {
+        bottomNav.classList.add('hidden');
+        if (fabAdd) fabAdd.classList.add('hidden');
+        return;
+    }
+
+    // 在應用程式各主分頁內顯示手機導航欄 (由 sm:hidden 保證大螢幕不顯示)
+    bottomNav.classList.remove('hidden');
+
+    // 切換底部導航欄 active 樣式
+    const tabMap = {
+        'main': 'mobile-nav-homework',
+        'contact-book': 'mobile-nav-contact',
+        'student-details': 'mobile-nav-stats'
+    };
+    ['mobile-nav-homework', 'mobile-nav-contact', 'mobile-nav-stats', 'mobile-nav-more'].forEach(btnId => {
+        const btn = document.getElementById(btnId);
+        if (btn) {
+            btn.classList.remove('text-indigo-600');
+            btn.classList.add('text-slate-500');
+        }
+    });
+    const curActiveBtn = document.getElementById(tabMap[pageName] || 'mobile-nav-homework');
+    if (curActiveBtn) {
+        curActiveBtn.classList.remove('text-slate-500');
+        curActiveBtn.classList.add('text-indigo-600');
+    }
+
+    // 只有在 main 作業主清單頁面顯示 FAB 新增作業按鈕
+    if (fabAdd) {
+        if (pageName === 'main') {
+            fabAdd.classList.remove('hidden');
+        } else {
+            fabAdd.classList.add('hidden');
+        }
+    }
+}
+
 export function showPortalPage(fromHistory = false) {
     hideAllPages();
     const portalPageEl = document.getElementById('portal-page');
@@ -117,6 +160,7 @@ export function showPortalPage(fromHistory = false) {
     updatePortalUI();
     restoreScroll('portal-page');
     updateGuestHomeBtnVisibility();
+    updateMobileNavVisibility('portal');
     const scrollIndicator = document.getElementById('portal-scroll-indicator');
     const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
     if (scrollIndicator && scrollY <= 25) {
@@ -138,6 +182,7 @@ export function showMainPage(fromHistory = false) {
     const detailPage = document.getElementById('detail-page');
     if (detailPage) detailPage.dataset.from = ''; 
     restoreScroll('main-page');
+    updateMobileNavVisibility('main');
 }
 
 export function showDetailPage(homeworkId, fromHistory = false) {
@@ -147,6 +192,7 @@ export function showDetailPage(homeworkId, fromHistory = false) {
     if (!fromHistory) pushPageState({ page: 'detail', id: homeworkId }, '#detail');
     renderStudentGrid(homeworkId); 
     restoreScroll('detail-page');
+    updateMobileNavVisibility('detail');
     requestAnimationFrame(() => { renderStudentGrid(homeworkId); });
 }
 
@@ -157,6 +203,7 @@ export function showStudentDetailsPage(fromHistory = false) {
     if (!fromHistory) pushPageState({ page: 'student-details' }, '#student-details');
     renderStudentDetailsPage(); 
     restoreScroll('student-details-page');
+    updateMobileNavVisibility('student-details');
 }
 
 export function showContactBookPage(fromHistory = false) {
@@ -170,6 +217,7 @@ export function showContactBookPage(fromHistory = false) {
     if (titleEl) titleEl.textContent = `${currentClass?.name || ''} 聯絡簿`;
     renderContactBookItems(); 
     restoreScroll('contact-book-page');
+    updateMobileNavVisibility('contact-book');
 }
 
 export function showHomeworkTypesPage(fromHistory = false) {
@@ -179,6 +227,7 @@ export function showHomeworkTypesPage(fromHistory = false) {
     if (!fromHistory) pushPageState({ page: 'homework-types' }, '#homework-types');
     renderHomeworkTypesPage(); 
     restoreScroll('homework-types-page');
+    updateMobileNavVisibility('homework-types');
 }
 
 export function promptSystemUsageAndNavigate() {

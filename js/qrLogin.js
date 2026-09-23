@@ -11,6 +11,9 @@ let activeQrUnsubscribe = null;
 let activeQrCountdownInterval = null;
 let currentChallengeId = null;
 let html5QrCodeScanner = null;
+let activePhoneOtpUnsubscribe = null;
+let activePhoneOtpCountdownInterval = null;
+let currentDevicePairCode = null;
 
 /**
  * 讀取當前裝置上的 Firebase Auth Session 記錄 (包含 Google 授權與 STS Token)
@@ -101,12 +104,21 @@ export async function startDeviceQrLoginSession() {
         const challengeDoc = {
             type: 'qr_login_challenge',
             challengeId: currentChallengeId,
+            pairCode: currentDevicePairCode,
             status: 'waiting', // waiting -> scanned -> authorized -> consumed / expired
             createdAt: new Date().toISOString(),
             expiresAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
             userAgent: navigator.userAgent
         };
         await setDoc(doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', currentChallengeId), challengeDoc);
+        try {
+            await setDoc(doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', 'pair_code_' + currentDevicePairCode), {
+                challengeId: currentChallengeId,
+                pairCode: currentDevicePairCode,
+                createdAt: new Date().toISOString(),
+                expiresAt: new Date(Date.now() + 5 * 60 * 1000).toISOString()
+            });
+        } catch(e) {}
     } catch (err) {
         console.error("Failed to create QR login challenge:", err);
         showToast("⚠️ 建立掃碼登入連線失敗，請稍後重試", "error");
@@ -144,7 +156,13 @@ export async function startDeviceQrLoginSession() {
     const countdownText = document.getElementById('qr-login-countdown');
     const refreshBtn = document.getElementById('qr-login-refresh-btn');
 
-    if (statusText) statusText.textContent = "等待手機掃描中...";
+    const pairCodeEl = document.getElementById('qr-device-pair-code');
+    if (pairCodeEl) pairCodeEl.textContent = currentDevicePairCode;
+    const otpInput = document.getElementById('otp-input-code');
+    if (otpInput) otpInput.value = '';
+    const otpError = document.getElementById('otp-login-error-msg');
+    if (otpError) { otpError.textContent = ''; otpError.classList.add('hidden'); }
+    if (statusText) statusText.textContent = "等待手機掃描或輸入認證碼...";
     if (statusIndicator) statusIndicator.className = "w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping";
     if (refreshBtn) refreshBtn.classList.add('hidden');
 
@@ -583,7 +601,337 @@ export async function checkUrlForQrLogin() {
 /**
  * 綁定所有 QR 登入相關 DOM 點擊事件
  */
+
+/**
+ * 公用電腦端：輸入已登入裝置上顯示的 6 位數認證碼並完成登入
+ */
+export async function verifyAndLoginWithOtp(inputCode) {
+    if (!fbDb) {
+        showToast("⚠️ 尚未連線至雲端服務，請檢查網路", "error");
+        return;
+    }
+    const cleanCode = (inputCode || '').toString().trim();
+    const errorEl = document.getElementById('otp-login-error-msg');
+    const submitBtn = document.getElementById('otp-login-submit-btn');
+
+    if (!cleanCode || cleanCode.length !== 6 || !/^\d{6}$/.test(cleanCode)) {
+        if (errorEl) {
+            errorEl.textContent = "請輸入完整的 6 位數純數字認證碼！";
+            errorEl.classList.remove('hidden');
+        }
+        return;
+    }
+
+    if (errorEl) errorEl.classList.add('hidden');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<span>⏳ 驗證中...</span>`;
+    }
+
+    try {
+        const otpRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', 'otp_code_' + cleanCode);
+        const snap = await getDoc(otpRef);
+
+        if (!snap.exists()) {
+            if (errorEl) {
+                errorEl.textContent = "⚠️ 找不到此認證碼，請確認已登入裝置上的代碼是否正確。";
+                errorEl.classList.remove('hidden');
+            }
+            return;
+        }
+
+        const data = snap.data();
+        if (data.status === 'consumed') {
+            if (errorEl) {
+                errorEl.textContent = "⚠️ 此認證碼已被使用過，請在已登入裝置重新產生！";
+                errorEl.classList.remove('hidden');
+            }
+            return;
+        }
+
+        const expiresAt = new Date(data.expiresAt).getTime();
+        if (Date.now() > expiresAt) {
+            if (errorEl) {
+                errorEl.textContent = "⚠️ 此認證碼已超過 5 分鐘有效時間，請重新產生！";
+                errorEl.classList.remove('hidden');
+            }
+            return;
+        }
+
+        // 標記為 consumed 防重複使用
+        try {
+            await updateDoc(otpRef, {
+                status: 'consumed',
+                consumedAt: new Date().toISOString()
+            });
+        } catch (e) {}
+
+        // 執行無縫登入 (與掃碼登入相同的高規格注入)
+        const authProvider = data.authProvider || 'password';
+        const providerName = authProvider === 'google' ? 'Google 帳號' : '雲端帳號';
+        showToast(`🎉 認證碼驗證成功！正在登入 ${data.userObj.displayName || data.userObj.email}...`, "success");
+
+        stopDeviceQrLoginSession(false);
+
+        // 注入 Session
+        let sessionInjected = false;
+        if (data.authSessionStr) {
+            try {
+                sessionInjected = await injectFirebaseAuthSessionRecord(JSON.parse(data.authSessionStr));
+            } catch (e) {}
+        }
+        if (data.credentials?.authEmail && data.credentials?.password) {
+            try {
+                await signInWithEmailAndPassword(fbAuth, data.credentials.authEmail, data.credentials.password);
+            } catch (e) {}
+        }
+
+        state.currentUser = {
+            ...data.userObj,
+            isQrAuthorized: true
+        };
+        sessionStorage.setItem('auth_provider', authProvider);
+        sessionStorage.setItem('qr_authorized_session', JSON.stringify(state.currentUser));
+        sessionStorage.removeItem('is_explicit_logout');
+        sessionStorage.removeItem('app_is_guest_mode');
+        localStorage.removeItem('visitor_id');
+        localStorage.removeItem('visitor_name');
+        localStorage.setItem('app_user_session', JSON.stringify(state.currentUser));
+        localStorage.setItem('storageSelected', 'true');
+
+        const userKey = getUserStorageKey(state.currentUser);
+        if (data.appData && Array.isArray(data.appData.classes) && data.appData.classes.length > 0) {
+            state.appData = sanitizeAppData(data.appData);
+            fixDates(state.appData);
+            state.currentClassId = state.appData.classes[0]?.id || null;
+            const serialized = safeStringify(state.appData);
+            localStorage.setItem('homeworkAppData_' + userKey, serialized);
+            localStorage.setItem('homeworkAppData', serialized);
+        }
+
+        updateDataManagementUI();
+        try { updatePortalUI(); } catch (e) {}
+
+        startRealtimeCloudSync();
+        await loadDataFromCloud(true);
+
+        const qrModal = document.getElementById('qr-login-modal');
+        if (qrModal) closeModal(qrModal);
+
+        showToast(`🎉 快速登入成功！歡迎 ${data.userObj.displayName || data.userObj.email}`, "success");
+
+        if (sessionInjected) {
+            setTimeout(() => window.location.reload(), 400);
+        } else {
+            proceedIntoSystem();
+        }
+
+    } catch (err) {
+        console.error("verifyAndLoginWithOtp error:", err);
+        if (errorEl) {
+            errorEl.textContent = "⚠️ 連線雲端驗證失敗，請重試";
+            errorEl.classList.remove('hidden');
+        }
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `<i class="fa-solid fa-key"></i><span>驗證登入</span>`;
+        }
+    }
+}
+
+/**
+ * 已登入手機端：產生 6 位數一次性登入認證碼 (OTP)
+ */
+export async function generatePhoneOtpCode() {
+    if (!state.currentUser) {
+        showToast("⚠️ 請先在手機登入帳號，才能產生登入認證碼！", "warning");
+        return;
+    }
+    if (!fbDb) {
+        showAlertModal("無法產生認證碼", "尚未連線至 Firebase 雲端服務。");
+        return;
+    }
+
+    stopPhoneOtpSession();
+
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const codeDisplay = document.getElementById('otp-phone-display-code');
+    const countdownEl = document.getElementById('otp-phone-countdown');
+    const noticeEl = document.getElementById('otp-phone-status-notice');
+
+    if (codeDisplay) codeDisplay.textContent = otpCode.substring(0, 3) + ' ' + otpCode.substring(3);
+    if (noticeEl) {
+        noticeEl.className = "p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-800 flex items-center justify-center gap-1.5";
+        noticeEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span><span>等待公用電腦輸入登入中...</span>`;
+    }
+
+    // 取得 Auth Session 與 密碼
+    let boundPassword = null;
+    let authEmail = state.currentUser.authEmail || state.currentUser.email;
+    try {
+        let bounds = JSON.parse(localStorage.getItem('bound_accounts_all') || '[]');
+        let found = bounds.find(b => b.uid === state.currentUser.uid || (b.email && b.email.toLowerCase() === (state.currentUser.email || '').toLowerCase()));
+        if (found) {
+            boundPassword = found.password || null;
+            authEmail = found.authEmail || authEmail;
+        }
+    } catch (e) {}
+
+    let authSessionStr = null;
+    try {
+        const authSessionRecord = await getFirebaseAuthSessionRecord();
+        if (authSessionRecord) authSessionStr = JSON.stringify(authSessionRecord);
+    } catch (e) {}
+
+    const authProvider = sessionStorage.getItem('auth_provider') || (state.currentUser?.isGoogleAuth ? 'google' : 'password');
+
+    try {
+        const otpDoc = {
+            type: 'otp_login_challenge',
+            code: otpCode,
+            status: 'waiting', // waiting -> consumed
+            userObj: JSON.parse(JSON.stringify(state.currentUser || {})),
+            authProvider: authProvider,
+            authSessionStr: authSessionStr,
+            credentials: boundPassword ? { authEmail, password: boundPassword } : null,
+            appData: state.appData || { classes: [], homeworks: [] },
+            createdAt: new Date().toISOString(),
+            expiresAt: new Date(Date.now() + 5 * 60 * 1000).toISOString()
+        };
+
+        const docRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', 'otp_code_' + otpCode);
+        await setDoc(docRef, otpDoc);
+
+        // 倒數計時 5 分鐘
+        let remainingSeconds = 300;
+        const updateCountdown = () => {
+            const mins = String(Math.floor(remainingSeconds / 60)).padStart(2, '0');
+            const secs = String(remainingSeconds % 60).padStart(2, '0');
+            if (countdownEl) countdownEl.innerHTML = `<i class="fa-regular fa-clock"></i><span>有效時間：${mins}:${secs}</span>`;
+        };
+        updateCountdown();
+
+        activePhoneOtpCountdownInterval = setInterval(() => {
+            remainingSeconds--;
+            if (remainingSeconds <= 0) {
+                clearInterval(activePhoneOtpCountdownInterval);
+                activePhoneOtpCountdownInterval = null;
+                if (noticeEl) {
+                    noticeEl.className = "p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-xs font-bold text-rose-700 flex items-center justify-center gap-1.5";
+                    noticeEl.innerHTML = `<span>⚠️ 認證碼已過期，請點擊重新產生</span>`;
+                }
+            } else {
+                updateCountdown();
+            }
+        }, 1000);
+
+        // 監聽公用電腦是否已輸入並消耗此 OTP
+        activePhoneOtpUnsubscribe = onSnapshot(docRef, (snap) => {
+            if (!snap.exists()) return;
+            const data = snap.data();
+            if (data.status === 'consumed') {
+                if (noticeEl) {
+                    noticeEl.className = "p-2.5 rounded-xl bg-emerald-100 border border-emerald-300 text-xs font-black text-emerald-900 flex items-center justify-center gap-1.5";
+                    noticeEl.innerHTML = `<span>🎉 公用電腦已成功登入！</span>`;
+                }
+                showToast("🎉 恭喜！目標電腦已成功完成認證碼登入。", "success");
+                stopPhoneOtpSession();
+                setTimeout(() => {
+                    closePhoneQrScannerModal();
+                }, 1500);
+            }
+        });
+
+    } catch (err) {
+        console.error("Failed to generate OTP code:", err);
+        showToast("⚠️ 產生認證碼失敗，請確認網路連線", "error");
+    }
+}
+
+/**
+ * 停止手機端 OTP 監聽與倒數
+ */
+export function stopPhoneOtpSession() {
+    if (activePhoneOtpUnsubscribe) {
+        activePhoneOtpUnsubscribe();
+        activePhoneOtpUnsubscribe = null;
+    }
+    if (activePhoneOtpCountdownInterval) {
+        clearInterval(activePhoneOtpCountdownInterval);
+        activePhoneOtpCountdownInterval = null;
+    }
+}
+
 export function setupQrLoginEvents() {
+    // 0. 公用電腦端：輸入 6 位數認證碼登入
+    const otpInput = document.getElementById('otp-input-code');
+    const otpSubmitBtn = document.getElementById('otp-login-submit-btn');
+    if (otpSubmitBtn && otpInput) {
+        otpSubmitBtn.addEventListener('click', () => {
+            verifyAndLoginWithOtp(otpInput.value);
+        });
+        otpInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                verifyAndLoginWithOtp(otpInput.value);
+            }
+        });
+    }
+
+    // 手機端：相機掃描 vs 產生認證碼 Tabs 切換
+    const tabCamera = document.getElementById('qr-auth-tab-camera');
+    const tabOtp = document.getElementById('qr-auth-tab-otp');
+    const viewCamera = document.getElementById('qr-auth-view-camera');
+    const viewOtp = document.getElementById('qr-auth-view-otp');
+
+    if (tabCamera && tabOtp && viewCamera && viewOtp) {
+        tabCamera.addEventListener('click', () => {
+            tabCamera.className = "flex-1 py-1.5 rounded-lg bg-white text-indigo-700 shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer";
+            tabOtp.className = "flex-1 py-1.5 rounded-lg text-stone-500 hover:text-stone-800 transition-all flex items-center justify-center gap-1.5 cursor-pointer";
+            viewCamera.classList.remove('hidden');
+            viewOtp.classList.add('hidden');
+            stopPhoneOtpSession();
+        });
+
+        tabOtp.addEventListener('click', () => {
+            tabOtp.className = "flex-1 py-1.5 rounded-lg bg-white text-indigo-700 shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer";
+            tabCamera.className = "flex-1 py-1.5 rounded-lg text-stone-500 hover:text-stone-800 transition-all flex items-center justify-center gap-1.5 cursor-pointer";
+            viewOtp.classList.remove('hidden');
+            viewCamera.classList.add('hidden');
+            generatePhoneOtpCode();
+        });
+    }
+
+    document.getElementById('otp-phone-refresh-btn')?.addEventListener('click', () => {
+        generatePhoneOtpCode();
+    });
+
+    // 手機端手動輸入電腦配對碼
+    const pairCodeInput = document.getElementById('qr-pair-code-input');
+    const pairCodeBtn = document.getElementById('qr-pair-code-submit-btn');
+    if (pairCodeBtn && pairCodeInput) {
+        pairCodeBtn.addEventListener('click', async () => {
+            const pCode = (pairCodeInput.value || '').trim();
+            if (!pCode || pCode.length !== 6) {
+                showAlertModal("請輸入 6 位配對碼", "請輸入電腦螢幕上顯示的 6 位數配對碼。");
+                return;
+            }
+            try {
+                const pSnap = await getDoc(doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', 'pair_code_' + pCode));
+                if (!pSnap.exists()) {
+                    showAlertModal("配對碼無效", "找不到該配對碼，可能已過期或電腦已關閉彈窗。");
+                    return;
+                }
+                const targetChallengeId = pSnap.data().challengeId;
+                await closePhoneQrScannerModal();
+                await promptAuthorizeChallenge(targetChallengeId);
+            } catch (err) {
+                showToast("⚠️ 查詢配對碼失敗，請檢查網路", "error");
+            }
+        });
+    }
+
     // 1. 開啟 QR 登入碼展示 (電腦 / 平板端)
     document.getElementById('portal-nav-qr-login-btn')?.addEventListener('click', () => {
         startDeviceQrLoginSession();
