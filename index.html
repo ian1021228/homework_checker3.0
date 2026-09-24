@@ -227,7 +227,7 @@
                         <!-- 系統更新紀錄按鈕 -->
                         <button id="portal-hero-changelog-btn" class="px-5 py-3.5 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-300/90 font-bold text-sm shadow-xs hover:shadow transition-all flex items-center gap-2 cursor-pointer" title="查看系統版本演進與歷次更新紀錄">
                             <i class="fa-solid fa-clock-rotate-left text-amber-700"></i>
-                            <span>更新紀錄 <span class="bg-amber-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full ml-0.5">v3.7</span></span>
+                            <span>更新紀錄 <span class="bg-amber-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full ml-0.5">v3.8</span></span>
                         </button>
                         <!-- 提供意見 / 聯絡作者 -->
                         <button id="portal-hero-feedback-btn" class="px-4 py-3.5 rounded-full bg-stone-100/90 hover:bg-stone-200 text-stone-700 font-bold text-sm shadow-2xs hover:shadow transition-all flex items-center gap-1.5 cursor-pointer" title="寫信給作者 ianw.solar@gmail.com">
@@ -343,7 +343,7 @@
                                 </span>
                                 <div>
                                     <h3 class="font-black text-stone-900 text-lg">系統更新紀錄 (Changelog)</h3>
-                                    <span class="text-xs text-stone-400 font-bold">最新版本 v3.7 • 2026/09/24</span>
+                                    <span class="text-xs text-stone-400 font-bold">最新版本 v3.8 • 2026/09/24</span>
                                 </div>
                             </div>
                             <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-200">最新版本</span>
@@ -352,20 +352,20 @@
                         <div class="p-4 bg-amber-50/50 rounded-2xl border border-amber-100/80 space-y-2 text-xs sm:text-sm text-stone-700 font-medium">
                             <div class="font-bold text-amber-950 flex items-center gap-1.5">
                                 <i class="fa-solid fa-bullhorn text-amber-600"></i>
-                                <span>v3.7 核心功能更新亮點：</span>
+                                <span>v3.8 核心功能更新亮點：</span>
                             </div>
                             <ul class="space-y-1.5 text-xs text-stone-600 pl-2">
-                                <li>🔗 <b>LINE 家長群專屬查核連結修正</b>：通報文案直達專屬家長端查核看板（`ian_homework_checker2.0_online_parent_dashboard`）。</li>
-                                <li>📋 <b>班級管理專屬連結圖示優化</b>：複製專屬連結圖標全面改為標準 Copy 剪貼簿圖示，操作更直覺。</li>
-                                <li>🖥️ <b>雙螢幕 1/3 黃金比例對照</b>：黑板聯絡簿側邊欄流暢展開收合，大螢幕對照作業神器。</li>
-                                <li>⚙️ <b>點收方式與管理後台整合</b>：設定頁面專屬配置，大幅精簡主頁動線。</li>
+                                <li>📢 <b>智慧語音催繳廣播 (TTS)</b>：一鍵調用大螢幕/喇叭清晰廣播未交座號名單，免去小老師吼叫。</li>
+                                <li>📋 <b>一鍵複製未交名單純文字</b>：卡片與點收頁新增快速催繳鈕，秒產乾淨文字貼黑板或班群。</li>
+                                <li>🏷️ <b>作業名稱智慧常用推薦標籤</b>：新增作業時常駐熱門膠囊標籤（國習、數習等），點擊秒填。</li>
+                                <li>⌨️ <b>極速鍵盤盲打與觸控震動</b>：方向鍵與 Space 空白鍵秒點作業，支援手機輕微觸控震動反饋。</li>
                             </ul>
                         </div>
 
                         <div class="flex items-center justify-between pt-1">
                             <button type="button" id="portal-card-changelog-btn" class="w-full py-2.5 px-4 bg-amber-100/80 hover:bg-amber-200/80 text-amber-950 font-bold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-clock-rotate-left text-amber-700"></i>
-                                <span>查看完整版本演進日誌 (v3.0 ~ v3.7)</span>
+                                <span>查看完整版本演進日誌 (v3.0 ~ v3.8)</span>
                             </button>
                         </div>
                     </div>
@@ -1456,8 +1456,24 @@
             </div>
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <h1 id="detail-homework-name" class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-500 to-indigo-600 animated-gradient-text tracking-tight drop-shadow-sm truncate mr-4"></h1>
-                <div class="flex gap-2 flex-shrink-0">
-                    <button id="show-all-done-btn" class="bg-emerald-50 text-emerald-600 border border-emerald-200/60 font-bold py-3 px-6 text-lg font-black rounded-3xl shadow-sm hover:bg-emerald-500 hover:text-white transition-all transform hover:-translate-y-0.5 whitespace-nowrap">檢視完成名單</button>
+                <div class="flex gap-2 flex-shrink-0 items-center flex-wrap">
+                    <!-- 鍵盤操作提示 (Desktop) -->
+                    <div class="hidden lg:flex items-center gap-2 text-xs font-bold text-slate-500 bg-white/70 px-3.5 py-2.5 rounded-2xl border border-slate-200/60 shadow-2xs">
+                        <i class="fa-solid fa-keyboard text-indigo-500"></i>
+                        <span>極速鍵盤：方向鍵換座號 • Space切換 • 數字直達</span>
+                    </div>
+                    <!-- 語音催繳廣播 -->
+                    <button id="voice-broadcast-detail-btn" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 font-bold py-2.5 px-4 text-sm rounded-2xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer" title="語音朗讀此作業未交名單">
+                        <i class="fa-solid fa-volume-high text-indigo-600"></i>
+                        <span>語音催繳</span>
+                    </button>
+                    <!-- 一鍵複製未交名單 -->
+                    <button id="copy-defaulters-detail-btn" class="bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200/80 font-bold py-2.5 px-4 text-sm rounded-2xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer" title="一鍵複製未交座號純文字">
+                        <i class="fa-solid fa-bullhorn text-amber-600"></i>
+                        <span>複製未交名單</span>
+                    </button>
+                    <!-- 檢視完成名單 -->
+                    <button id="show-all-done-btn" class="bg-emerald-50 text-emerald-600 border border-emerald-200/60 font-bold py-2.5 px-5 text-sm sm:text-base font-black rounded-2xl shadow-sm hover:bg-emerald-500 hover:text-white transition-all transform hover:-translate-y-0.5 whitespace-nowrap cursor-pointer">檢視完成名單</button>
                 </div>
             </div>
             
@@ -2171,6 +2187,15 @@
                 <div>
                     <label for="homework-name" class="block text-sm font-bold text-slate-700 mb-1.5">作業名稱</label>
                     <input type="text" id="homework-name" class="block w-full rounded-xl border-slate-200 bg-slate-50 focus:bg-white shadow-sm p-3 text-sm font-bold transition-colors" required placeholder="例如：數學習作 P10">
+                    <!-- 常用作業智慧推薦標籤 -->
+                    <div id="quick-homework-tags" class="flex flex-wrap items-center gap-1.5 mt-2.5">
+                        <span class="text-[11px] text-slate-400 font-bold mr-0.5">常用推薦:</span>
+                        <button type="button" class="quick-hw-tag px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 rounded-lg text-xs font-bold transition-all active:scale-95 cursor-pointer" data-tag="國語習作">📚 國語習作</button>
+                        <button type="button" class="quick-hw-tag px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/80 rounded-lg text-xs font-bold transition-all active:scale-95 cursor-pointer" data-tag="數學習作">📐 數學習作</button>
+                        <button type="button" class="quick-hw-tag px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 rounded-lg text-xs font-bold transition-all active:scale-95 cursor-pointer" data-tag="英文單字造句">🔤 英文單字</button>
+                        <button type="button" class="quick-hw-tag px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200/80 rounded-lg text-xs font-bold transition-all active:scale-95 cursor-pointer" data-tag="家庭聯絡簿簽名">📝 聯絡簿簽名</button>
+                        <button type="button" class="quick-hw-tag px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/80 rounded-lg text-xs font-bold transition-all active:scale-95 cursor-pointer" data-tag="理化講義">🧪 理化講義</button>
+                    </div>
                 </div>
                 <div id="homework-type-container">
                     <label for="homework-type-select" class="block text-sm font-bold text-slate-700 mb-1.5">作業種類</label>
@@ -2725,12 +2750,41 @@
 
                 <!-- 版本歷程時間軸 -->
                 <div class="space-y-6">
-                    <!-- v3.7 最新發布 -->
+                    <!-- v3.8 最新發布 -->
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/70 via-purple-50/50 to-pink-50/30 border border-indigo-200/80 shadow-xs relative">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                             <div class="flex items-center gap-2">
-                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v3.7 最新發布</span>
-                                <span class="text-xs font-bold text-indigo-900">LINE 家長通報專屬連結修正、管理班級複製圖標優化</span>
+                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v3.8 最新發布</span>
+                                <span class="text-xs font-bold text-indigo-900">語音催繳廣播、一鍵複製未交名單、作業智慧推薦標籤、鍵盤盲打極速點收</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-400">2026-09-24</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>📢 智慧語音催繳廣播 (AI Voice Announcer)</b>：作業卡片與點收頁面新增語音廣播功能，點擊一秒調用教室喇叭清晰朗讀未交同學座號（如「數學習作未繳交同學為：3號、8號」），全班繳齊時自動廣播嘉獎，免去小老師喉嚨負擔！</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>📋 一鍵複製未交催繳純文字</b>：作業卡片與點收頂端新增「複製未交名單」按鈕，秒產乾淨文字格式（例：<code>【七賢107 數學習作 未交名單】共3人：3號、8號、14號</code>），秒貼班群或黑板角落。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>🏷️ 作業名稱智慧常用推薦標籤</b>：新增作業彈窗內建熱門膠囊標籤（📚 國習、📐 數習、🔤 英單字、📝 聯絡簿、🧪 理化），點擊直接秒帶入，大幅省去每日手動打字時間。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>⌨️ 教室大螢幕極速鍵盤盲打與觸控震動</b>：支援鍵盤方向鍵左右換號、Space 空白鍵快速切換繳交狀態、數字鍵直接鎖定座號；手機端點擊支援微震動反饋（Haptic Feedback），單手點收手感極佳。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- v3.7 版本 -->
+                    <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-slate-700 text-white text-xs font-black uppercase tracking-wider shadow-xs">v3.7 正式版</span>
+                                <span class="text-xs font-bold text-slate-800">LINE 家長通報專屬連結修正、管理班級複製圖標優化</span>
                             </div>
                             <span class="text-xs font-mono font-bold text-slate-400">2026-09-24</span>
                         </div>

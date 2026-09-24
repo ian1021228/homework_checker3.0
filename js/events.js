@@ -86,6 +86,7 @@ import {
     renderCalendar,
     updateDataManagementUI,
     updatePortalUI,
+    isStudentCompleted,
     } from './render.js';
 
 import {
@@ -1982,6 +1983,34 @@ export function setupButtonEvents() {
         }
     });
 
+    // 常用作業推薦標籤快速帶入
+    document.getElementById('quick-homework-tags')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('.quick-hw-tag');
+        if (btn) {
+            const tag = btn.dataset.tag || btn.innerText.replace(/^[^\s]+\s*/, '').trim();
+            const input = document.getElementById('homework-name');
+            if (input) {
+                input.value = tag;
+                input.focus();
+                showToast(`已帶入推薦作業名稱：「${tag}」`, "info", 1200);
+            }
+        }
+    });
+
+    // 語音廣播催繳按鈕 (Detail Page)
+    bindClick('voice-broadcast-detail-btn', () => {
+        if (state.currentHomeworkId) {
+            speakHomeworkAnnouncement(state.currentHomeworkId);
+        }
+    });
+
+    // 複製未交名單按鈕 (Detail Page)
+    bindClick('copy-defaulters-detail-btn', () => {
+        if (state.currentHomeworkId) {
+            copyHomeworkDefaulters(state.currentHomeworkId);
+        }
+    });
+
     // 批次狀態切換
     bindClick('batch-status-btn', async () => { 
         if (!state.currentHomeworkId) return; 
@@ -2139,10 +2168,73 @@ export function setupButtonEvents() {
         }
     });
 
+    // 智慧語音催繳廣播 (AI Voice Announcer / TTS)
+    function speakHomeworkAnnouncement(homeworkId) {
+        const hw = state.appData.homeworks.find(h => h.id === homeworkId);
+        if (!hw) return;
+        const cls = state.appData.classes.find(c => c.id === hw.classId);
+        const clsName = cls ? cls.name : '本班';
+        const missingStudents = (hw.students || []).filter(s => !isStudentCompleted(s, hw.typeId || 'default'));
+        let speechText = '';
+        if (missingStudents.length === 0) {
+            speechText = `${clsName}請注意，${hw.name}全班同學皆已繳交齊畢，表現優良！`;
+            showToast(`🔊 正在語音廣播：「${hw.name} 全班已繳齊」`, "success");
+        } else {
+            const seatNums = missingStudents.map(s => `${s.seat}號`).join('，');
+            speechText = `${clsName}請注意，${hw.name}尚未繳交同學為：${seatNums}。請同學於放學前儘速補交完畢。`;
+            showToast(`🔊 正在語音廣播催繳「${hw.name}」（共 ${missingStudents.length} 人）`, "info");
+        }
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(speechText);
+            utterance.lang = 'zh-TW';
+            utterance.rate = 0.95;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            showToast("⚠️ 您的瀏覽器不支援語音合成功能", "warning");
+        }
+    }
+
+    // 一鍵複製未交催繳純文字
+    function copyHomeworkDefaulters(homeworkId) {
+        const hw = state.appData.homeworks.find(h => h.id === homeworkId);
+        if (!hw) return;
+        const cls = state.appData.classes.find(c => c.id === hw.classId);
+        const clsName = cls ? cls.name : '本班';
+        const missingStudents = (hw.students || []).filter(s => !isStudentCompleted(s, hw.typeId || 'default'));
+        if (missingStudents.length === 0) {
+            showToast(`🎉「${hw.name}」全班皆已繳齊，無缺交名單！`, "success");
+            return;
+        }
+        const missingSeatNums = missingStudents.map(s => `${s.seat}號`).join('、');
+        const text = `📢 【${clsName} ${hw.name} 未交名單】\n共 ${missingStudents.length} 人尚未繳交：${missingSeatNums}\n請同學於放學前儘速補交！`;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(`📋 已複製「${hw.name}」未交名單（共 ${missingStudents.length} 人）`, "success");
+            }).catch(() => {
+                showToast(`📋 已複製未交名單`, "success");
+            });
+        } else {
+            showToast(`📋 已複製「${hw.name}」未交名單`, "success");
+        }
+    }
+
     // 作業清單項目點擊
     const hwListEl = document.getElementById('homework-list');
     if (hwListEl) {
         hwListEl.addEventListener('click', (e) => {
+            const voiceBtn = e.target.closest('.voice-broadcast-btn');
+            if (voiceBtn) {
+                e.stopPropagation();
+                speakHomeworkAnnouncement(voiceBtn.dataset.id);
+                return;
+            }
+            const copyDefBtn = e.target.closest('.copy-defaulters-btn');
+            if (copyDefBtn) {
+                e.stopPropagation();
+                copyHomeworkDefaulters(copyDefBtn.dataset.id);
+                return;
+            }
             const deleteBtn = e.target.closest('.delete-hw-btn'), editBtn = e.target.closest('.edit-hw-btn');
             if (deleteBtn) { 
                 e.stopPropagation(); 
@@ -2419,6 +2511,9 @@ export function setupButtonEvents() {
         studentGrid.addEventListener('click', async (e) => {
             const studentBtn = e.target.closest('.student-btn');
             if (studentBtn) {
+                if (window.navigator && typeof window.navigator.vibrate === 'function') {
+                    try { window.navigator.vibrate(15); } catch (_) {}
+                }
                 const seat = parseInt(studentBtn.dataset.seat); 
                 const hw = state.appData.homeworks.find(h => h.id === state.currentHomeworkId); 
                 if (!hw || !hw.students) return;
@@ -3239,5 +3334,62 @@ export function toggleDualScreenCollapse() {
         if (hwList) hwList.classList.remove('dual-screen-active');
     }
 }
+
+// ⌨️ 全鍵盤極速點收模式 (Keyboard Turbo Mode)
+let keyboardSeatBuffer = '';
+let keyboardSeatTimer = null;
+
+window.addEventListener('keydown', (e) => {
+    const detailPage = document.getElementById('detail-page');
+    if (!detailPage || detailPage.classList.contains('hidden')) return;
+
+    // 若使用者正在輸入文字或操作表單選擇器，則不攔截快捷鍵
+    const activeTag = document.activeElement ? document.activeElement.tagName : '';
+    if (activeTag === 'INPUT' || activeTag === 'TEXTAREA' || activeTag === 'SELECT') return;
+
+    const studentBtns = Array.from(document.querySelectorAll('#student-grid .student-btn'));
+    if (studentBtns.length === 0) return;
+
+    let focusedIndex = studentBtns.findIndex(btn => btn === document.activeElement);
+
+    // 方向鍵右/下：前進至下一座號
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        const nextIndex = (focusedIndex + 1) % studentBtns.length;
+        studentBtns[nextIndex].focus();
+        return;
+    }
+    // 方向鍵左/上：後退至上一座號
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const prevIndex = (focusedIndex - 1 + studentBtns.length) % studentBtns.length;
+        studentBtns[prevIndex].focus();
+        return;
+    }
+    // Space 空白鍵：直接切換目前選中座號之繳交狀態
+    if (e.code === 'Space') {
+        e.preventDefault();
+        const targetBtn = (focusedIndex >= 0) ? studentBtns[focusedIndex] : studentBtns[0];
+        if (targetBtn) {
+            targetBtn.click();
+            targetBtn.focus();
+        }
+        return;
+    }
+    // 數字鍵直達座號（支援 1~99 號，輸入後 300ms 自動定位）
+    if (e.key >= '0' && e.key <= '9') {
+        keyboardSeatBuffer += e.key;
+        clearTimeout(keyboardSeatTimer);
+        keyboardSeatTimer = setTimeout(() => {
+            const seatNum = parseInt(keyboardSeatBuffer, 10);
+            const btn = document.getElementById(`btn-seat-${seatNum}`);
+            if (btn) {
+                btn.focus();
+                showToast(`⌨️ 鍵盤已鎖定 ${seatNum} 號（按 Space 切換狀態）`, "info", 1000);
+            }
+            keyboardSeatBuffer = '';
+        }, 300);
+    }
+});
 
 
