@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hw-checker-v3.6';
+const CACHE_NAME = 'hw-checker-v3.8.1';
 const urlsToCache = [
   './index.html',
   './parent.html',
@@ -26,7 +26,11 @@ const urlsToCache = [
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache).catch(e => console.warn('Cache add error:', e)))
+    caches.open(CACHE_NAME).then(cache => {
+      return Promise.allSettled(
+        urlsToCache.map(url => cache.add(url).catch(e => console.warn('快取失敗:', url, e)))
+      );
+    })
   );
 });
 
@@ -36,6 +40,7 @@ self.addEventListener('activate', event => {
       return Promise.all(
         cacheNames.map(name => {
           if (name !== CACHE_NAME) {
+            console.log('清除舊版本快取:', name);
             return caches.delete(name);
           }
         })
@@ -45,30 +50,30 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          if (response && response.status === 200) {
-            const resClone = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(event.request, resClone));
-          }
-          return response;
-        })
-        .catch(() => caches.match(event.request).then(cached => cached || caches.match('./index.html')))
-    );
-    return;
-  }
+  // 只攔截同源 GET 請求，第三方 CDN 與 Firebase 不強制快取干預
+  if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
 
+  // 網路優先策略 (Network First, Cache Fallback)，確保最新代碼即時生效
   event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request).then(networkResponse => {
-        if (networkResponse && networkResponse.status === 200 && event.request.method === 'GET') {
+    fetch(event.request)
+      .then(networkResponse => {
+        if (networkResponse && networkResponse.status === 200) {
           const resClone = networkResponse.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, resClone));
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, resClone).catch(() => {});
+          });
         }
         return networkResponse;
-      }).catch(() => caches.match('./index.html'));
-    })
+      })
+      .catch(async () => {
+        const cached = await caches.match(event.request);
+        if (cached) return cached;
+        if (event.request.mode === 'navigate') {
+          return (await caches.match('./index.html')) || (await caches.match('./parent.html'));
+        }
+        return new Response('離線模式，此資源未快取', { status: 503, statusText: 'Offline' });
+      })
   );
 });

@@ -1985,8 +1985,12 @@ export function setupButtonEvents() {
 
     // 複製未交名單按鈕 (Detail Page)
     bindClick('copy-defaulters-detail-btn', () => {
-        if (state.currentHomeworkId) {
-            copyHomeworkDefaulters(state.currentHomeworkId);
+        const detailBtn = document.getElementById('copy-defaulters-detail-btn');
+        const targetId = state.currentHomeworkId || (detailBtn ? detailBtn.dataset.id : null);
+        if (targetId) {
+            copyHomeworkDefaulters(targetId);
+        } else {
+            showToast("⚠️ 請先選擇作業", "warning");
         }
     });
 
@@ -2148,10 +2152,20 @@ export function setupButtonEvents() {
     });
 
     // 一鍵複製未交催繳純文字
-    function copyHomeworkDefaulters(homeworkId) {
-        const hw = state.appData.homeworks.find(h => h.id === homeworkId);
-        if (!hw) return;
-        const cls = state.appData.classes.find(c => c.id === hw.classId);
+    async function copyHomeworkDefaulters(homeworkId) {
+        if (!homeworkId && state.currentHomeworkId) {
+            homeworkId = state.currentHomeworkId;
+        }
+        if (!homeworkId) {
+            showToast("⚠️ 未指定作業項目", "warning");
+            return;
+        }
+        const hw = (state.appData.homeworks || []).find(h => String(h.id) === String(homeworkId));
+        if (!hw) {
+            showToast("⚠️ 找不到該項作業資料", "warning");
+            return;
+        }
+        const cls = (state.appData.classes || []).find(c => String(c.id) === String(hw.classId));
         const clsName = cls ? cls.name : '本班';
         const missingStudents = (hw.students || []).filter(s => !isStudentCompleted(s, hw.typeId || 'default'));
         if (missingStudents.length === 0) {
@@ -2160,15 +2174,7 @@ export function setupButtonEvents() {
         }
         const missingSeatNums = missingStudents.map(s => `${s.seat}號`).join('、');
         const text = `📢 【${clsName} ${hw.name} 未交名單】\n共 ${missingStudents.length} 人尚未繳交：${missingSeatNums}\n請同學於放學前儘速補交！`;
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).then(() => {
-                showToast(`📋 已複製「${hw.name}」未交名單（共 ${missingStudents.length} 人）`, "success");
-            }).catch(() => {
-                showToast(`📋 已複製未交名單`, "success");
-            });
-        } else {
-            showToast(`📋 已複製「${hw.name}」未交名單`, "success");
-        }
+        await safeCopyToClipboard(text, `📋 已複製「${hw.name}」未交名單（共 ${missingStudents.length} 人）`);
     }
 
     // 作業清單項目點擊
@@ -3119,11 +3125,17 @@ export function generateLineReportText() {
         text += `（今日尚無登記作業）\n`;
     } else {
         curHws.forEach((hw, idx) => {
-            const missingSeats = [];
-            const seatStatus = hw.seatStatus || {};
-            for (let i = 1; i <= (curClass?.maxSeats || 30); i++) {
-                if (seatStatus[i] === 2) {
-                    missingSeats.push(`${i}號`);
+            let missingSeats = [];
+            if (Array.isArray(hw.students) && hw.students.length > 0) {
+                missingSeats = hw.students
+                    .filter(s => !isStudentCompleted(s, hw.typeId || 'default'))
+                    .map(s => `${s.seat}號`);
+            } else if (hw.seatStatus) {
+                const seatStatus = hw.seatStatus || {};
+                for (let i = 1; i <= (curClass?.maxSeats || 30); i++) {
+                    if (seatStatus[i] === 2) {
+                        missingSeats.push(`${i}號`);
+                    }
                 }
             }
             if (missingSeats.length === 0) {
