@@ -2962,7 +2962,12 @@ export function setupButtonEvents() {
         showContactBookPage();
     });
     document.getElementById('mobile-nav-stats')?.addEventListener('click', () => {
-        document.getElementById('history-stats-btn')?.click();
+        const studentDetailsBtn = document.getElementById('student-details-btn');
+        if (studentDetailsBtn) {
+            studentDetailsBtn.click();
+        } else {
+            showStudentDetailsPage();
+        }
     });
     document.getElementById('mobile-nav-more')?.addEventListener('click', () => {
         const sheet = document.getElementById('mobile-more-sheet');

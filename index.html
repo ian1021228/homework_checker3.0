@@ -237,7 +237,7 @@
                         <!-- 系統更新紀錄按鈕 -->
                         <button id="portal-hero-changelog-btn" class="px-5 py-3.5 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-300/90 font-bold text-sm shadow-xs hover:shadow transition-all flex items-center gap-2 cursor-pointer" title="查看系統版本演進與歷次更新紀錄">
                             <i class="fa-solid fa-clock-rotate-left text-amber-700"></i>
-                            <span>更新紀錄 <span class="bg-amber-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full ml-0.5">v3.8.1</span></span>
+                            <span>更新紀錄 <span class="bg-amber-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full ml-0.5">v3.8.2</span></span>
                         </button>
                         <!-- 提供意見 / 聯絡作者 -->
                         <button id="portal-hero-feedback-btn" class="px-4 py-3.5 rounded-full bg-stone-100/90 hover:bg-stone-200 text-stone-700 font-bold text-sm shadow-2xs hover:shadow transition-all flex items-center gap-1.5 cursor-pointer" title="寫信給作者 ianw.solar@gmail.com">
@@ -353,7 +353,7 @@
                                 </span>
                                 <div>
                                     <h3 class="font-black text-stone-900 text-lg">系統更新紀錄 (Changelog)</h3>
-                                    <span class="text-xs text-stone-400 font-bold">最新版本 v3.8.1 • 2026/09/24</span>
+                                    <span class="text-xs text-stone-400 font-bold">最新版本 v3.8.2 • 2026/09/24</span>
                                 </div>
                             </div>
                             <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-200">最新版本</span>
@@ -362,9 +362,10 @@
                         <div class="p-4 bg-amber-50/50 rounded-2xl border border-amber-100/80 space-y-2 text-xs sm:text-sm text-stone-700 font-medium">
                             <div class="font-bold text-amber-950 flex items-center gap-1.5">
                                 <i class="fa-solid fa-bullhorn text-amber-600"></i>
-                                <span>v3.8.1 核心功能更新亮點：</span>
+                                <span>v3.8.2 核心功能更新亮點：</span>
                             </div>
                             <ul class="space-y-1.5 text-xs text-stone-600 pl-2">
+                                <li>📱 <b>修復手機端底部導航欄「統計」按鈕</b>：修復手機底部「統計」按鈕點擊無反應問題，點擊一秒直達「學生詳情統計」頁面。</li>
                                 <li>📋 <b>一鍵複製「未交催繳純文字」名單</b>：作業卡片右上角與作業點收頁面頂端新增一鍵催繳按鈕，秒產乾淨文字格式（例：<code>【七賢107班 數學習作 未交名單】共3人：3號、8號、14號</code>）。</li>
                                 <li>⚡ <b>Service Worker 離線架構升級</b>：改採網路優先策略 (Network First)，主動清理舊版快取，修復 Cache.put 網路錯誤，確保跨端即時獲取最新功能。</li>
                                 <li>🔗 <b>LINE 每日通報專屬查核連結全面同步</b>：通報文案直達獨立家長端看板，名單缺交狀況自動智慧核算。</li>
@@ -374,7 +375,7 @@
                         <div class="flex items-center justify-between pt-1">
                             <button type="button" id="portal-card-changelog-btn" class="w-full py-2.5 px-4 bg-amber-100/80 hover:bg-amber-200/80 text-amber-950 font-bold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-clock-rotate-left text-amber-700"></i>
-                                <span>查看完整版本演進日誌 (v3.0 ~ v3.8.1)</span>
+                                <span>查看完整版本演進日誌 (v3.0 ~ v3.8.2)</span>
                             </button>
                         </div>
                     </div>
@@ -2740,16 +2741,20 @@
 
                 <!-- 版本歷程時間軸 -->
                 <div class="space-y-6">
-                    <!-- v3.8.1 最新發布 -->
+                    <!-- v3.8.2 最新發布 -->
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/70 via-purple-50/50 to-pink-50/30 border border-indigo-200/80 shadow-xs relative">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                             <div class="flex items-center gap-2">
-                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v3.8.1 最新發布</span>
-                                <span class="text-xs font-bold text-indigo-900">Service Worker 快取架構重大升級、一鍵催繳相容性強化</span>
+                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v3.8.2 最新發布</span>
+                                <span class="text-xs font-bold text-indigo-900">修復手機端底部導航欄「統計」按鈕、直達學生詳情頁面</span>
                             </div>
                             <span class="text-xs font-mono font-bold text-slate-400">2026-09-24</span>
                         </div>
                         <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>📱 修復手機底部「統計」按鈕點擊無反應</b>：修復手機端原生底部導覽列「統計」按鈕事件繫結，點擊直達「學生詳情統計」頁面，支援隨時查核各座號缺繳累積次數。</span>
+                            </li>
                             <li class="flex items-start gap-2">
                                 <span class="text-emerald-500 font-bold shrink-0">✔</span>
                                 <span><b>⚡ Service Worker 離線快取架構升級</b>：全面改採網路優先策略 (Network First)，主動清理舊版快取並修復 Cache.put 網路錯誤，解決瀏覽器因舊快取導致功能未即刻更新之問題。</span>
@@ -2761,10 +2766,6 @@
                             <li class="flex items-start gap-2">
                                 <span class="text-emerald-500 font-bold shrink-0">✔</span>
                                 <span><b>🔗 LINE 家長通報專屬查核連結全面同步</b>：每日通報文案中的查核連結直達獨立家長端看板（<code>https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/?code=[該班代碼]</code>），免密碼即時查核。</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
-                                <span><b>🎉 全班繳齊貼心提示</b>：當全班作業皆已繳交齊畢時，點擊自動提示「全班皆已繳齊，無缺交名單」，免除小老師重複人工核對時間。</span>
                             </li>
                         </ul>
                     </div>
@@ -3183,7 +3184,7 @@
 
 <script src="js/lib/qrcode.min.js"></script>
 <script src="js/lib/html5-qrcode.min.js"></script>
-<script type="module" src="js/app.js?v=3.8.1"></script>
+<script type="module" src="js/app.js?v=3.8.2"></script>
 </body>
 </html>
 
