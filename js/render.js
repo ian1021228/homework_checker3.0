@@ -133,7 +133,7 @@ export function renderClassList() {
                             <span class="text-[11px] hidden sm:inline">複製代碼</span>
                         </button>
                         <button type="button" data-code="${code}" data-name="${c.name}" class="copy-parent-link-btn px-3 py-1.5 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl transition-colors font-bold flex items-center gap-1.5 shrink-0 shadow-2xs" title="複製此班級專屬家長端連結（已包含此班級代碼）">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            <i class="fa-solid fa-copy"></i>
                             <span class="text-[11px] hidden sm:inline">複製專屬連結</span>
                         </button>
                     ` : ''}

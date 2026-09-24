@@ -227,7 +227,7 @@
                         <!-- 系統更新紀錄按鈕 -->
                         <button id="portal-hero-changelog-btn" class="px-5 py-3.5 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-300/90 font-bold text-sm shadow-xs hover:shadow transition-all flex items-center gap-2 cursor-pointer" title="查看系統版本演進與歷次更新紀錄">
                             <i class="fa-solid fa-clock-rotate-left text-amber-700"></i>
-                            <span>更新紀錄 <span class="bg-amber-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full ml-0.5">v3.5</span></span>
+                            <span>更新紀錄 <span class="bg-amber-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full ml-0.5">v3.7</span></span>
                         </button>
                         <!-- 提供意見 / 聯絡作者 -->
                         <button id="portal-hero-feedback-btn" class="px-4 py-3.5 rounded-full bg-stone-100/90 hover:bg-stone-200 text-stone-700 font-bold text-sm shadow-2xs hover:shadow transition-all flex items-center gap-1.5 cursor-pointer" title="寫信給作者 ianw.solar@gmail.com">
@@ -343,7 +343,7 @@
                                 </span>
                                 <div>
                                     <h3 class="font-black text-stone-900 text-lg">系統更新紀錄 (Changelog)</h3>
-                                    <span class="text-xs text-stone-400 font-bold">最新版本 v3.5 • 2026/09/23</span>
+                                    <span class="text-xs text-stone-400 font-bold">最新版本 v3.7 • 2026/09/24</span>
                                 </div>
                             </div>
                             <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-200">最新版本</span>
@@ -352,20 +352,20 @@
                         <div class="p-4 bg-amber-50/50 rounded-2xl border border-amber-100/80 space-y-2 text-xs sm:text-sm text-stone-700 font-medium">
                             <div class="font-bold text-amber-950 flex items-center gap-1.5">
                                 <i class="fa-solid fa-bullhorn text-amber-600"></i>
-                                <span>v3.5 核心功能更新亮點：</span>
+                                <span>v3.7 核心功能更新亮點：</span>
                             </div>
                             <ul class="space-y-1.5 text-xs text-stone-600 pl-2">
-                                <li>⚡ <b>快速登入認證碼 (OTP)</b>：公用電腦輸入手機 6 位數認證碼即刻免密碼秒速登入。</li>
-                                <li>📱 <b>手機原生 App 體驗</b>：底部導覽欄、懸浮新增按鈕 (FAB) 與抽屜選單，排版清爽優雅。</li>
-                                <li>🖥️ <b>雙螢幕模式 (Beta版)</b>：黑板聯絡簿側邊欄，支援一鍵箭頭收合展開，大螢幕對照作業神器。</li>
-                                <li>📋 <b>LINE 家長群每日通報</b>：一鍵自動彙整作業缺繳與聯絡事項，免密碼直達連結。</li>
+                                <li>🔗 <b>LINE 家長群專屬查核連結修正</b>：通報文案直達專屬家長端查核看板（`ian_homework_checker2.0_online_parent_dashboard`）。</li>
+                                <li>📋 <b>班級管理專屬連結圖示優化</b>：複製專屬連結圖標全面改為標準 Copy 剪貼簿圖示，操作更直覺。</li>
+                                <li>🖥️ <b>雙螢幕 1/3 黃金比例對照</b>：黑板聯絡簿側邊欄流暢展開收合，大螢幕對照作業神器。</li>
+                                <li>⚙️ <b>點收方式與管理後台整合</b>：設定頁面專屬配置，大幅精簡主頁動線。</li>
                             </ul>
                         </div>
 
                         <div class="flex items-center justify-between pt-1">
                             <button type="button" id="portal-card-changelog-btn" class="w-full py-2.5 px-4 bg-amber-100/80 hover:bg-amber-200/80 text-amber-950 font-bold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-clock-rotate-left text-amber-700"></i>
-                                <span>查看完整版本演進日誌 (v3.0 ~ v3.5)</span>
+                                <span>查看完整版本演進日誌 (v3.0 ~ v3.7)</span>
                             </button>
                         </div>
                     </div>
@@ -2725,12 +2725,33 @@
 
                 <!-- 版本歷程時間軸 -->
                 <div class="space-y-6">
-                    <!-- v3.6 最新發布 -->
+                    <!-- v3.7 最新發布 -->
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/70 via-purple-50/50 to-pink-50/30 border border-indigo-200/80 shadow-xs relative">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                             <div class="flex items-center gap-2">
-                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v3.6 最新發布</span>
-                                <span class="text-xs font-bold text-indigo-900">雙螢幕 1/3 黃金比例、LINE通報移至聯絡簿、點收方式與管理後台移至設定</span>
+                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v3.7 最新發布</span>
+                                <span class="text-xs font-bold text-indigo-900">LINE 家長通報專屬連結修正、管理班級複製圖標優化</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-400">2026-09-24</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>🔗 LINE 家長通報專屬查核連結修正</b>：將 LINE 每日通報文案中的「家長專屬即時查核連結」更新為直達專屬家長端查核看板（<code>https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/?code=[該班代碼]</code>），免密碼一鍵直達作業與聯絡簿查核頁面。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>📋 管理班級複製專屬連結圖標升級</b>：將管理班級清單中的「複製專屬連結」按鈕圖標由向外跳轉箭頭替換為標準複製（Copy）剪貼簿圖示（<code>fa-solid fa-copy</code>），操作語義更直覺明確。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- v3.6 版本 -->
+                    <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-slate-700 text-white text-xs font-black uppercase tracking-wider shadow-xs">v3.6 正式版</span>
+                                <span class="text-xs font-bold text-slate-800">雙螢幕 1/3 黃金比例、LINE通報移至聯絡簿、點收方式與管理後台移至設定</span>
                             </div>
                             <span class="text-xs font-mono font-bold text-slate-400">2026-09-23</span>
                         </div>

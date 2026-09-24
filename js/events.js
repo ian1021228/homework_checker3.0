@@ -3108,7 +3108,7 @@ export function generateLineReportText() {
     }
 
     text += `\n🔗 家長專屬即時查核連結（免密碼直達）：\n`;
-    const baseUrl = 'https://ian1021228.github.io/homework_checker3.0/';
+    const baseUrl = 'https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/';
     text += classCode ? `${baseUrl}?code=${classCode}\n` : `${baseUrl}\n`;
     text += `━━━━━━━━━━━━━━━━━━━━━━\n`;
     text += `七賢國中107 王禹硯 開發 • 親師作業點收系統`;
