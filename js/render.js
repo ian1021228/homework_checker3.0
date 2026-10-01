@@ -128,13 +128,17 @@ export function renderClassList() {
                         <button type="button" data-class-id="${c.id}" class="regen-class-code-btn text-xs font-bold text-slate-400 hover:text-slate-700 px-1 py-0.5 rounded hover:bg-slate-200 transition-colors shrink-0" title="隨機產生權限碼">🎲</button>
                     </div>
                     ${code ? `
-                        <button type="button" data-code="${code}" data-name="${c.name}" class="copy-class-code-btn px-3 py-1.5 text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl transition-colors font-bold flex items-center gap-1.5 shrink-0" title="複製此班級權限代碼">
+                        <button type="button" data-code="${code}" data-name="${c.name}" class="copy-class-code-btn px-2.5 py-1.5 text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl transition-colors font-bold flex items-center gap-1.5 shrink-0" title="複製此班級權限代碼">
                             <i class="fa-solid fa-copy"></i>
                             <span class="text-[11px] hidden sm:inline">複製代碼</span>
                         </button>
-                        <button type="button" data-code="${code}" data-name="${c.name}" class="copy-parent-link-btn px-3 py-1.5 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl transition-colors font-bold flex items-center gap-1.5 shrink-0 shadow-2xs" title="複製此班級專屬家長端連結（已包含此班級代碼）">
-                            <i class="fa-solid fa-copy"></i>
-                            <span class="text-[11px] hidden sm:inline">複製專屬連結</span>
+                        <button type="button" data-code="${code}" data-name="${c.name}" class="copy-parent-link-btn px-2.5 py-1.5 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl transition-colors font-bold flex items-center gap-1.5 shrink-0 shadow-2xs" title="複製此班級專屬家長端連結（已包含此班級代碼）">
+                            <i class="fa-solid fa-house-chimney-user"></i>
+                            <span class="text-[11px] hidden sm:inline">複製家長端連結</span>
+                        </button>
+                        <button type="button" data-code="${code}" data-name="${c.name}" class="copy-student-link-btn px-2.5 py-1.5 text-xs bg-sky-50 hover:bg-sky-100 text-sky-700 rounded-xl transition-colors font-bold flex items-center gap-1.5 shrink-0 shadow-2xs" title="複製此班級專屬學生端數位聯絡簿連結（已包含此班級代碼）">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                            <span class="text-[11px] hidden sm:inline">複製學生端連結</span>
                         </button>
                     ` : ''}
                     <button data-id="${c.id}" data-name="${c.name}" class="delete-class-btn text-slate-300 hover:text-rose-500 font-bold p-1.5 rounded-xl hover:bg-rose-50 transition-colors text-lg leading-none shrink-0 ml-0.5" title="刪除班級">&times;</button>

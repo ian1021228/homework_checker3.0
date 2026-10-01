@@ -2317,6 +2317,17 @@ export function setupButtonEvents() {
                 return;
             }
 
+            // 複製該班級專屬學生端連結（包含代碼參數）
+            const copyStudentBtn = e.target.closest('.copy-student-link-btn');
+            if (copyStudentBtn) {
+                e.stopPropagation();
+                const code = copyStudentBtn.dataset.code;
+                const name = copyStudentBtn.dataset.name;
+                const studentUrl = `https://ian1021228.github.io/ian_homework_checker2.0_online_student_dashboard/?code=${encodeURIComponent(code)}`;
+                await safeCopyToClipboard(studentUrl, `✅ 已複製「${name}」專屬學生端聯絡簿連結（包含代碼）！`);
+                return;
+            }
+
             // 班級改名按鈕或點擊班級名稱觸發 inline 編輯
             const renameBtn = e.target.closest('.rename-class-btn');
             const nameLabel = e.target.closest('.class-name-text');
