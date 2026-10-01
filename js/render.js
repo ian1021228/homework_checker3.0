@@ -140,6 +140,10 @@ export function renderClassList() {
                             <i class="fa-solid fa-graduation-cap"></i>
                             <span class="text-[11px] hidden sm:inline">複製學生端連結</span>
                         </button>
+                        <button type="button" data-class-id="${c.id}" data-name="${c.name}" class="manage-student-pins-btn px-2.5 py-1.5 text-xs bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200/80 rounded-xl transition-colors font-bold flex items-center gap-1.5 shrink-0 shadow-2xs cursor-pointer" title="管理此班級學生 6 位數成績 PIN 碼與重設後門">
+                            <i class="fa-solid fa-key text-amber-600"></i>
+                            <span class="text-[11px] hidden sm:inline">成績 PIN 碼</span>
+                        </button>
                     ` : ''}
                     <button data-id="${c.id}" data-name="${c.name}" class="delete-class-btn text-slate-300 hover:text-rose-500 font-bold p-1.5 rounded-xl hover:bg-rose-50 transition-colors text-lg leading-none shrink-0 ml-0.5" title="刪除班級">&times;</button>
                 </div>

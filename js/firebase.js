@@ -804,7 +804,8 @@ export async function syncDataToCloud() {
                         updatedAt: new Date().toISOString(),
                         homeworks: classHomeworks,
                         contactBook: c.contactBook || {},
-                        homeworkTypes: safeClone(state.appData.homeworkTypes || DEFAULT_TYPES)
+                        homeworkTypes: safeClone(state.appData.homeworkTypes || DEFAULT_TYPES),
+                        studentPins: c.studentPins || {}
                     };
                     await setDoc(parentDocRef, {
                         ...parentPayload,
@@ -1016,6 +1017,36 @@ export async function deleteMyAccount() {
     } catch (err) {
         console.error("Delete account error:", err);
         showToast("刪除過程中發生錯誤：" + (err?.message || "請稍後再試"), "error");
+    }
+}
+
+export async function syncClassStudentPinsToCloud(classObj) {
+    if (!fbDb || !classObj || !classObj.accessCode) return;
+    try {
+        const code = String(classObj.accessCode).trim();
+        const parentDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'parentClasses', code);
+        await setDoc(parentDocRef, {
+            studentPins: classObj.studentPins || {},
+            updatedAt: new Date().toISOString()
+        }, { merge: true });
+
+        // Update userProfiles for each configured seat
+        if (classObj.studentPins) {
+            for (const [seat, pin] of Object.entries(classObj.studentPins)) {
+                if (pin) {
+                    const studentDocId = `studentScores_${code}_seat${seat}`;
+                    const profileDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', studentDocId);
+                    await setDoc(profileDocRef, {
+                        classCode: code,
+                        seat: String(seat),
+                        parentPin: String(pin),
+                        updatedAt: new Date().toISOString()
+                    }, { merge: true }).catch(() => {});
+                }
+            }
+        }
+    } catch (e) {
+        console.warn("syncClassStudentPinsToCloud error:", e);
     }
 }
 
