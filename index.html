@@ -261,7 +261,7 @@
                         <!-- 系統更新紀錄按鈕 -->
                         <button id="portal-hero-changelog-btn" class="px-5 py-3.5 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-300/90 font-bold text-sm shadow-xs hover:shadow transition-all flex items-center gap-2 cursor-pointer" title="查看系統版本演進與歷次更新紀錄">
                             <i class="fa-solid fa-clock-rotate-left text-amber-700"></i>
-                            <span>更新紀錄 <span class="bg-amber-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full ml-0.5">v3.9.0</span></span>
+                            <span>更新紀錄 <span class="bg-amber-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full ml-0.5">v4.0.0</span></span>
                         </button>
                         <!-- 提供意見 / 聯絡作者 -->
                         <button id="portal-hero-feedback-btn" class="px-4 py-3.5 rounded-full bg-stone-100/90 hover:bg-stone-200 text-stone-700 font-bold text-sm shadow-2xs hover:shadow transition-all flex items-center gap-1.5 cursor-pointer" title="寫信給作者 ianw.solar@gmail.com">
@@ -377,7 +377,7 @@
                                 </span>
                                 <div>
                                     <h3 class="font-black text-stone-900 text-lg">系統更新紀錄 (Changelog)</h3>
-                                    <span class="text-xs text-stone-400 font-bold">最新版本 v3.9.0 • 2026/10/01</span>
+                                    <span class="text-xs text-stone-400 font-bold">最新版本 v4.0.0 • 2026/10/01</span>
                                 </div>
                             </div>
                             <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-200">最新版本</span>
@@ -386,20 +386,21 @@
                         <div class="p-4 bg-amber-50/50 rounded-2xl border border-amber-100/80 space-y-2 text-xs sm:text-sm text-stone-700 font-medium">
                             <div class="font-bold text-amber-950 flex items-center gap-1.5">
                                 <i class="fa-solid fa-bullhorn text-amber-600"></i>
-                                <span>v3.9.0 核心功能更新亮點：</span>
+                                <span>v4.0.0 核心功能更新亮點：</span>
                             </div>
                             <ul class="space-y-1.5 text-xs text-stone-600 pl-2">
-                                <li>🎓 <b>全新學生端（數位聯絡簿與自主成績登記系統）上線</b>：目標取代實體聯絡簿，學生可填寫小考成績、即時計算平均分、自我檢核作業、查閱7天聯絡簿與記錄心情日記。</li>
-                                <li>🔒 <b>家長端全面升級 4 位數查閱密碼 (PIN) 安全防護</b>：保護學生個人成績隱私，家長需輸入學生端顯示的專屬密碼方可查看學生情況，支援隨時重新上鎖。</li>
-                                <li>🚀 <b>首頁新增「家長端專區」與「學生端專區」雙直達通道</b>：導覽列與 Hero 行動區塊常態提供直達入口，三端互聯更迅速。</li>
-                                <li>📋 <b>班級清單新增「複製學生端連結」按鈕</b>：支援一鍵複製附帶代碼的學生專屬連結，學生進入系統秒綁定班級。</li>
+                                <li>📊 <b>家長端作業繳交與統計免密碼直查，成績獨立專頁密碼保護</b>：家長端查看作業繳交情況、完成率與缺繳統計完全免密碼，僅小考成績需要輸入密碼保護孩子隱私。獨立成績專頁提供 4 大關鍵指標（平均分、測驗次數、最高分、待訂正數）。</li>
+                                <li>📈 <b>小考進步趨勢 SVG 走勢圖</b>：家長端與學生端同步搭載動態折線走勢圖與進步狀態標籤（📈 連續進步 / 🎯 穩定發揮 / ⚠️ 略微下滑），直觀掌握成績起伏軌跡。</li>
+                                <li>📚 <b>19 門臺灣課綱領域學科深度分析</b>：涵蓋語文數學、社會、自然、藝文科技、健體綜合 5 大領域，細緻掌握各科最高分、均分與未訂正警示，支援點擊即時篩選。</li>
+                                <li>🔎 <b>多維度歷史成績查詢與篩選排序</b>：支援時間區間（今日/近7天/近30天/全部）、科目、訂正狀態篩選及分數日期排序，歷史成績一目了然。</li>
+                                <li>🔑 <b>學生與家長 PIN 碼無縫雙向驗證</b>：徹底修復學生端預設密碼連線同步，家長在成績分頁免手動改密碼即可直接輸入預設密碼 <code>1000 + 座號</code>（或自訂密碼）即刻解鎖。</li>
                             </ul>
                         </div>
 
                         <div class="flex items-center justify-between pt-1">
                             <button type="button" id="portal-card-changelog-btn" class="w-full py-2.5 px-4 bg-amber-100/80 hover:bg-amber-200/80 text-amber-950 font-bold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-clock-rotate-left text-amber-700"></i>
-                                <span>查看完整版本演進日誌 (v3.0 ~ v3.9.0)</span>
+                                <span>查看完整版本演進日誌 (v3.0 ~ v4.0.0)</span>
                             </button>
                         </div>
                     </div>
@@ -2774,12 +2775,45 @@
 
                 <!-- 版本歷程時間軸 -->
                 <div class="space-y-6">
-                    <!-- v3.9.0 最新發布 -->
+                    <!-- v4.0.0 最新發布 -->
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-emerald-50/80 via-teal-50/50 to-indigo-50/30 border border-emerald-200/90 shadow-xs relative">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                             <div class="flex items-center gap-2">
-                                <span class="px-3 py-1 rounded-full bg-emerald-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v3.9.0 最新發布</span>
-                                <span class="text-xs font-bold text-emerald-950">全新學生端（數位聯絡簿與自主登記小考成績）、家長端 PIN 密碼安全防護</span>
+                                <span class="px-3 py-1 rounded-full bg-emerald-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v4.0.0 最新發布</span>
+                                <span class="text-xs font-bold text-emerald-950">家長端作業與統計免密碼直查、獨立【成績與學習分析】專頁、19 門臺灣課綱學科深度矩陣、小考進步趨勢圖與歷史成績查詢</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-400">2026-10-01</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>📊 家長端作業繳交與統計免密碼直查，成績獨立專頁密碼保護</b>：家長端主介面新增四大獨立導航分頁（【今日作業進度】、【成績與學習分析】、【全班作業總覽】、【聯絡簿與心情】）。家長查看孩子每日作業繳交情況、完成率進度條與各項作業統計<b>完全不需要輸入密碼</b>；僅個人小考成績需要輸入密碼保護孩子隱私。成績專頁提供累計測驗次數、總平均分、歷史最高分與待訂正次數 4 大指標卡片，全面解鎖學生學習成效。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>📈 學生與家長端雙向小考進步趨勢走勢圖 (SVG)</b>：採用原生高效向量繪製技術，動態呈現每次小考分數起伏軌跡與平均基準線，具備即時進步狀態判定標籤（📈 連續進步中 / 🎯 穩定發揮 / ⚠️ 略微下滑），學習狀況一目了然。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>📚 19 門臺灣課綱學科深度表現矩陣</b>：完整涵蓋語文數學（國語文、英語文、數學）、社會領域（歷史、地理、公民與社會）、自然科學（生物、理化、地球科學）、藝術與科技（音樂、視覺藝術、表演藝術、資訊科技、生活科技）、健體與綜合活動（健康教育、體育、家政、童軍、輔導）共 19 門學科，細緻分析各科均分進度條、測驗次數、最高分與未訂正警示，支援點擊一鍵連動篩選。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>🔎 歷史成績多維度篩選與智慧排序</b>：歷史紀錄專區支援時間區間（今日、近7天、近30天、全部歷史）、學科分類、訂正狀態（全部/已訂正/待訂正）篩選，並可依測驗日期新至舊、分數高至低、分數低至高排序，全方位掌控學習歷程。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold shrink-0">✔</span>
+                                <span><b>🔑 修復學生與家長 PIN 碼驗證同步 Bug</b>：修復學生端初始未手動修改密碼時家長端驗證失敗之問題，全面採用預設確定性密碼 <code>1000 + 座號</code> 雙向容錯機制，學生進入即可在畫面上看見專屬密碼，家長輸入即可秒速解鎖。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- v3.9.0 正式版 -->
+                    <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-slate-700 text-white text-xs font-black uppercase tracking-wider shadow-xs">v3.9.0 正式版</span>
+                                <span class="text-xs font-bold text-slate-800">全新學生端（數位聯絡簿與自主登記小考成績）、家長端 PIN 密碼安全防護</span>
                             </div>
                             <span class="text-xs font-mono font-bold text-slate-400">2026-10-01</span>
                         </div>
