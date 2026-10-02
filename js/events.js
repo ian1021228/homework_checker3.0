@@ -2129,13 +2129,18 @@ export function setupButtonEvents() {
         const nameInput = document.getElementById('class-name');
         const codeInput = document.getElementById('class-access-code');
         const className = nameInput ? nameInput.value.trim() : '';
-        let accessCode = codeInput ? codeInput.value.trim().toUpperCase() : '';
+        const enteredCode = codeInput ? codeInput.value.trim().toUpperCase() : '';
+        let accessCode = enteredCode;
         if (!accessCode) {
             accessCode = generateRandomAccessCode();
         }
         if(className) {
-            if (accessCode && state.appData.classes.some(c => c.accessCode && c.accessCode.toUpperCase() === accessCode)) {
-                showToast("⚠️ 權限碼與現有班級重複，已為您隨機產生新權限碼！", "warning");
+            if (enteredCode && state.appData.classes.some(c => c.accessCode && c.accessCode.toUpperCase() === enteredCode)) {
+                showToast(`⚠️ 班級代碼「${enteredCode}」已被其他班級使用，請更換其他代碼！`, "error");
+                if (codeInput) { codeInput.focus(); codeInput.select(); }
+                return;
+            }
+            if (!enteredCode && state.appData.classes.some(c => c.accessCode && c.accessCode.toUpperCase() === accessCode)) {
                 accessCode = generateRandomAccessCode();
             }
             state.appData.classes.push({ 
@@ -2295,7 +2300,8 @@ export function setupButtonEvents() {
                     if (cls) {
                         const oldCode = cls.accessCode;
                         if (newCode && state.appData.classes.some(c => c.id !== classId && c.accessCode && c.accessCode.toUpperCase() === newCode)) {
-                            showToast("⚠️ 此權限碼已被其他班級使用！", "error");
+                            showToast(`⚠️ 班級代碼「${newCode}」已被其他班級使用，請輸入其他代碼！`, "error");
+                            if (input) { input.focus(); input.select(); }
                             return;
                         }
                         if (oldCode && oldCode !== newCode) {
@@ -2379,7 +2385,7 @@ export function setupButtonEvents() {
                 const cls = state.appData.classes.find(c => c.id === classId);
                 if (!cls) return;
 
-                const nameContainer = triggerEl.closest('.flex-1');
+                const nameContainer = triggerEl.closest('.class-name-container') || triggerEl.closest('.flex-1') || triggerEl.parentElement;
                 if (!nameContainer || nameContainer.querySelector('.inline-rename-input')) return;
 
                 const originalHtml = nameContainer.innerHTML;
@@ -2571,6 +2577,7 @@ export function setupButtonEvents() {
         renderStudentPinsList(cls);
         openModal(modal);
     }
+    window.openStudentPinsModal = openStudentPinsModal;
 
     const studentPinsModal = document.getElementById('student-pins-modal');
     if (studentPinsModal) {

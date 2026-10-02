@@ -25,6 +25,8 @@ import {
     setDoc, 
     getDoc, 
     collection, 
+    query,
+    where,
     getDocs, 
     onSnapshot, 
     updateDoc, 
@@ -55,6 +57,8 @@ export {
     setDoc, 
     getDoc, 
     collection, 
+    query,
+    where,
     getDocs, 
     onSnapshot, 
     updateDoc, 
@@ -802,6 +806,23 @@ export async function syncDataToCloud() {
                         }
                     }
 
+                    // 保護學生已提交之小考成績，避免雲端同步時遭空 submissions 覆寫
+                    try {
+                        const existingSnap = await getDoc(parentDocRef);
+                        if (existingSnap.exists()) {
+                            const cloudExams = existingSnap.data()?.exams || [];
+                            (c.exams || []).forEach(localExam => {
+                                const cloudExam = cloudExams.find(ce => ce.id === localExam.id);
+                                if (cloudExam && cloudExam.submissions) {
+                                    localExam.submissions = {
+                                        ...cloudExam.submissions,
+                                        ...(localExam.submissions || {})
+                                    };
+                                }
+                            });
+                        }
+                    } catch (e) {}
+
                     const parentPayload = {
                         classId: c.id,
                         className: c.name,
@@ -1068,6 +1089,21 @@ export async function syncClassExamsToCloud(classObj) {
     try {
         const code = String(classObj.accessCode).trim();
         const parentDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'parentClasses', code);
+        try {
+            const existingSnap = await getDoc(parentDocRef);
+            if (existingSnap.exists()) {
+                const cloudExams = existingSnap.data()?.exams || [];
+                (classObj.exams || []).forEach(localExam => {
+                    const cloudExam = cloudExams.find(ce => ce.id === localExam.id);
+                    if (cloudExam && cloudExam.submissions) {
+                        localExam.submissions = {
+                            ...cloudExam.submissions,
+                            ...(localExam.submissions || {})
+                        };
+                    }
+                });
+            }
+        } catch (e) {}
         await setDoc(parentDocRef, {
             exams: classObj.exams || [],
             updatedAt: new Date().toISOString()

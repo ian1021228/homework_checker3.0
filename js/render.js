@@ -111,16 +111,16 @@ export function renderClassList() {
         classItem.className = 'p-3.5 sm:p-4 bg-white border border-slate-200/80 rounded-2xl mb-3 shadow-xs transition-all hover:border-indigo-200 group';
         const code = c.accessCode || '';
         classItem.innerHTML = `
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-                <div class="flex items-center gap-2 min-w-0 flex-1">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                <div class="class-name-container flex items-center gap-2 shrink-0 min-w-[130px]">
                     <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 shrink-0"></span>
-                    <span class="class-name-text font-black text-slate-800 text-sm sm:text-base truncate cursor-pointer hover:text-indigo-600" data-class-id="${c.id}" title="點擊修改班級名稱：${c.name}">${c.name}</span>
+                    <span class="class-name-text font-black text-slate-800 text-sm sm:text-base cursor-pointer hover:text-indigo-600 select-none" data-class-id="${c.id}" title="點擊修改班級名稱：${c.name}">${c.name || '未命名班級'}</span>
                     <button type="button" data-class-id="${c.id}" data-name="${c.name}" class="rename-class-btn text-slate-400 hover:text-indigo-600 px-2 py-1 rounded-lg hover:bg-indigo-50 transition-colors text-xs shrink-0 flex items-center gap-1" title="修改班級名稱">
                         <i class="fa-solid fa-pen-to-square"></i>
                         <span class="text-[11px] hidden sm:inline">改名</span>
                     </button>
                 </div>
-                <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
+                <div class="flex items-center gap-2 flex-wrap">
                     <div class="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 focus-within:border-indigo-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
                         <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider whitespace-nowrap">座號人數</span>
                         <input type="number" min="1" max="100" data-class-id="${c.id}" class="class-max-seat-input w-12 bg-transparent text-xs font-mono font-black text-indigo-700 focus:outline-none text-center" value="${c.lastMaxSeat || 30}">

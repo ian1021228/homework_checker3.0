@@ -5,7 +5,7 @@
 import { state } from './state.js';
 import { globalAppId } from './constants.js';
 import { showToast, showConfirmModal, openModal, closeModal, safeCopyToClipboard } from './utils.js';
-import { fbDb, doc, setDoc, syncClassExamsToCloud, syncDataToCloud } from './firebase.js';
+import { fbDb, doc, getDoc, setDoc, collection, query, where, onSnapshot, syncClassExamsToCloud, syncDataToCloud } from './firebase.js';
 import { saveData } from './storage.js';
 
 // ==========================================
@@ -30,6 +30,10 @@ export function getDomainBySubject(subName) {
 let currentSelectedExamId = null;
 let currentExportFormat = 'xlsx';
 let currentExportDateRange = 'all';
+let hideScoresPrivacy = false; // 勾選隱藏成績（防偷窺/大螢幕隱私模式）
+let hideCompletedStudents = false; // 填寫完分數要隱藏（避免重複填寫）
+let currentSyncClassCode = null;
+let unsubscribeStudentScores = null;
 
 // ==========================================
 // 2. 六大分數區段分析計算器 (100, 90~99, 80~89, 70~79, 60~69, <60)
@@ -121,6 +125,84 @@ export async function updateClassMaxSeat(classId, newMaxSeat) {
   return true;
 }
 
+/**
+ * 啟動學生端填寫成績與教師端實時雙向同步
+ * 監聽 userProfiles 中 classCode 為當前班級之所有學生獨立個人資料，即刻匯總至全班 exams
+ */
+export function startRealtimeStudentScoresSync(curClass) {
+  if (!curClass || !curClass.accessCode) return;
+  const cleanCode = String(curClass.accessCode).trim();
+  if (currentSyncClassCode === cleanCode && unsubscribeStudentScores) {
+    return;
+  }
+  if (unsubscribeStudentScores) {
+    try { unsubscribeStudentScores(); } catch (e) {}
+    unsubscribeStudentScores = null;
+  }
+  currentSyncClassCode = cleanCode;
+
+  if (!fbDb) return;
+  try {
+    const q = query(
+      collection(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles'),
+      where('classCode', '==', cleanCode)
+    );
+    unsubscribeStudentScores = onSnapshot(q, (snapshot) => {
+      let changed = false;
+      curClass.exams = curClass.exams || [];
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        if (!data || data.seat === undefined || data.seat === null) return;
+        const seatStr = String(data.seat);
+        const scores = Array.isArray(data.scores) ? data.scores : [];
+        scores.forEach(s => {
+          const examId = s.examId || s.id;
+          const exam = curClass.exams.find(e => e.id === examId || (e.name === s.name && e.subject === s.subject));
+          if (exam) {
+            exam.submissions = exam.submissions || {};
+            const existingSub = exam.submissions[seatStr];
+            const incomingScore = Number(s.score);
+            if (!existingSub || Number(existingSub.score) !== incomingScore || existingSub.correction !== s.correction || existingSub.remark !== s.remark) {
+              exam.submissions[seatStr] = {
+                score: incomingScore,
+                correction: s.correction || '已完成訂正',
+                remark: s.remark || '',
+                originalScore: s.originalScore !== undefined ? s.originalScore : (existingSub ? existingSub.originalScore : null),
+                lastModified: s.lastModified || existingSub?.lastModified || '',
+                isMakeup: Boolean(s.isMakeup),
+                updatedAt: data.updatedAt || new Date().toISOString()
+              };
+              changed = true;
+            }
+          }
+        });
+      });
+
+      if (changed) {
+        renderSelectedExamDetails();
+        const examListContainer = document.getElementById('scores-exam-list');
+        if (examListContainer) {
+          curClass.exams.forEach(exam => {
+            const card = examListContainer.querySelector(`[data-exam-id="${exam.id}"]`);
+            if (card) {
+              const count = Object.keys(exam.submissions || {}).length;
+              const maxSeat = curClass.lastMaxSeat || 30;
+              const badge = card.querySelector('.exam-fill-status-badge');
+              if (badge) badge.textContent = `${count}/${maxSeat} 已填`;
+            }
+          });
+        }
+        saveData();
+        syncClassExamsToCloud(curClass);
+      }
+    }, (err) => {
+      console.warn("Realtime student scores sync warning:", err);
+    });
+  } catch (err) {
+    console.warn("startRealtimeStudentScoresSync error:", err);
+  }
+}
+
 // ==========================================
 // 4. 全螢幕成績系統渲染 (Fullscreen View Render)
 // ==========================================
@@ -128,6 +210,9 @@ export function renderExamScoresView() {
   const curClass = getCurrentClass();
   const fullscreenView = document.getElementById('exam-scores-fullscreen-view');
   if (!fullscreenView || !curClass) return;
+
+  // 啟動實時雙向同步
+  startRealtimeStudentScoresSync(curClass);
 
   // 1. 頂部標題與班級徽章
   const classBadge = document.getElementById('scores-view-class-badge');
@@ -304,6 +389,10 @@ function renderSelectedExamDetails() {
   const maxScore = filledCount > 0 ? Math.max(...scoresList) : '--';
   const minScore = filledCount > 0 ? Math.min(...scoresList) : '--';
 
+  const displayAvg = hideScoresPrivacy ? (filledCount > 0 ? '🔒 ***' : '--') : (avgScore !== '--' ? `${avgScore} 分` : '--');
+  const displayMax = hideScoresPrivacy ? (filledCount > 0 ? '🔒 ***' : '--') : (maxScore !== '--' ? `${maxScore} 分` : '--');
+  const displayMin = hideScoresPrivacy ? (filledCount > 0 ? '🔒 ***' : '--') : (minScore !== '--' ? `${minScore} 分` : '--');
+
   // 計算 6 大分數區段
   const segments = calculateScoreSegments(scoresList);
 
@@ -329,15 +418,15 @@ function renderSelectedExamDetails() {
         </div>
         <div class="px-3 py-1.5 rounded-xl bg-teal-50 border border-teal-200 text-center">
           <span class="text-[10px] font-bold text-teal-600 block">班級平均分</span>
-          <span class="text-sm font-black text-teal-800">${avgScore} 分</span>
+          <span class="text-sm font-black text-teal-800">${displayAvg}</span>
         </div>
         <div class="px-3 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-center">
           <span class="text-[10px] font-bold text-indigo-600 block">最高分</span>
-          <span class="text-sm font-black text-indigo-800">${maxScore} 分</span>
+          <span class="text-sm font-black text-indigo-800">${displayMax}</span>
         </div>
         <div class="px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-200 text-center">
           <span class="text-[10px] font-bold text-rose-600 block">最低分</span>
-          <span class="text-sm font-black text-rose-800">${minScore} 分</span>
+          <span class="text-sm font-black text-rose-800">${displayMin}</span>
         </div>
       </div>
     </div>
@@ -353,7 +442,7 @@ function renderSelectedExamDetails() {
       </div>
 
       <!-- 區段長條圖 -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+      <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2">
         ${Object.values(segments).map(seg => {
           const pct = filledCount > 0 ? ((seg.count / filledCount) * 100).toFixed(0) : 0;
           return `
@@ -375,10 +464,18 @@ function renderSelectedExamDetails() {
 
   // 渲染學生座號表 (1 ~ maxSeat)
   tbody.innerHTML = '';
+  let visibleCount = 0;
   for (let seat = 1; seat <= maxSeat; seat++) {
     const seatStr = String(seat);
     const sub = submissions[seatStr] || null;
+    const isFilled = sub && sub.score !== undefined && sub.score !== null && sub.score !== '';
     const isMissingOriginally = missingSeatsArr.includes(seatStr);
+
+    // 填寫完分數要隱藏（避免重複填寫）
+    if (hideCompletedStudents && isFilled) {
+      continue;
+    }
+    visibleCount++;
 
     const tr = document.createElement('tr');
     tr.className = 'hover:bg-slate-50/80 transition-colors';
@@ -397,21 +494,30 @@ function renderSelectedExamDetails() {
       statusBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500">未填寫</span>';
     }
 
-    // 2. 分數欄 (含原分數與最後修改時間小字備註)
+    // 2. 分數欄 (若勾選隱藏成績，顯示防偷窺 ***)
     let scoreDisplay = '';
-    if (sub && sub.score !== undefined && sub.score !== null && sub.score !== '') {
+    if (isFilled) {
       const scoreNum = Number(sub.score);
       const scoreColor = scoreNum >= 90 ? 'text-indigo-600' : scoreNum >= 60 ? 'text-slate-800' : 'text-rose-600';
-      scoreDisplay = `
-        <div class="text-center">
-          <span class="text-base font-black ${scoreColor}">${scoreNum} 分</span>
-          ${sub.originalScore !== undefined && sub.originalScore !== null && Number(sub.originalScore) !== scoreNum ? `
-            <div class="text-[10px] text-amber-700 font-bold mt-0.5 leading-tight">
-              原分: ${sub.originalScore} 分<br><span class="text-slate-400 font-medium">(${sub.lastModified || '已修改'})</span>
-            </div>
-          ` : (sub.lastModified ? `<div class="text-[10px] text-slate-400 font-medium mt-0.5">(${sub.lastModified})</div>` : '')}
-        </div>
-      `;
+      if (hideScoresPrivacy) {
+        scoreDisplay = `
+          <div class="text-center">
+            <span class="text-base font-black text-slate-400 select-none tracking-widest font-mono">*** 分</span>
+            <div class="text-[10px] text-teal-600 font-bold mt-0.5">🔒 已隱藏 (隱私保護)</div>
+          </div>
+        `;
+      } else {
+        scoreDisplay = `
+          <div class="text-center">
+            <span class="text-base font-black ${scoreColor}">${scoreNum} 分</span>
+            ${sub.originalScore !== undefined && sub.originalScore !== null && Number(sub.originalScore) !== scoreNum ? `
+              <div class="text-[10px] text-amber-700 font-bold mt-0.5 leading-tight">
+                原分: ${sub.originalScore} 分<br><span class="text-slate-400 font-medium">(${sub.lastModified || '已修改'})</span>
+              </div>
+            ` : (sub.lastModified ? `<div class="text-[10px] text-slate-400 font-medium mt-0.5">(${sub.lastModified})</div>` : '')}
+          </div>
+        `;
+      }
     } else {
       scoreDisplay = '<span class="text-slate-300 font-bold block text-center">--</span>';
     }
@@ -455,6 +561,26 @@ function renderSelectedExamDetails() {
     });
 
     tbody.appendChild(tr);
+  }
+
+  if (visibleCount === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" class="text-center py-12 text-emerald-600 font-bold text-sm">
+          <i class="fa-solid fa-circle-check text-2xl mb-2 block"></i>
+          全班學生皆已完成填寫！目前無待填寫或缺考學生。
+        </td>
+      </tr>
+    `;
+  }
+
+  const filterStatsEl = document.getElementById('scores-table-filter-stats');
+  if (filterStatsEl) {
+    if (hideCompletedStudents) {
+      filterStatsEl.textContent = `(已隱藏 ${filledCount} 位已填寫，目前顯示 ${visibleCount} 位待填寫/缺考)`;
+    } else {
+      filterStatsEl.textContent = `(全班共 ${maxSeat} 位學生，已填寫 ${filledCount} 位)`;
+    }
   }
 }
 
@@ -758,10 +884,17 @@ export async function saveTeacherEditScore() {
     try {
       const code = String(curClass.accessCode).trim();
       const profileDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', `studentScores_${code}_seat${seatStr}`);
-      await setDoc(profileDocRef, {
+      const snap = await getDoc(profileDocRef);
+      let existingScores = [];
+      if (snap.exists() && Array.isArray(snap.data()?.scores)) {
+        existingScores = [...snap.data().scores];
+      }
+      const itemIdx = existingScores.findIndex(s => s.id === exam.id || s.examId === exam.id);
+      const scoreObj = {
+        id: exam.id,
         examId: exam.id,
+        name: exam.name,
         subject: exam.subject,
-        examName: exam.name,
         date: exam.date,
         score: newScoreNum,
         correction: correction || '已完成訂正',
@@ -769,6 +902,17 @@ export async function saveTeacherEditScore() {
         originalScore: originalScore !== undefined ? originalScore : null,
         lastModified: nowStr,
         isMakeup,
+        updatedAt: new Date().toISOString()
+      };
+      if (itemIdx >= 0) {
+        existingScores[itemIdx] = { ...existingScores[itemIdx], ...scoreObj };
+      } else {
+        existingScores.unshift(scoreObj);
+      }
+      await setDoc(profileDocRef, {
+        classCode: code,
+        seat: Number(seatStr),
+        scores: existingScores,
         updatedAt: new Date().toISOString()
       }, { merge: true });
     } catch (e) {
@@ -1152,6 +1296,23 @@ export function setupExamScoresEvents() {
       fullscreenView.classList.add('hidden');
       fullscreenView.classList.remove('flex');
     }
+    if (unsubscribeStudentScores) {
+      try { unsubscribeStudentScores(); } catch (e) {}
+      unsubscribeStudentScores = null;
+      currentSyncClassCode = null;
+    }
+  });
+
+  // 勾選隱藏成績（防偷窺/大螢幕隱私）
+  document.getElementById('toggle-hide-scores-privacy')?.addEventListener('change', (e) => {
+    hideScoresPrivacy = e.target.checked;
+    renderSelectedExamDetails();
+  });
+
+  // 填寫完分數要隱藏（避免重複填寫）
+  document.getElementById('toggle-hide-completed-students')?.addEventListener('change', (e) => {
+    hideCompletedStudents = e.target.checked;
+    renderSelectedExamDetails();
   });
 
   // 學生端直達連結按鈕
@@ -1170,11 +1331,11 @@ export function setupExamScoresEvents() {
   document.getElementById('btn-open-pins-from-scores')?.addEventListener('click', () => {
     const curClass = getCurrentClass();
     if (!curClass) return;
-    const pinBtn = document.querySelector(`.manage-student-pins-btn[data-class-id="${curClass.id}"]`);
-    if (pinBtn) {
-      pinBtn.click();
+    if (typeof window.openStudentPinsModal === 'function') {
+      window.openStudentPinsModal(curClass.id);
     } else {
-      openModal(document.getElementById('student-pins-management-modal'));
+      const pinBtn = document.querySelector(`.manage-student-pins-btn[data-class-id="${curClass.id}"]`);
+      if (pinBtn) pinBtn.click();
     }
   });
 

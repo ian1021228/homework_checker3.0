@@ -378,32 +378,31 @@
                                 </span>
                                 <div>
                                     <h3 class="font-black text-stone-900 text-lg">系統更新紀錄 (Changelog)</h3>
-                                    <span class="text-xs text-stone-400 font-bold">最新版本 v4.1.0 • 2026/10/02</span>
+                                    <span class="text-xs text-stone-400 font-bold">最新版本 v4.2.0 • 2026/10/02</span>
                                 </div>
                             </div>
-                            <span class="px-2.5 py-1 rounded-full bg-teal-50 text-teal-700 text-xs font-black border border-teal-200">最新版本</span>
+                            <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-200">最新版本</span>
                         </div>
 
-                        <div class="p-4 bg-teal-50/50 rounded-2xl border border-teal-100/80 space-y-2 text-xs sm:text-sm text-stone-700 font-medium">
-                            <div class="font-bold text-teal-950 flex items-center gap-1.5">
-                                <i class="fa-solid fa-bullhorn text-teal-600"></i>
-                                <span>v4.1.0 核心功能更新亮點：</span>
+                        <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100/80 space-y-2 text-xs sm:text-sm text-stone-700 font-medium">
+                            <div class="font-bold text-emerald-950 flex items-center gap-1.5">
+                                <i class="fa-solid fa-bullhorn text-emerald-600"></i>
+                                <span>v4.2.0 核心更新亮點：</span>
                             </div>
                             <ul class="space-y-1.5 text-xs text-stone-600 pl-2">
-                                <li>📊 <b>教師端全螢幕成績系統與統一出題</b>：作業列表新增全螢幕成績系統入口，教師可統一發布 21 科考試、設定時間與指定缺考座號名單。</li>
-                                <li>👥 <b>最後座號管理與紫色 [修改] 即時連動</b>：初次進入引導填寫最後座號，新增作業頁面顯示紫色 <code>[修改]</code> 小字，一鍵修改並全班作業同步套用。</li>
-                                <li>📝 <b>待填寫分數與詳細明細雙區塊</b>：學生端待填寫區登記成績後自動移至明細，缺考學生填寫後自動標註「補考」。</li>
-                                <li>🕒 <b>原分數與最後修改時間歷史追蹤</b>：分數編輯後教師/學生/家長端皆顯示小字備註與最後修改時間；教師具備改分後門。</li>
-                                <li>📈 <b>全班 6 大分數區段分析 (100, 90~99, 80~89, 70~79, 60~69, &lt;60)</b>：點擊任一考試方格展開全班級距分析與孩子落點標註。</li>
-                                <li>✅ <b>聯絡簿事項完成打勾與動態未完成計數</b>：勾選已完成作業，上方選單即時顯示未完成數量。</li>
-                                <li>📥 <b>多元格式一鍵匯出 (Word/Excel/PDF/HTML/CSV)</b>：支援時間區間與科目複選，一鍵匯出全班成績統計報表。</li>
+                                <li>🏷️ <b>班級名稱與全螢幕表格防壓扁修復</b>：徹底修復班級清單名稱被擠壓消失問題，成績系統表格支援自適應水平滑動，版面整齊不變形。</li>
+                                <li>🙈 <b>成績系統隱私遮蔽防偷窺（勾選隱藏成績）</b>：全螢幕成績系統新增「隱藏成績（防偷窺遮罩）」選項，投影大螢幕時數字以 <code>***</code> 遮罩保護學生隱私。</li>
+                                <li>✨ <b>填寫完分數自動隱藏（防重複填寫）</b>：教師端支援一鍵隱藏已填寫學生，學生端登記小考後即刻自待填寫清單移除，避免重複填寫。</li>
+                                <li>⚠️ <b>班級代碼重複即時防護提示</b>：新增或修改班級權限碼時若與現有班級代碼重複，系統即刻發出警示並阻止覆寫。</li>
+                                <li>🔝 <b>PIN 碼設定彈窗層級修復</b>：修復成績系統點擊 PIN 碼設定被遮擋問題，提升至最高頂層即點即開。</li>
+                                <li>🔄 <b>學生端與教師端實時雙向同步</b>：雙向即時雲端監聽，學生端交卷教師端秒級呈現；修復學生端全班區段視窗關閉功能。</li>
                             </ul>
                         </div>
 
                         <div class="flex items-center justify-between pt-1">
-                            <button type="button" id="portal-card-changelog-btn" class="w-full py-2.5 px-4 bg-teal-100/80 hover:bg-teal-200/80 text-teal-950 font-bold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
-                                <i class="fa-solid fa-clock-rotate-left text-teal-700"></i>
-                                <span>查看完整版本演進日誌 (v3.0 ~ v4.1.1)</span>
+                            <button type="button" id="portal-card-changelog-btn" class="w-full py-2.5 px-4 bg-emerald-100/80 hover:bg-emerald-200/80 text-emerald-950 font-bold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fa-solid fa-clock-rotate-left text-emerald-700"></i>
+                                <span>查看完整版本演進日誌 (v3.0 ~ v4.2.0)</span>
                             </button>
                         </div>
                     </div>
@@ -1425,7 +1424,7 @@
                         <span class="text-slate-400">-</span>
                         <input type="date" id="filter-date-end" class="text-sm rounded-xl border-slate-200 shadow-sm bg-white font-semibold text-slate-600 py-2 px-3 cursor-pointer">
                     </div>
-                    <button id="hw-list-scores-btn" type="button" class="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-extrabold text-xs sm:text-sm py-2 px-3 sm:px-4 rounded-xl shadow-xs hover:shadow transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0" title="進入全螢幕成績系統">
+                    <button id="hw-list-scores-btn" type="button" class="hidden bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-extrabold text-xs sm:text-sm py-2 px-3 sm:px-4 rounded-xl shadow-xs hover:shadow transition-all items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0" title="進入全螢幕成績系統">
                         <i class="fa-solid fa-chart-line"></i>
                         <span>成績系統</span>
                     </button>
@@ -2334,7 +2333,7 @@
     </div>
 
     <!-- 🔑 學生 6 位數成績專屬驗證碼 (PIN) 管理與開通 Modal -->
-    <div id="student-pins-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-md flex items-center justify-center p-4 hidden modal z-50">
+    <div id="student-pins-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-md flex items-center justify-center p-4 hidden modal z-[160]">
         <div class="modal-content glass-card rounded-3xl shadow-2xl p-6 sm:p-8 md:p-9 w-full max-w-3xl lg:max-w-4xl transform scale-95 border border-slate-100 max-h-[92vh] flex flex-col custom-scrollbar overflow-hidden">
             <!-- Modal Header -->
             <div class="flex items-center justify-between pb-4 border-b border-slate-100 flex-shrink-0">
@@ -2854,11 +2853,52 @@
 
                 <!-- 版本歷程時間軸 -->
                 <div class="space-y-6">
-                    <!-- v4.1.1 最新發布 -->
+                    <!-- v4.2.0 最新發布 -->
+                    <div class="p-5 rounded-2xl bg-gradient-to-br from-emerald-50/90 via-teal-50/60 to-indigo-50/40 border-2 border-emerald-500 shadow-md relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-emerald-600 text-white text-xs font-black uppercase tracking-wider shadow-xs animate-pulse">v4.2.0 最新發布</span>
+                                <span class="text-xs font-bold text-emerald-950">班級名稱與表格防壓扁修復、成績隱私遮蔽防偷窺、填寫完分數自動隱藏、班級代碼重複警示、PIN 碼彈窗層級修復、學生教師端實時雙向同步</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-400">2026-10-02</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-600 font-bold shrink-0">✔</span>
+                                <span><b>🏷️ 班級管理清單名稱與全螢幕成績表格防壓扁修復</b>：修復班級清單右側按鈕彈性折行，保證班級名稱容器具備最小寬度絕不被壓縮消失；全螢幕成績系統表格加入自適應最小寬度與水平滑動支援，徹底解決桌面與手機端欄位被壓扁變形問題。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-600 font-bold shrink-0">✔</span>
+                                <span><b>🙈 全螢幕成績系統勾選隱藏成績（大螢幕投影防窺保護）</b>：成績系統操作列新增「隱藏成績（防偷窺遮罩）」核取方塊，勾選後所有學生各科得分以 <code>*** 分</code> 顯示，且上方平均分、最高分及區段人數均啟動隱私保護，投影班級大螢幕時全面守護學生個人隱私。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-600 font-bold shrink-0">✔</span>
+                                <span><b>✨ 填寫完分數自動隱藏（防重複填寫與快速清點）</b>：教師端成績系統提供「填寫完分數要隱藏」快速過濾，一鍵收合已登記學生，只呈現待填寫或缺考名單；學生端登記完小考分數後，立即從「待填寫小考清單」消失，避免學生或家長重複登記。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-600 font-bold shrink-0">✔</span>
+                                <span><b>⚠️ 班級代碼重複即時防護與防呆警示</b>：教師端在建立新班級或修改班級權限代碼時，自動比對現有所有班級代碼；若偵測到重複代碼，立即跳出警告視窗阻止建立與覆蓋，確保全域班級代碼獨立唯一。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-600 font-bold shrink-0">✔</span>
+                                <span><b>🔝 PIN 碼設定彈窗層級（z-index）修復</b>：修復全螢幕成績系統內部點擊「PIN 碼設定」時彈窗被覆蓋在成績底層的層級問題，提升至最高前景層級（z-[160]），點擊即開、操作流暢。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-600 font-bold shrink-0">✔</span>
+                                <span><b>🔄 學生端與教師端實時雙向同步機制</b>：教師端成績系統自動啟用雙向即時監聽（onSnapshot），學生端交卷或更新成績後，教師端成績看板與區段長條圖秒級自動更新；教師直接修改成績亦同步寫回學生專屬檔案。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-600 font-bold shrink-0">✔</span>
+                                <span><b>🛠️ 學生端全班區段視窗與事件監聽修復</b>：修復學生端 JavaScript 函式引用異常，確保全班成績區段彈窗點擊關閉按鈕與點擊遮罩背景皆可無阻關閉。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- v4.1.1 歷史更新 -->
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/90 via-teal-50/60 to-emerald-50/40 border border-indigo-300 shadow-xs relative">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                             <div class="flex items-center gap-2">
-                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v4.1.1 最新發布</span>
+                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v4.1.1</span>
                                 <span class="text-xs font-bold text-indigo-950">統一 PIN 碼架構（班級代碼 + 座號）、家長學生共用專屬密碼、初次進入獨立選擇座號頁面（絕不默認1號）、班級代碼雲端即時同步強化</span>
                             </div>
                             <span class="text-xs font-mono font-bold text-slate-400">2026-10-02</span>
@@ -3514,11 +3554,26 @@
                         <!-- JS 動態生成當前測驗之六大分數區段長條圖與填寫率 -->
                     </div>
 
+                    <!-- 控制工具列 (隱藏成績防偷窺、填寫完分數要隱藏避免重複) -->
+                    <div class="px-4 sm:px-6 pt-3 pb-1 flex flex-wrap items-center justify-between gap-2.5 shrink-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold cursor-pointer shadow-2xs select-none transition-all">
+                                <input type="checkbox" id="toggle-hide-scores-privacy" class="w-4 h-4 rounded text-teal-600 focus:ring-teal-500 border-slate-300 cursor-pointer">
+                                <span><i class="fa-solid fa-eye-slash text-slate-400 mr-1"></i>勾選隱藏成績（防偷窺/大螢幕隱私）</span>
+                            </label>
+                            <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold cursor-pointer shadow-2xs select-none transition-all">
+                                <input type="checkbox" id="toggle-hide-completed-students" class="w-4 h-4 rounded text-teal-600 focus:ring-teal-500 border-slate-300 cursor-pointer">
+                                <span><i class="fa-solid fa-filter text-slate-400 mr-1"></i>填寫完分數要隱藏（避免重複填寫）</span>
+                            </label>
+                        </div>
+                        <div id="scores-table-filter-stats" class="text-xs font-bold text-slate-400"></div>
+                    </div>
+
                     <!-- 學生填寫成績表格 -->
                     <div class="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar">
                         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
                             <div class="overflow-x-auto">
-                                <table class="w-full text-left text-sm border-collapse">
+                                <table class="w-full text-left text-sm border-collapse min-w-[720px]">
                                     <thead>
                                         <tr class="bg-slate-50/80 border-b border-slate-200/80 text-xs font-black text-slate-500 uppercase tracking-wider">
                                             <th class="py-3 px-4 w-16 text-center">座號</th>
