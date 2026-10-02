@@ -24,6 +24,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=M+PLUS+Rounded+1c:wght@400;500;700;800;900&family=Nunito:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     
     <link rel="stylesheet" href="css/style.css">
 
@@ -377,31 +378,32 @@
                                 </span>
                                 <div>
                                     <h3 class="font-black text-stone-900 text-lg">系統更新紀錄 (Changelog)</h3>
-                                    <span class="text-xs text-stone-400 font-bold">最新版本 v4.0.0 • 2026/10/01</span>
+                                    <span class="text-xs text-stone-400 font-bold">最新版本 v4.1.0 • 2026/10/02</span>
                                 </div>
                             </div>
-                            <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-200">最新版本</span>
+                            <span class="px-2.5 py-1 rounded-full bg-teal-50 text-teal-700 text-xs font-black border border-teal-200">最新版本</span>
                         </div>
 
-                        <div class="p-4 bg-amber-50/50 rounded-2xl border border-amber-100/80 space-y-2 text-xs sm:text-sm text-stone-700 font-medium">
-                            <div class="font-bold text-amber-950 flex items-center gap-1.5">
-                                <i class="fa-solid fa-bullhorn text-amber-600"></i>
-                                <span>v4.0.0 核心功能更新亮點：</span>
+                        <div class="p-4 bg-teal-50/50 rounded-2xl border border-teal-100/80 space-y-2 text-xs sm:text-sm text-stone-700 font-medium">
+                            <div class="font-bold text-teal-950 flex items-center gap-1.5">
+                                <i class="fa-solid fa-bullhorn text-teal-600"></i>
+                                <span>v4.1.0 核心功能更新亮點：</span>
                             </div>
                             <ul class="space-y-1.5 text-xs text-stone-600 pl-2">
-                                <li>📊 <b>家長端作業繳交與統計免密碼直查，成績獨立專頁密碼保護</b>：家長端查看作業繳交情況、完成率與缺繳統計完全免密碼，僅小考成績需要輸入密碼保護孩子隱私。獨立成績專頁提供 4 大關鍵指標（平均分、測驗次數、最高分、待訂正數）。</li>
-                                <li>📈 <b>小考進步趨勢 SVG 走勢圖</b>：家長端與學生端同步搭載動態折線走勢圖與進步狀態標籤（📈 連續進步 / 🎯 穩定發揮 / ⚠️ 略微下滑），直觀掌握成績起伏軌跡。</li>
-                                <li>📚 <b>21 門臺灣課綱六大領域學科深度分析</b>：完整涵蓋語文領域（國語文、英語文）、數學領域（數學）、社會領域（歷史、地理、公民與社會、綜合社會）、自然科學（生物、理化、地球科學、綜合自然）、藝文科技（音樂、視覺藝術、表演藝術、資訊科技、生活科技）、健體綜合（健康教育、體育、家政、童軍、輔導）共 21 門學科，細緻掌握各科最高分、均分與未訂正警示，支援點擊即時篩選。</li>
-                                <li>📱 <b>學生端與家長端 PWA 一鍵安裝支援</b>：支援電腦端 (Chrome/Edge) 與手機端 (iOS Safari / Android) 一鍵下載安裝至桌面或主畫面，離線秒開更便利。</li>
-                                <li>🔎 <b>多維度歷史成績查詢與篩選排序</b>：支援時間區間（今日/近7天/近30天/全部）、科目、訂正狀態篩選及分數日期排序，歷史成績一目了然。</li>
-                                <li>🔑 <b>學生個人 6 位數專屬驗證碼與教師端管理後門</b>：升級 6 位數專屬 PIN 碼機制（預設 <code>100000 + 座號</code>），教師端新增班級成績 PIN 碼管理，支援批次開通、隨機生成與座號一鍵重設後門；學生端本機免密直開、跨座號防窺鎖定。</li>
+                                <li>📊 <b>教師端全螢幕成績系統與統一出題</b>：作業列表新增全螢幕成績系統入口，教師可統一發布 21 科考試、設定時間與指定缺考座號名單。</li>
+                                <li>👥 <b>最後座號管理與紫色 [修改] 即時連動</b>：初次進入引導填寫最後座號，新增作業頁面顯示紫色 <code>[修改]</code> 小字，一鍵修改並全班作業同步套用。</li>
+                                <li>📝 <b>待填寫分數與詳細明細雙區塊</b>：學生端待填寫區登記成績後自動移至明細，缺考學生填寫後自動標註「補考」。</li>
+                                <li>🕒 <b>原分數與最後修改時間歷史追蹤</b>：分數編輯後教師/學生/家長端皆顯示小字備註與最後修改時間；教師具備改分後門。</li>
+                                <li>📈 <b>全班 6 大分數區段分析 (100, 90~99, 80~89, 70~79, 60~69, &lt;60)</b>：點擊任一考試方格展開全班級距分析與孩子落點標註。</li>
+                                <li>✅ <b>聯絡簿事項完成打勾與動態未完成計數</b>：勾選已完成作業，上方選單即時顯示未完成數量。</li>
+                                <li>📥 <b>多元格式一鍵匯出 (Word/Excel/PDF/HTML/CSV)</b>：支援時間區間與科目複選，一鍵匯出全班成績統計報表。</li>
                             </ul>
                         </div>
 
                         <div class="flex items-center justify-between pt-1">
-                            <button type="button" id="portal-card-changelog-btn" class="w-full py-2.5 px-4 bg-amber-100/80 hover:bg-amber-200/80 text-amber-950 font-bold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
-                                <i class="fa-solid fa-clock-rotate-left text-amber-700"></i>
-                                <span>查看完整版本演進日誌 (v3.0 ~ v4.0.0)</span>
+                            <button type="button" id="portal-card-changelog-btn" class="w-full py-2.5 px-4 bg-teal-100/80 hover:bg-teal-200/80 text-teal-950 font-bold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fa-solid fa-clock-rotate-left text-teal-700"></i>
+                                <span>查看完整版本演進日誌 (v3.0 ~ v4.1.1)</span>
                             </button>
                         </div>
                     </div>
@@ -1372,6 +1374,11 @@
                              <span>學生詳情</span>
                          </button>
                          
+                                                  <!-- 3.5 📊 成績系統 -->
+                         <button id="exam-scores-system-btn" class="glass-card border border-teal-200/80 bg-teal-50/50 text-teal-700 hover:text-teal-800 font-black py-2.5 sm:py-3 px-4 sm:px-5 text-sm sm:text-base rounded-2xl shadow-xs hover:bg-teal-100/60 hover:border-teal-300 transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer" title="進入全螢幕成績系統（統一發布考試、全班成績、多元格式匯出）">
+                             <i class="fa-solid fa-chart-line text-teal-600"></i>
+                             <span>成績系統</span>
+                         </button>
                          <!-- 4. 🏷️ 條碼設定 -->
                          <button id="set-barcodes-btn" class="glass-card border border-blue-200/80 bg-blue-50/40 text-blue-600 hover:text-blue-700 font-black py-2.5 sm:py-3 px-4 sm:px-5 text-sm sm:text-base rounded-2xl shadow-xs hover:bg-blue-50 hover:border-blue-300 transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 hide-on-admin-view flex items-center gap-1.5 cursor-pointer">
                              <span>🏷️ 條碼設定</span>
@@ -1418,6 +1425,11 @@
                         <span class="text-slate-400">-</span>
                         <input type="date" id="filter-date-end" class="text-sm rounded-xl border-slate-200 shadow-sm bg-white font-semibold text-slate-600 py-2 px-3 cursor-pointer">
                     </div>
+                    <button id="hw-list-scores-btn" type="button" class="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-extrabold text-xs sm:text-sm py-2 px-3 sm:px-4 rounded-xl shadow-xs hover:shadow transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0" title="進入全螢幕成績系統">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>成績系統</span>
+                    </button>
+
                 </div>
                 <div class="flex justify-end items-center gap-2 flex-shrink-0">
                     <label for="sort-homework" class="text-sm font-bold uppercase tracking-wider text-slate-400 hidden lg:block">排序方式：</label>
@@ -2220,7 +2232,10 @@
                 </div>
                 <div id="student-count-container" class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="student-count" class="block text-sm font-bold text-slate-700 mb-1.5">最後座號</label>
+                        <label for="student-count" class="block text-sm font-bold text-slate-700 mb-1.5 flex items-center justify-between">
+                            <span>最後座號</span>
+                            <button type="button" id="btn-quick-edit-max-seat" class="text-purple-600 hover:text-purple-800 text-xs font-bold cursor-pointer hover:underline" title="修改此班最後座號（全班作業將同步套用）">[修改]</button>
+                        </label>
                         <input type="number" id="student-count" min="1" max="100" class="block w-full rounded-xl border-slate-200 bg-slate-50 focus:bg-white shadow-sm p-3 text-sm font-bold transition-colors" required placeholder="例如：30">
                     </div>
                     <div>
@@ -2345,7 +2360,7 @@
                 <div class="flex items-center gap-2 flex-wrap">
                     <button type="button" id="btn-batch-enable-pins" class="py-2 px-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5 cursor-pointer">
                         <i class="fa-solid fa-bolt"></i>
-                        <span>一鍵開通全班 6 位數 PIN 碼 (100000+座號)</span>
+                        <span>一鍵開通全班預設 PIN 碼 (班級代碼+座號)</span>
                     </button>
                     <button type="button" id="btn-batch-random-pins" class="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer">
                         <i class="fa-solid fa-dice"></i>
@@ -2839,6 +2854,76 @@
 
                 <!-- 版本歷程時間軸 -->
                 <div class="space-y-6">
+                    <!-- v4.1.1 最新發布 -->
+                    <div class="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/90 via-teal-50/60 to-emerald-50/40 border border-indigo-300 shadow-xs relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v4.1.1 最新發布</span>
+                                <span class="text-xs font-bold text-indigo-950">統一 PIN 碼架構（班級代碼 + 座號）、家長學生共用專屬密碼、初次進入獨立選擇座號頁面（絕不默認1號）、班級代碼雲端即時同步強化</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-400">2026-10-02</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <span class="text-indigo-500 font-bold shrink-0">✔</span>
+                                <span><b>🔑 教師端預設 PIN 碼架構全面統一為【班級代碼 + 座號】</b>：教師端一鍵開通、一鍵重設與預設 PIN 碼全面採用 <code>班級代碼 + 座號</code>（如：<code>KNKVMK3</code>、<code>777AAA3</code>），系統支援英數字母不區分大小寫快速驗證。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-indigo-500 font-bold shrink-0">✔</span>
+                                <span><b>👪 家長學生共用相同 PIN 碼，徹底精簡查核驗證流程</b>：徹底刪除冗餘之家長端專屬查核密碼與學生自訂密碼彈窗，家長查看成績與學生端使用完全相同的 PIN 碼，消除各端認知不同步與密碼記憶負擔。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-indigo-500 font-bold shrink-0">✔</span>
+                                <span><b>🎯 學生端與家長端初次進入必先顯示座號選擇頁面，絕不默認 1 號</b>：徹底重構座號本機快取架構，座號綁定嚴格依據班級代碼獨立隔離，初次進入或未帶座號參數時強制呈現清晰座號矩陣供使用者點選，解決默認 1 號問題。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-indigo-500 font-bold shrink-0">✔</span>
+                                <span><b>☁️ 班級代碼即時雙向雲端同步強化</b>：教師端在建立班級、儲存權限碼、編輯班級名稱時全面保證立即同步至公共資料庫，確保學生端與家長端隨時隨地 100% 成功加入班級。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- v4.1.0 重大更新 -->
+                    <div class="p-5 rounded-2xl bg-gradient-to-br from-teal-50/90 via-emerald-50/60 to-indigo-50/40 border border-teal-300 shadow-xs relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-teal-700 text-white text-xs font-black uppercase tracking-wider shadow-xs">v4.1.0</span>
+                                <span class="text-xs font-bold text-teal-950">教師端全螢幕成績系統、統一發布考試、全班 6 大分數區段分析、缺考補考機制、最後座號管理與多元多格式匯出 (Word/Excel/PDF/HTML/CSV)</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-400">2026-10-02</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <span class="text-teal-500 font-bold shrink-0">✔</span>
+                                <span><b>📊 教師端全螢幕成績系統與統一出題發布</b>：在作業列表新增專屬【成績系統】入口，以全螢幕沈浸式展示。教師可一鍵發布 21 門學科考試（涵蓋各大領域）、設定測驗名稱與時間，並能指定缺考座號名單。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-teal-500 font-bold shrink-0">✔</span>
+                                <span><b>👥 班級最後座號流轉管理與【修改】連動</b>：初次進入教師端引導設定最後座號，新增作業時自動預設帶入，點擊新增作業旁紫色 <code>[修改]</code> 小字可即時調整並全班作業同步套用，亦可在班級管理隨時編輯。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-teal-500 font-bold shrink-0">✔</span>
+                                <span><b>📝 待填寫分數與測驗紀錄詳細明細雙區塊</b>：學生端改為響應教師發布之考試，在【待填寫分數】登記成績、訂正情形與備註後自動歸檔至【測驗紀錄詳細明細】，缺考座號學生填寫後自動標註「補考」。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-teal-500 font-bold shrink-0">✔</span>
+                                <span><b>🕒 分數修改歷史追蹤與教師改分後門</b>：若分數被重新編輯，教師端、學生端與家長端皆會以小字備註最後修改時間及原分數（如：<code>最後修改：2026/10/02 18:30 (原分數: 85分)</code>）；教師可直接在後台修改學生分數。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-teal-500 font-bold shrink-0">✔</span>
+                                <span><b>📈 全班 6 大分數區段分析 (100, 90~99, 80~89, 70~79, 60~69, <60)</b>：點擊任一考試方格即可展開全班級距長條圖與人數比例，並高亮顯示學生本人落點區間。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-teal-500 font-bold shrink-0">✔</span>
+                                <span><b>✅ 聯絡簿完成打勾與選單即時未完成計數</b>：學生端可在聯絡簿勾選已完成作業，上方選單即時動態呈現未完成作業數量（例如：<code>聯絡簿 (3)</code>）。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-teal-500 font-bold shrink-0">✔</span>
+                                <span><b>📥 多元格式一鍵匯出 (Word, Excel, PDF, HTML, CSV)</b>：教師端支援選擇時間範圍與科目複選，一鍵匯出精美排版之成績報表。</span>
+                            </li>
+                        </ul>
+                    </div>
+
                     <!-- v4.0.0 最新發布 -->
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-emerald-50/80 via-teal-50/50 to-indigo-50/30 border border-emerald-200/90 shadow-xs relative">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
@@ -3349,6 +3434,341 @@
 <script src="js/lib/qrcode.min.js"></script>
 <script src="js/lib/html5-qrcode.min.js"></script>
 <script type="module" src="js/app.js?v=3.8.2"></script>
+
+    <!-- ============================================================== -->
+    <!-- 📊 全螢幕班級成績與測驗管理系統 (Fullscreen Exam Scores System)   -->
+    <!-- ============================================================== -->
+    <div id="exam-scores-fullscreen-view" class="fixed inset-0 z-[120] bg-slate-900/60 backdrop-blur-md hidden flex-col transition-all duration-300">
+        <div class="w-full h-full bg-[#f8fafc] flex flex-col overflow-hidden text-slate-800">
+            <!-- 頂部功能列 (Header) -->
+            <header class="bg-white border-b border-slate-200/90 px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 shrink-0 shadow-xs">
+                <div class="flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-teal-500 to-emerald-600 text-white flex items-center justify-center text-lg shadow-md shadow-teal-500/20 shrink-0">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight">班級成績與小考管理系統</h2>
+                            <span id="scores-view-class-badge" class="px-2.5 py-0.5 rounded-full text-xs font-black bg-teal-50 text-teal-700 border border-teal-200">班級</span>
+                        </div>
+                        <p class="text-xs text-slate-400 font-medium hidden sm:block">教師統一發布考試、學生端填寫分數、缺考補考標記與多格式一鍵匯出</p>
+                    </div>
+                </div>
+
+                <!-- 功能按鈕組 -->
+                <div class="flex items-center gap-2 flex-wrap">
+                    <!-- 1. 新增考試 -->
+                    <button type="button" id="btn-create-exam" class="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-extrabold text-xs sm:text-sm py-2 px-3.5 sm:px-4 rounded-xl shadow-md shadow-teal-600/20 transition-all flex items-center gap-1.5 cursor-pointer">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>新增考試</span>
+                    </button>
+
+                    <!-- 2. 學生端直達連結 -->
+                    <button type="button" id="btn-copy-student-link-from-scores" class="bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 font-bold text-xs sm:text-sm py-2 px-3 sm:px-3.5 rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer" title="複製此班級專屬學生端數位聯絡簿連結">
+                        <i class="fa-solid fa-graduation-cap text-sky-600"></i>
+                        <span>學生端直達連結</span>
+                    </button>
+
+                    <!-- 3. PIN 碼設定 -->
+                    <button type="button" id="btn-open-pins-from-scores" class="bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-bold text-xs sm:text-sm py-2 px-3 sm:px-3.5 rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer" title="設定與管理學生 6 位數成績專屬 PIN 碼">
+                        <i class="fa-solid fa-key text-amber-600"></i>
+                        <span>PIN碼設定</span>
+                    </button>
+
+                    <!-- 4. 匯出成績 -->
+                    <button type="button" id="btn-open-export-modal" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold text-xs sm:text-sm py-2 px-3 sm:px-3.5 rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer" title="一鍵匯出成績 (Word, HTML, PDF, Excel, CSV)">
+                        <i class="fa-solid fa-file-export text-indigo-600"></i>
+                        <span>匯出成績</span>
+                    </button>
+
+                    <!-- 5. 關閉全螢幕 -->
+                    <button type="button" id="btn-close-exam-scores-view" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors cursor-pointer ml-1" title="返回作業列表">
+                        <i class="fa-solid fa-xmark text-base"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 主體區域 (雙欄：左側考試清單，右側全班成績矩陣) -->
+            <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+                <!-- 左欄：已發布考試清單 (360px) -->
+                <div class="w-full lg:w-96 bg-white border-r border-slate-200/90 flex flex-col shrink-0 overflow-hidden">
+                    <div class="p-3.5 border-b border-slate-100 flex items-center justify-between gap-2">
+                        <div class="text-xs font-black text-slate-700 flex items-center gap-1.5">
+                            <i class="fa-solid fa-layer-group text-teal-600"></i>
+                            <span>已發布考試清單</span>
+                            <span id="scores-exam-count-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">0</span>
+                        </div>
+                        <select id="filter-exam-subject" class="text-xs py-1 px-2 rounded-lg border border-slate-200 bg-slate-50 font-bold text-slate-600">
+                            <option value="all">所有學科</option>
+                        </select>
+                    </div>
+                    <div id="scores-exam-list" class="flex-1 overflow-y-auto p-3 space-y-2.5 custom-scrollbar">
+                        <!-- JS 動態生成考試卡片 -->
+                    </div>
+                </div>
+
+                <!-- 右欄：全班學生成績詳情與修改 (自適應剩餘寬度) -->
+                <div class="flex-1 flex flex-col overflow-hidden bg-slate-50/50">
+                    <!-- 選中考試之頂部資訊列 (卡片摘要與全班 6 大區段即時視覺化) -->
+                    <div id="selected-exam-header-container" class="bg-white border-b border-slate-200/90 p-4 sm:p-5 shrink-0 space-y-3">
+                        <!-- JS 動態生成當前測驗之六大分數區段長條圖與填寫率 -->
+                    </div>
+
+                    <!-- 學生填寫成績表格 -->
+                    <div class="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar">
+                        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-50/80 border-b border-slate-200/80 text-xs font-black text-slate-500 uppercase tracking-wider">
+                                            <th class="py-3 px-4 w-16 text-center">座號</th>
+                                            <th class="py-3 px-4 w-28 text-center">填寫狀態</th>
+                                            <th class="py-3 px-4 w-36 text-center">測驗分數</th>
+                                            <th class="py-3 px-4 w-36 text-center">訂正情形</th>
+                                            <th class="py-3 px-4 min-w-[200px]">備註 / 錯題檢討</th>
+                                            <th class="py-3 px-4 w-28 text-center">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="scores-students-tbody" class="divide-y divide-slate-100">
+                                        <!-- JS 動態生成各座號成績行 -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📝 新增 / 編輯考試彈窗 (Exam Editor Modal) -->
+    <div id="modal-exam-editor" class="fixed inset-0 z-[130] bg-slate-900/60 backdrop-blur-md hidden flex items-center justify-center p-4 modal transition-all duration-300">
+        <div class="relative w-full max-w-xl bg-white rounded-3xl p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-4 max-h-[92vh] overflow-y-auto custom-scrollbar">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-9 h-9 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center text-lg border border-teal-100">
+                        <i class="fa-solid fa-pen-nib"></i>
+                    </span>
+                    <h3 id="exam-editor-title" class="text-lg font-black text-slate-900">新增考試</h3>
+                </div>
+                <button type="button" id="close-exam-editor-btn" class="text-slate-400 hover:text-slate-600 text-lg p-1.5 rounded-full hover:bg-slate-100 transition-colors cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="form-exam-editor" class="space-y-4">
+                <input type="hidden" id="exam-edit-id" value="">
+
+                <!-- 1. 測驗科目 (六大領域，21門學科) -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1.5 flex items-center justify-between">
+                        <span>測驗科目（臺灣課綱六大領域 21 門學科）</span>
+                        <span id="exam-selected-subject-badge" class="text-xs font-extrabold text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-md border border-teal-200">國語文</span>
+                    </label>
+                    <input type="hidden" id="exam-subject-input" value="國語文">
+                    <div class="space-y-2 border border-slate-200 rounded-2xl p-3 bg-slate-50/60 max-h-48 overflow-y-auto custom-scrollbar" id="exam-subject-picker-container">
+                        <!-- 由 JS 動態生成 6 大領域及 21 門按鈕 -->
+                    </div>
+                </div>
+
+                <!-- 2. 考試名稱 (內容) -->
+                <div>
+                    <label for="exam-name-input" class="block text-xs font-bold text-slate-600 mb-1.5">考試名稱（單元 / 內容）</label>
+                    <input type="text" id="exam-name-input" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white text-sm font-bold focus:outline-none focus:ring-2 focus:ring-teal-500" required placeholder="例如：第1單元數的運算隨堂小考">
+                </div>
+
+                <!-- 3. 測驗時間 -->
+                <div>
+                    <label for="exam-date-input" class="block text-xs font-bold text-slate-600 mb-1.5">測驗時間（預設今日）</label>
+                    <input type="date" id="exam-date-input" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white text-sm font-bold focus:outline-none focus:ring-2 focus:ring-teal-500" required>
+                </div>
+
+                <!-- 4. 缺考座號 -->
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label for="exam-missing-seats-input" class="block text-xs font-bold text-slate-600">缺考座號（預設無，選填）</label>
+                        <span class="text-[11px] text-amber-600 font-bold">填寫分數時將自動標註「補考」</span>
+                    </div>
+                    <input type="text" id="exam-missing-seats-input" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white text-sm font-mono font-bold focus:outline-none focus:ring-2 focus:ring-teal-500" placeholder="例如：5, 12, 18-20 (可用下方按鈕快速點選)">
+                    <div class="mt-2 p-2 rounded-xl bg-slate-100/70 border border-slate-200 flex flex-wrap gap-1 max-h-24 overflow-y-auto custom-scrollbar" id="exam-missing-seats-chips">
+                        <!-- JS 依目前班級座號生成 1..maxSeat 點選按鈕 -->
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2.5 pt-3 border-t border-slate-100">
+                    <button type="button" id="cancel-exam-editor-btn" class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition-colors cursor-pointer">取消</button>
+                    <button type="submit" id="save-exam-btn" class="px-6 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-xs shadow-md shadow-teal-600/20 transition-all cursor-pointer">儲存發布考試</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ✏️ 教師修改學生分數彈窗 (Teacher Edit Student Score Modal) -->
+    <div id="modal-teacher-edit-score" class="fixed inset-0 z-[140] bg-slate-900/60 backdrop-blur-md hidden flex items-center justify-center p-4 modal transition-all duration-300">
+        <div class="relative w-full max-w-md bg-white rounded-3xl p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-9 h-9 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg border border-indigo-100">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </span>
+                    <h3 class="text-lg font-black text-slate-900">修改學生分數</h3>
+                </div>
+                <button type="button" id="close-teacher-edit-score-btn" class="text-slate-400 hover:text-slate-600 text-lg p-1.5 rounded-full hover:bg-slate-100 transition-colors cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="form-teacher-edit-score" class="space-y-4">
+                <input type="hidden" id="teacher-edit-exam-id" value="">
+                <input type="hidden" id="teacher-edit-seat" value="">
+
+                <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100 space-y-1 text-xs">
+                    <div><span class="text-slate-400 font-bold">學生座號：</span><b id="teacher-edit-seat-display" class="text-slate-800 font-extrabold">-- 號</b></div>
+                    <div><span class="text-slate-400 font-bold">測驗項目：</span><b id="teacher-edit-exam-name-display" class="text-slate-800 font-extrabold">--</b></div>
+                    <div id="teacher-edit-original-score-box" class="hidden text-amber-700 font-bold"></div>
+                </div>
+
+                <div>
+                    <label for="teacher-input-score" class="block text-xs font-bold text-slate-600 mb-1.5">修改後分數 (0 ~ 100)</label>
+                    <input type="number" id="teacher-input-score" min="0" max="100" class="w-full text-center text-2xl font-black py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500" required>
+                </div>
+
+                <div>
+                    <label for="teacher-select-correction" class="block text-xs font-bold text-slate-600 mb-1.5">訂正情形</label>
+                    <select id="teacher-select-correction" class="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold focus:bg-white">
+                        <option value="全對免訂正">✨ 全對免訂正</option>
+                        <option value="已完成訂正">✅ 已完成訂正</option>
+                        <option value="待訂正/需請教">✏️ 待訂正/需請教</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="teacher-input-remark" class="block text-xs font-bold text-slate-600 mb-1.5">教師備註 / 評語（選填）</label>
+                    <input type="text" id="teacher-input-remark" class="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold focus:bg-white" placeholder="例如：補考成績已核定">
+                </div>
+
+                <p class="text-[11px] text-slate-400 leading-snug">
+                    ※ 修改後，教師端、學生端與家長端皆會以小字標註最後修改時間及原分數。
+                </p>
+
+                <div class="flex justify-end gap-2.5 pt-3 border-t border-slate-100">
+                    <button type="button" id="cancel-teacher-edit-score-btn" class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition-colors cursor-pointer">取消</button>
+                    <button type="submit" id="save-teacher-edit-score-btn" class="px-6 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-xs shadow-md shadow-teal-600/20 transition-all cursor-pointer">確定修改分數</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 📥 成績多格式匯出精靈 (Export Scores Modal) -->
+    <div id="modal-export-scores" class="fixed inset-0 z-[140] bg-slate-900/60 backdrop-blur-md hidden flex items-center justify-center p-4 modal transition-all duration-300">
+        <div class="relative w-full max-w-lg bg-white rounded-3xl p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-4 max-h-[92vh] overflow-y-auto custom-scrollbar">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-9 h-9 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg border border-indigo-100">
+                        <i class="fa-solid fa-file-export"></i>
+                    </span>
+                    <h3 class="text-lg font-black text-slate-900">匯出學生成績報表</h3>
+                </div>
+                <button type="button" id="close-export-scores-btn" class="text-slate-400 hover:text-slate-600 text-lg p-1.5 rounded-full hover:bg-slate-100 transition-colors cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <!-- 1. 選擇匯出格式 -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-2">1. 選擇匯出格式（單選）</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="export-format-selector">
+                        <button type="button" data-format="xlsx" class="export-fmt-btn p-3 rounded-2xl border-2 border-teal-500 bg-teal-50/70 text-teal-800 text-center transition-all cursor-pointer">
+                            <i class="fa-solid fa-file-excel text-xl text-teal-600 block mb-1"></i>
+                            <span class="text-xs font-black">Excel (.xlsx)</span>
+                        </button>
+                        <button type="button" data-format="docx" class="export-fmt-btn p-3 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-center transition-all cursor-pointer">
+                            <i class="fa-solid fa-file-word text-xl text-blue-600 block mb-1"></i>
+                            <span class="text-xs font-black">Word (.docx)</span>
+                        </button>
+                        <button type="button" data-format="pdf" class="export-fmt-btn p-3 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-center transition-all cursor-pointer">
+                            <i class="fa-solid fa-file-pdf text-xl text-rose-600 block mb-1"></i>
+                            <span class="text-xs font-black">PDF 報表 (.pdf)</span>
+                        </button>
+                        <button type="button" data-format="html" class="export-fmt-btn p-3 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-center transition-all cursor-pointer">
+                            <i class="fa-solid fa-globe text-xl text-amber-600 block mb-1"></i>
+                            <span class="text-xs font-black">網頁報表 (.html)</span>
+                        </button>
+                        <button type="button" data-format="csv" class="export-fmt-btn p-3 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-center transition-all cursor-pointer">
+                            <i class="fa-solid fa-file-csv text-xl text-emerald-600 block mb-1"></i>
+                            <span class="text-xs font-black">CSV 文字檔 (.csv)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. 選擇時間範圍 -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1.5">2. 選擇測驗時間範圍</label>
+                    <div class="flex flex-wrap gap-1.5 mb-2" id="export-time-quick-btns">
+                        <button type="button" data-range="all" class="time-range-btn px-3 py-1.5 rounded-xl border border-teal-500 bg-teal-50 text-teal-800 text-xs font-bold cursor-pointer">全部時間</button>
+                        <button type="button" data-range="today" class="time-range-btn px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-bold cursor-pointer">今日</button>
+                        <button type="button" data-range="week" class="time-range-btn px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-bold cursor-pointer">本週 (7天)</button>
+                        <button type="button" data-range="month" class="time-range-btn px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-bold cursor-pointer">本月 (30天)</button>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs">
+                        <input type="date" id="export-date-start" class="flex-1 py-2 px-3 rounded-xl border border-slate-200 bg-slate-50 font-bold">
+                        <span class="text-slate-400">至</span>
+                        <input type="date" id="export-date-end" class="flex-1 py-2 px-3 rounded-xl border border-slate-200 bg-slate-50 font-bold">
+                    </div>
+                </div>
+
+                <!-- 3. 選擇科目 (可複選) -->
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="block text-xs font-bold text-slate-600">3. 選擇匯出科目（可複選）</label>
+                        <div class="flex items-center gap-2">
+                            <button type="button" id="btn-export-select-all-subs" class="text-xs font-bold text-indigo-600 hover:underline cursor-pointer">全選</button>
+                            <span class="text-slate-300">|</span>
+                            <button type="button" id="btn-export-clear-subs" class="text-xs font-bold text-slate-400 hover:underline cursor-pointer">清空</button>
+                        </div>
+                    </div>
+                    <div id="export-subjects-checklist" class="p-2.5 rounded-2xl border border-slate-200 bg-slate-50 max-h-36 overflow-y-auto custom-scrollbar grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                        <!-- 由 JS 動態生成 21 門科目核取方塊 -->
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2.5 pt-3 border-t border-slate-100">
+                    <button type="button" id="cancel-export-scores-btn" class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition-colors cursor-pointer">取消</button>
+                    <button type="button" id="btn-confirm-export-scores" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-teal-600 to-indigo-600 hover:from-teal-700 hover:to-indigo-700 text-white font-extrabold text-xs shadow-md shadow-teal-600/20 transition-all flex items-center gap-1.5 cursor-pointer">
+                        <i class="fa-solid fa-download"></i>
+                        <span>一鍵匯出下載</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🏫 初次/快速修改班級最後座號彈窗 (Max Seat Setup Modal) -->
+    <div id="initial-max-seat-modal" class="fixed inset-0 z-[150] bg-slate-900/60 backdrop-blur-md hidden flex items-center justify-center p-4 modal transition-all duration-300">
+        <div class="relative w-full max-w-sm bg-white rounded-3xl p-6 sm:p-7 shadow-2xl border border-slate-200 text-center space-y-4">
+            <button type="button" id="btn-close-initial-max-seat" class="hidden absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-colors cursor-pointer">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+            <div class="w-14 h-14 rounded-3xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl mx-auto border border-indigo-100 shadow-xs">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <div>
+                <h3 id="max-seat-modal-title" class="text-xl font-black text-slate-900">歡迎！請先設定班級最後座號</h3>
+                <p id="max-seat-modal-desc" class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    請輸入目前班級的最後座號（學生總人數）。設定後，新增作業與發布小考將以此作為預設號碼，之後可隨時在班級管理或新增作業時修改。
+                </p>
+            </div>
+            <div class="max-w-[180px] mx-auto">
+                <label for="initial-max-seat-input" class="block text-xs font-bold text-slate-400 mb-1">班級最後座號</label>
+                <input type="number" id="initial-max-seat-input" min="1" max="100" value="30" class="w-full text-center text-3xl font-black py-2.5 px-3 rounded-2xl border-2 border-indigo-200 bg-indigo-50/50 focus:bg-white focus:outline-none focus:border-indigo-600 text-indigo-900">
+            </div>
+            <button type="button" id="btn-save-initial-max-seat" class="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm shadow-md shadow-indigo-600/20 transition-all cursor-pointer">
+                確認並完成設定
+            </button>
+        </div>
+    </div>
+
 </body>
 </html>
 

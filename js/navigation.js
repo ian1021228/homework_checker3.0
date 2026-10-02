@@ -15,6 +15,7 @@ import {
     updateGuestHomeBtnVisibility,
     isStudentCompleted 
 } from './render.js';
+import { checkInitialMaxSeatSetup } from './examScores.js';
 
 export function applyCheckMode(mode) {
     state.currentCheckMode = mode;
@@ -183,6 +184,7 @@ export function showMainPage(fromHistory = false) {
     if (detailPage) detailPage.dataset.from = ''; 
     restoreScroll('main-page');
     updateMobileNavVisibility('main');
+    checkInitialMaxSeatSetup();
 }
 
 export function showDetailPage(homeworkId, fromHistory = false) {

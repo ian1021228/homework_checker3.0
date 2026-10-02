@@ -107,7 +107,15 @@ import {
     showWelcomeStep2
 , fullRender } from './navigation.js';
 
+import {
+    setupExamScoresEvents,
+    updateClassMaxSeat,
+    checkInitialMaxSeatSetup
+} from './examScores.js';
+
 export function setupButtonEvents() {
+    setupExamScoresEvents();
+
     // 訪客體驗懸浮回首頁
     bindClick('guest-home-btn', () => {
         showPortalPage(false);
@@ -2134,10 +2142,12 @@ export function setupButtonEvents() {
                 id: generateId(), 
                 name: className, 
                 accessCode: accessCode,
+                lastMaxSeat: 30,
                 contactBook: {}, 
                 studentBarcodes: {} 
             }); 
             await saveData(); 
+            await syncDataToCloud();
             if (nameInput) nameInput.value = ''; 
             if (codeInput) codeInput.value = '';
             renderClassSelector(); 
@@ -2253,6 +2263,7 @@ export function setupButtonEvents() {
                         }
                     }
                     await saveData();
+                    await syncDataToCloud();
                     renderClassSelector();
                     renderClassList();
                     renderHomeworkList();
@@ -2292,9 +2303,28 @@ export function setupButtonEvents() {
                         }
                         cls.accessCode = newCode;
                         await saveData();
+                        await syncDataToCloud();
                         renderClassList();
                         showToast(newCode ? `已設定「${cls.name}」權限碼：${newCode}` : `已清除「${cls.name}」權限碼`, "success");
                     }
+                }
+                return;
+            }
+
+            const saveMaxSeatBtn = e.target.closest('.save-class-max-seat-btn');
+            if (saveMaxSeatBtn) {
+                e.stopPropagation();
+                const classId = saveMaxSeatBtn.dataset.classId;
+                const input = classListEl.querySelector(`.class-max-seat-input[data-class-id="${classId}"]`);
+                if (input) {
+                    const val = parseInt(input.value, 10);
+                    if (!val || val < 1 || val > 100) {
+                        showToast("請輸入 1 至 100 之間的有效座號！", "warning");
+                        return;
+                    }
+                    await updateClassMaxSeat(classId, val);
+                    renderClassList();
+                    showToast(`已成功更新最後座號為 ${val} 號，並同步套用至全班作業！`, "success");
                 }
                 return;
             }
@@ -2392,6 +2422,7 @@ export function setupButtonEvents() {
                     cls.name = newName;
 
                     await saveData();
+                    await syncDataToCloud();
                     renderClassSelector();
                     renderClassList();
                     renderHomeworkList();
@@ -2445,6 +2476,7 @@ export function setupButtonEvents() {
                     }
                     cls.accessCode = newCode;
                     await saveData();
+                    await syncDataToCloud();
                     renderClassList();
                     showToast(newCode ? `已設定「${cls.name}」權限碼：${newCode}` : `已清除「${cls.name}」權限碼`, "success");
                 }
@@ -2466,10 +2498,11 @@ export function setupButtonEvents() {
         cls.studentPins = cls.studentPins || {};
 
         let enabledCount = 0;
+        const baseCode = String(cls.accessCode || '').trim();
 
         for (let seat = 1; seat <= maxSeat; seat++) {
             const pin = cls.studentPins[seat] || '';
-            const isEnabled = Boolean(pin && String(pin).trim().length === 6);
+            const isEnabled = Boolean(pin && String(pin).trim().length > 0);
             if (isEnabled) enabledCount++;
 
             const row = document.createElement('div');
@@ -2497,11 +2530,11 @@ export function setupButtonEvents() {
                 <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                     <div class="flex items-center gap-1 bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-500/20 shadow-2xs">
                         <span class="text-[10px] font-bold text-slate-400">PIN:</span>
-                        <input type="text" maxlength="6" inputmode="numeric" data-seat="${seat}" class="student-pin-input font-mono font-black text-xs text-amber-900 tracking-widest w-20 bg-transparent focus:outline-none" placeholder="未設定" value="${pin}">
+                        <input type="text" maxlength="32" data-seat="${seat}" class="student-pin-input font-mono font-black text-xs text-amber-900 tracking-wider w-28 bg-transparent focus:outline-none uppercase" placeholder="未設定" value="${pin}">
                     </div>
-                    <button type="button" data-seat="${seat}" class="btn-reset-seat-pin px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer" title="一鍵重設此座號 6 位數密碼">
+                    <button type="button" data-seat="${seat}" class="btn-reset-seat-pin px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer" title="一鍵重設此座號預設密碼（班級代碼+座號）">
                         <i class="fa-solid fa-arrows-rotate text-[10px]"></i>
-                        <span>一鍵重設</span>
+                        <span>預設重設</span>
                     </button>
                     ${isEnabled ? `
                         <button type="button" data-seat="${seat}" class="btn-disable-seat-pin px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition-colors cursor-pointer" title="關閉開通">
@@ -2549,17 +2582,18 @@ export function setupButtonEvents() {
             closeModal(studentPinsModal);
         });
 
-        // Batch action: Enable all pins (100000 + seat)
+        // Batch action: Enable all pins (classCode + seat)
         document.getElementById('btn-batch-enable-pins')?.addEventListener('click', () => {
             const cls = state.appData.classes.find(c => c.id === currentEditingPinsClassId);
             if (!cls) return;
             const maxSeat = typeof cls.lastMaxSeat === 'number' && cls.lastMaxSeat > 0 ? cls.lastMaxSeat : 30;
+            const code = String(cls.accessCode || '').trim();
             cls.studentPins = cls.studentPins || {};
             for (let s = 1; s <= maxSeat; s++) {
-                cls.studentPins[s] = String(100000 + s);
+                cls.studentPins[s] = `${code}${s}`;
             }
             renderStudentPinsList(cls);
-            showToast("已為全班生成 6 位數預設 PIN 碼，請點擊「儲存並同步至雲端」！", "info");
+            showToast(`已為全班生成預設 PIN 碼（${code || '班級代碼'} + 座號），請點擊「儲存並同步至雲端」！`, "info");
         });
 
         // Batch action: Random pins for all
@@ -2572,7 +2606,7 @@ export function setupButtonEvents() {
                 cls.studentPins[s] = String(Math.floor(100000 + Math.random() * 900000));
             }
             renderStudentPinsList(cls);
-            showToast("已隨機生成全班 6 位數 PIN 碼，請點擊「儲存並同步至雲端」！", "info");
+            showToast("已隨機生成全班 PIN 碼，請點擊「儲存並同步至雲端」！", "info");
         });
 
         // Batch action: Clear all
@@ -2589,13 +2623,14 @@ export function setupButtonEvents() {
             const cls = state.appData.classes.find(c => c.id === currentEditingPinsClassId);
             if (!cls) return;
             const maxSeat = typeof cls.lastMaxSeat === 'number' && cls.lastMaxSeat > 0 ? cls.lastMaxSeat : 30;
+            const code = String(cls.accessCode || '').trim();
             cls.studentPins = cls.studentPins || {};
-            let rosterText = `【${cls.name}】學生個人專屬 6 位數成績密碼表：\n班級代碼：${cls.accessCode || '未設定'}\n------------------------------------\n`;
+            let rosterText = `【${cls.name}】學生個人專屬成績 PIN 碼表：\n班級代碼：${code || '未設定'}\n------------------------------------\n`;
             for (let s = 1; s <= maxSeat; s++) {
-                const p = cls.studentPins[s] || "（未開通）";
+                const p = cls.studentPins[s] || `${code}${s}`;
                 rosterText += `座號 ${String(s).padStart(2, ' ')} 號：${p}\n`;
             }
-            rosterText += `------------------------------------\n※ 學生與家長登入後，輸入專屬 6 位數密碼即可解鎖成績系統。\n※ 學生手機在首次輸入驗證成功後將自動記憶憑證，日後免密直開！`;
+            rosterText += `------------------------------------\n※ 預設密碼為【班級代碼 + 座號】（學生與家長共用相同 PIN 碼解鎖成績系統）。\n※ 學生手機在首次輸入驗證成功後將自動記憶憑證，日後免密直開！`;
             await safeCopyToClipboard(rosterText, "✅ 已複製全班密碼對照表至剪貼簿！");
         });
 
@@ -2605,12 +2640,13 @@ export function setupButtonEvents() {
             pinsListContainer.addEventListener('click', (e) => {
                 const cls = state.appData.classes.find(c => c.id === currentEditingPinsClassId);
                 if (!cls) return;
+                const code = String(cls.accessCode || '').trim();
                 cls.studentPins = cls.studentPins || {};
 
                 const resetBtn = e.target.closest('.btn-reset-seat-pin');
                 if (resetBtn) {
                     const seat = resetBtn.dataset.seat;
-                    const newPin = String(100000 + Number(seat));
+                    const newPin = `${code}${seat}`;
                     cls.studentPins[seat] = newPin;
                     renderStudentPinsList(cls);
                     showToast(`已重設 ${seat} 號密碼為：${newPin}（請點擊儲存並同步）`, "info");
@@ -2629,7 +2665,7 @@ export function setupButtonEvents() {
                 const enableBtn = e.target.closest('.btn-enable-seat-pin');
                 if (enableBtn) {
                     const seat = enableBtn.dataset.seat;
-                    cls.studentPins[seat] = String(100000 + Number(seat));
+                    cls.studentPins[seat] = `${code}${seat}`;
                     renderStudentPinsList(cls);
                     showToast(`已為 ${seat} 號開通專屬密碼：${cls.studentPins[seat]}`, "info");
                     return;
@@ -2639,13 +2675,13 @@ export function setupButtonEvents() {
             pinsListContainer.addEventListener('input', (e) => {
                 if (e.target.classList.contains('student-pin-input')) {
                     const seat = e.target.dataset.seat;
-                    const val = e.target.value.trim();
+                    const val = e.target.value.trim().toUpperCase();
                     const cls = state.appData.classes.find(c => c.id === currentEditingPinsClassId);
                     if (cls) {
                         cls.studentPins = cls.studentPins || {};
-                        if (val.length === 6 && /^\d{6}$/.test(val)) {
+                        if (val) {
                             cls.studentPins[seat] = val;
-                        } else if (!val) {
+                        } else {
                             delete cls.studentPins[seat];
                         }
                     }
@@ -2663,10 +2699,10 @@ export function setupButtonEvents() {
             cls.studentPins = cls.studentPins || {};
             inputs.forEach(inp => {
                 const seat = inp.dataset.seat;
-                const val = inp.value.trim();
-                if (val && /^\d{6}$/.test(val)) {
+                const val = inp.value.trim().toUpperCase();
+                if (val) {
                     cls.studentPins[seat] = val;
-                } else if (!val) {
+                } else {
                     delete cls.studentPins[seat];
                 }
             });

@@ -122,6 +122,11 @@ export function renderClassList() {
                 </div>
                 <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
                     <div class="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 focus-within:border-indigo-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider whitespace-nowrap">座號人數</span>
+                        <input type="number" min="1" max="100" data-class-id="${c.id}" class="class-max-seat-input w-12 bg-transparent text-xs font-mono font-black text-indigo-700 focus:outline-none text-center" value="${c.lastMaxSeat || 30}">
+                        <button type="button" data-class-id="${c.id}" class="save-class-max-seat-btn text-xs font-bold text-indigo-600 hover:text-indigo-800 px-1.5 py-0.5 rounded hover:bg-indigo-50 transition-colors whitespace-nowrap" title="儲存最後座號">儲存</button>
+                    </div>
+                    <div class="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 focus-within:border-indigo-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
                         <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider whitespace-nowrap">權限碼</span>
                         <input type="text" data-class-id="${c.id}" class="class-code-input w-24 sm:w-28 bg-transparent text-xs font-mono font-black text-indigo-700 focus:outline-none uppercase" placeholder="未設定" value="${code}" maxlength="16">
                         <button type="button" data-class-id="${c.id}" class="save-class-code-btn text-xs font-bold text-indigo-600 hover:text-indigo-800 px-1.5 py-0.5 rounded hover:bg-indigo-50 transition-colors whitespace-nowrap" title="儲存權限碼">儲存</button>

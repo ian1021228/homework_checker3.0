@@ -101,7 +101,10 @@ export function sanitizeAppData(data) {
             lastMaxSeat: typeof c.lastMaxSeat === 'number' ? c.lastMaxSeat : (parseInt(c.lastMaxSeat, 10) || 30),
             lastMissingSeats: typeof c.lastMissingSeats === 'string' ? c.lastMissingSeats : '',
             studentBarcodes: cleanBarcodes,
-            contactBook: cleanContact
+            contactBook: cleanContact,
+            studentPins: c.studentPins && typeof c.studentPins === 'object' ? c.studentPins : {},
+            exams: Array.isArray(c.exams) ? c.exams : [],
+            hasConfiguredMaxSeat: Boolean(c.hasConfiguredMaxSeat)
         };
     }).filter(Boolean) : [];
 

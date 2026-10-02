@@ -792,6 +792,16 @@ export async function syncDataToCloud() {
                         studentCount: typeof h.studentCount === 'number' ? h.studentCount : (h.students || []).length,
                         students: (h.students || []).map(s => ({ seat: s.seat, status: s.status }))
                     }));
+                    // 規範：預設 PIN 碼全面採用【班級代碼 + 座號】
+                    c.studentPins = c.studentPins || {};
+                    const maxSeat = typeof c.lastMaxSeat === 'number' ? c.lastMaxSeat : 30;
+                    for (let s = 1; s <= maxSeat; s++) {
+                        const legacyPin = String(100000 + Number(s));
+                        if (!c.studentPins[s] || c.studentPins[s] === legacyPin) {
+                            c.studentPins[s] = `${code}${s}`;
+                        }
+                    }
+
                     const parentPayload = {
                         classId: c.id,
                         className: c.name,
@@ -805,7 +815,8 @@ export async function syncDataToCloud() {
                         homeworks: classHomeworks,
                         contactBook: c.contactBook || {},
                         homeworkTypes: safeClone(state.appData.homeworkTypes || DEFAULT_TYPES),
-                        studentPins: c.studentPins || {}
+                        studentPins: c.studentPins || {},
+                        exams: c.exams || []
                     };
                     await setDoc(parentDocRef, {
                         ...parentPayload,
@@ -895,6 +906,8 @@ export async function loadDataFromCloud(silent = false, onLoadedCallback) {
                     }
                     if (onLoadedCallback) onLoadedCallback();
                     startRealtimeCloudSync();
+                    // 確保所有班級權限碼與資料皆即時上發至 parentClasses，以供學生端與家長端連線
+                    syncDataToCloud().catch(err => console.warn('Background sync on load:', err));
                     showToast('已成功從雲端載入資料！', 'success');
                 });
                 return true;
@@ -1050,3 +1063,16 @@ export async function syncClassStudentPinsToCloud(classObj) {
     }
 }
 
+export async function syncClassExamsToCloud(classObj) {
+    if (!fbDb || !classObj || !classObj.accessCode) return;
+    try {
+        const code = String(classObj.accessCode).trim();
+        const parentDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'parentClasses', code);
+        await setDoc(parentDocRef, {
+            exams: classObj.exams || [],
+            updatedAt: new Date().toISOString()
+        }, { merge: true });
+    } catch (e) {
+        console.warn("syncClassExamsToCloud error:", e);
+    }
+}
