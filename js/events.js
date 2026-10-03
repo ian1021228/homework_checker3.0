@@ -88,6 +88,7 @@ import {
     updateDataManagementUI,
     updatePortalUI,
     isStudentCompleted,
+    renderAllDoneList,
     } from './render.js';
 
 import {
@@ -390,10 +391,64 @@ export function setupButtonEvents() {
     });
 
     // 8. 各子分頁返回按鈕
-    bindClick('back-to-main-btn', () => showMainPage());
-    bindClick('back-from-student-details-btn', () => showMainPage());
+    bindClick('back-to-main-btn', () => {
+        const detailPage = document.getElementById('detail-page');
+        if (detailPage && detailPage.dataset.from === 'student-details-page') {
+            detailPage.dataset.from = '';
+            showStudentDetailsPage();
+        } else {
+            showMainPage();
+        }
+    });
+    bindClick('back-from-student-details-btn', () => {
+        state.lastActiveStudentSeat = null;
+        showMainPage();
+    });
     bindClick('back-from-types-btn', () => showMainPage());
     bindClick('back-from-contact-book-btn', () => showMainPage());
+
+    // 檢視全勤學生名單按鈕（學生詳情統計頁）
+    bindClick('show-overall-all-done-btn', () => {
+        if (!state.currentClassId || state.appData.classes.length === 0) {
+            showAlertModal("提示", "請先建立或選擇班級！");
+            return;
+        }
+        const currentClass = state.appData.classes.find(c => c.id === state.currentClassId);
+        const filteredHomeworks = state.appData.homeworks.filter(hw => hw.classId === state.currentClassId);
+        
+        if (filteredHomeworks.length === 0) {
+            showAlertModal("提示", "目前此班級尚無登錄任何作業，無法統計全勤名單。");
+            return;
+        }
+
+        const maxSeat = currentClass?.maxSeat || (state.appData.settings?.maxSeat || 35);
+        const missingSeats = new Set(currentClass?.missingSeats || []);
+
+        // 計算全勤學生：在目前班級的所有作業中，每一項都已完成且非缺號
+        const allDoneSeats = [];
+        for (let seat = 1; seat <= maxSeat; seat++) {
+            if (missingSeats.has(seat)) continue;
+            
+            const allCompleted = filteredHomeworks.every(hw => {
+                const student = (hw.students || []).find(s => s.seat === seat);
+                if (!student) return false;
+                const typeId = hw.typeId || 'default';
+                return isStudentCompleted(student, typeId);
+            });
+
+            if (allCompleted) {
+                allDoneSeats.push(seat);
+            }
+        }
+
+        renderAllDoneList(allDoneSeats, 'overall-all-done-list');
+        const descEl = document.getElementById('overall-all-done-desc');
+        if (descEl) {
+            descEl.textContent = `此處列出在當前班級的所有作業中，狀態皆為「已完成/已繳交」的學生（共 ${allDoneSeats.length} 位全勤）。`;
+        }
+        const modal = document.getElementById('overall-all-done-modal');
+        if (modal) openModal(modal);
+    });
 
     // 彈窗關閉
     bindClick('portal-modal-close-btn', () => closePortalAuthModal());
@@ -2043,6 +2098,32 @@ export function setupButtonEvents() {
         }
     });
 
+    // 檢視完成名單按鈕 (Detail Page)
+    bindClick('show-all-done-btn', () => {
+        const hw = state.appData.homeworks.find(h => h.id === state.currentHomeworkId);
+        if (!hw) {
+            showAlertModal("提示", "找不到目前作業資訊！");
+            return;
+        }
+        const currentClass = state.appData.classes.find(c => c.id === hw.classId);
+        const maxSeat = currentClass?.maxSeat || (state.appData.settings?.maxSeat || 35);
+        const missingSeats = new Set(currentClass?.missingSeats || []);
+        const typeId = hw.typeId || 'default';
+
+        const doneSeats = [];
+        for (let seat = 1; seat <= maxSeat; seat++) {
+            if (missingSeats.has(seat)) continue;
+            const student = (hw.students || []).find(s => s.seat === seat);
+            if (student && isStudentCompleted(student, typeId)) {
+                doneSeats.push(seat);
+            }
+        }
+
+        renderAllDoneList(doneSeats, 'all-done-list');
+        const modal = document.getElementById('all-done-modal');
+        if (modal) openModal(modal);
+    });
+
     // 批次狀態切換
     bindClick('batch-status-btn', async () => { 
         if (!state.currentHomeworkId) return; 
@@ -2793,7 +2874,20 @@ export function setupButtonEvents() {
     if (studentDetailsList) {
         studentDetailsList.addEventListener('click', (e) => { 
             if(e.target.classList.contains('homework-link')) { 
-                document.getElementById('detail-page').dataset.from = 'student-details-page'; 
+                const studentCard = e.target.closest('[data-seat]');
+                const seat = studentCard ? parseInt(studentCard.dataset.seat, 10) : null;
+                if (seat) {
+                    state.lastActiveStudentSeat = seat;
+                }
+                state.scrollPositions['student-details-page'] = window.scrollY || document.documentElement.scrollTop || 0;
+                const detailPage = document.getElementById('detail-page');
+                if (detailPage) {
+                    detailPage.dataset.from = 'student-details-page';
+                    const backBtn = document.getElementById('back-to-main-btn');
+                    if (backBtn) {
+                        backBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 返回學生詳情`;
+                    }
+                }
                 showDetailPage(e.target.dataset.id); 
             } 
         });

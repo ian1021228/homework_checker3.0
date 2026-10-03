@@ -13,6 +13,7 @@ export const state = {
     currentCheckMode: localStorage.getItem('checkMode') || null,
     currentPage: 'main-page',
     scrollPositions: {},
+    lastActiveStudentSeat: null,
     isSaving: false,
     saveTimeout: null,
     fileHandle: null,

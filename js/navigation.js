@@ -81,7 +81,7 @@ export function applyCheckMode(mode) {
     // 更新頂部導覽列標籤
     const topLabel = document.getElementById('top-check-mode-label');
     if (topLabel) {
-        const icon = mode === 'manual' ? '<i class="fa-solid fa-hand-pointer"></i>' : '<i class="fa-solid fa-barcode"></i>';
+        const icon = mode === 'manual' ? '<i class="fa-duotone fa-light fa-hand-back-point-up"></i>' : '<i class="fa-sharp-duotone fa-regular fa-scanner-gun"></i>';
         topLabel.innerHTML = `<span class="text-base">${icon}</span><span>點收方式</span>`;
     }
 }
@@ -106,7 +106,14 @@ export function hideAllPages() {
 
 export function restoreScroll(targetPageId) { 
     state.currentPage = targetPageId; 
-    window.scrollTo({ top: state.scrollPositions[targetPageId] || 0, behavior: 'auto' }); 
+    const savedY = state.scrollPositions[targetPageId] || 0;
+    window.scrollTo({ top: savedY, behavior: 'auto' }); 
+    requestAnimationFrame(() => {
+        window.scrollTo({ top: savedY, behavior: 'auto' });
+        setTimeout(() => {
+            window.scrollTo({ top: savedY, behavior: 'auto' });
+        }, 50);
+    });
     updateGuestHomeBtnVisibility();
 }
 
@@ -192,6 +199,13 @@ export function showDetailPage(homeworkId, fromHistory = false) {
     const detailPageEl = document.getElementById('detail-page'); 
     if (detailPageEl) detailPageEl.classList.remove('hidden');
     if (!fromHistory) pushPageState({ page: 'detail', id: homeworkId }, '#detail');
+
+    // 若非從學生詳情點入，維持返回按鈕文字為「返回作業列表」
+    const backBtn = document.getElementById('back-to-main-btn');
+    if (backBtn && (!detailPageEl || detailPageEl.dataset.from !== 'student-details-page')) {
+        backBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 返回作業列表`;
+    }
+
     renderStudentGrid(homeworkId); 
     restoreScroll('detail-page');
     updateMobileNavVisibility('detail');
@@ -206,6 +220,23 @@ export function showStudentDetailsPage(fromHistory = false) {
     renderStudentDetailsPage(); 
     restoreScroll('student-details-page');
     updateMobileNavVisibility('student-details');
+
+    if (state.lastActiveStudentSeat) {
+        const targetSeat = state.lastActiveStudentSeat;
+        setTimeout(() => {
+            const card = document.getElementById(`student-card-seat-${targetSeat}`);
+            if (card) {
+                const savedY = state.scrollPositions['student-details-page'] || 0;
+                if (!savedY) {
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                card.classList.add('ring-4', 'ring-indigo-400', 'ring-offset-2', 'transition-all');
+                setTimeout(() => {
+                    card.classList.remove('ring-4', 'ring-indigo-400', 'ring-offset-2');
+                }, 1800);
+            }
+        }, 80);
+    }
 }
 
 export function showContactBookPage(fromHistory = false) {

@@ -1568,8 +1568,8 @@
                 <!-- 模式切換按鈕 -->
                 <div class="flex bg-slate-100/80 p-1.5 gap-1.5 items-center">
                     <span class="text-xs font-bold text-slate-500 pl-2 hidden sm:inline whitespace-nowrap">點收方式：</span>
-                    <button id="mode-manual-btn" class="flex-1 py-2 px-4 rounded-xl font-bold text-sm glass-card shadow-sm border border-white/60 text-indigo-600 transition-all">手動點收</button>
-                    <button id="mode-scan-btn" class="flex-1 py-2 px-4 rounded-xl font-bold text-sm text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 border border-transparent transition-all">條碼掃描</button>
+                    <button id="mode-manual-btn" class="flex-1 py-2 px-4 rounded-xl font-bold text-sm glass-card shadow-sm border border-white/60 text-indigo-600 transition-all flex items-center justify-center gap-1.5 cursor-pointer"><i class="fa-duotone fa-light fa-hand-back-point-up"></i> 手動點收</button>
+                    <button id="mode-scan-btn" class="flex-1 py-2 px-4 rounded-xl font-bold text-sm text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 border border-transparent transition-all flex items-center justify-center gap-1.5 cursor-pointer"><i class="fa-sharp-duotone fa-regular fa-scanner-gun"></i> 掃描點收</button>
                 </div>
                 <!-- 掃描專屬設定區 (預設隱藏) -->
                 <div id="scan-mode-container" class="disable-on-admin-view hidden p-4 bg-indigo-50/30 flex-wrap items-center gap-3 border-t border-slate-100">
@@ -1620,7 +1620,7 @@
                  </div>
                 <div class="flex justify-between items-center flex-wrap gap-4 mt-2">
                     <h1 id="student-details-title" class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-500 to-indigo-600 animated-gradient-text tracking-tight drop-shadow-sm">學生詳情統計</h1>
-                    <button id="show-overall-all-done-btn" class="bg-gradient-to-r from-indigo-500 to-blue-600 text-white font-bold py-3.5 px-7 text-lg font-black rounded-3xl shadow-md shadow-indigo-500/10 hover:shadow-xl transition-all transform hover:-translate-y-0.5 whitespace-nowrap">
+                    <button id="show-overall-all-done-btn" class="bg-gradient-to-r from-indigo-500 to-blue-600 text-white font-bold py-3.5 px-7 text-lg font-black rounded-3xl shadow-md shadow-indigo-500/10 hover:shadow-xl transition-all transform hover:-translate-y-0.5 whitespace-nowrap cursor-pointer">
                         <i class="fa-solid fa-trophy mr-1 text-amber-500"></i> 檢視全勤學生名單
                     </button>
                 </div>
@@ -2001,10 +2001,10 @@
                    </p>
                    <div class="flex gap-2 relative z-10">
                        <button id="setting-mode-manual-btn" type="button" class="flex-1 py-2.5 px-3 rounded-xl font-black text-sm glass-card border border-white/60 text-slate-700 hover:bg-slate-50 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs">
-                           <span class="flex items-center gap-1.5"><i class="fa-solid fa-hand-pointer"></i> 手動點收</span>
+                           <span class="flex items-center gap-1.5"><i class="fa-duotone fa-light fa-hand-back-point-up"></i> 手動點收</span>
                        </button>
                        <button id="setting-mode-scan-btn" type="button" class="flex-1 py-2.5 px-3 rounded-xl font-black text-sm glass-card border border-white/60 text-slate-700 hover:bg-slate-50 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs">
-                           <span class="flex items-center gap-1.5"><i class="fa-solid fa-barcode"></i> 條碼掃描</span>
+                           <span class="flex items-center gap-1.5"><i class="fa-sharp-duotone fa-regular fa-scanner-gun"></i> 掃描點收</span>
                        </button>
                    </div>
                    <p class="text-[11px] text-indigo-600 mt-2.5 font-semibold relative z-10">提示：切換至手動點收將隱藏主頁上的條碼按鈕與輸入框，讓版面更清爽簡潔。</p>
@@ -2544,10 +2544,10 @@
     <div id="overall-all-done-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center p-4 hidden modal z-50">
         <div class="modal-content glass-card rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-lg transform scale-95 border border-slate-100">
             <h2 class="text-2xl font-extrabold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-600 drop-shadow-sm"><i class="fa-solid fa-trophy text-amber-500 mr-2"></i>全勤榮譽名單</h2>
-            <p class="text-sm text-slate-500 mb-6">此處列出在當前班級的所有作業中，狀態皆為「已完成/已繳交」的學生。</p>
+            <p id="overall-all-done-desc" class="text-sm text-slate-500 mb-6">此處列出在當前班級的所有作業中，狀態皆為「已完成/已繳交」的學生。</p>
             <div id="overall-all-done-list" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3 max-h-96 overflow-y-auto pr-1 custom-scrollbar"></div>
             <div class="flex justify-end pt-6 mt-5 border-t border-slate-100">
-                <button type="button" class="cancel-btn bg-slate-100 text-slate-600 font-bold py-2.5 px-6 text-sm rounded-xl hover:bg-slate-200 transition-colors">關閉</button>
+                <button type="button" class="cancel-btn bg-slate-100 text-slate-600 font-bold py-2.5 px-6 text-sm rounded-xl hover:bg-slate-200 transition-colors cursor-pointer">關閉</button>
             </div>
         </div>
     </div>
@@ -2918,6 +2918,18 @@
                             <li class="flex items-start gap-2">
                                 <i class="fa-solid fa-check text-emerald-500 shrink-0 mt-0.5"></i>
                                 <span><b>家長端新增「今日親師速報」每日摘要一覽卡片</b>：針對下班時間破碎的家長，於家長端首頁置頂提供「今日親師速報」卡片，一眼統整孩子今日作業完成進度、今日小考成績、今日聯絡事項則數與孩子今日心情，點擊卡片更可直接跳轉至各專屬分頁。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-emerald-500 shrink-0 mt-0.5"></i>
+                                <span><b>學生詳情與作業詳情無縫來回核對</b>：從學生詳情點進作業詳情後，頂部按鈕智慧切換為「返回學生詳情」，點擊後精準返回學生詳情頁面並自動捲動回原瀏覽位置與學生卡片，方便教師高速來回批次核對作業繳交狀況。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-emerald-500 shrink-0 mt-0.5"></i>
+                                <span><b>全勤榮譽名單與單一作業完成名單</b>：修復並啟用學生詳情統計頁面「檢視全勤學生名單」按鈕，一鍵即時統整全班在所有作業均完成繳交的榮譽名單；並同步支援作業詳情頁「檢視完成名單」。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-emerald-500 shrink-0 mt-0.5"></i>
+                                <span><b>點收方式專業圖標全面升級</b>：手動點收與掃描點收按鈕升級為專屬 FontAwesome Duotone 專業圖標（手動點收採用 <code>fa-hand-back-point-up</code>，掃描點收採用 <code>fa-scanner-gun</code>），操作辨識度倍增。</span>
                             </li>
                         </ul>
                     </div>

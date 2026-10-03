@@ -432,6 +432,8 @@ export function renderStudentDetailsPage() {
         hasIssues = true;
         const studentCard = document.createElement('div');
         studentCard.className = 'glass-card rounded-3xl shadow-sm border border-slate-200/60 p-6 sm:p-8 hover:shadow-md transition-all';
+        studentCard.dataset.seat = data.seat;
+        studentCard.id = `student-card-seat-${data.seat}`;
         const issuesHtml = data.issues.map(issue => `<span class="mr-2 inline-block bg-slate-50 border border-slate-200/40 rounded-xl px-3 py-1.5 mb-2 text-sm"><span class="homework-link font-black ${issue.colorClass} cursor-pointer hover:underline" data-id="${issue.hwId}">${issue.hwName}</span> <span class="text-xs font-bold opacity-50 ml-1">(${issue.statusText})</span></span>`).join('');
         studentCard.innerHTML = `
             <h3 class="text-xl font-black text-slate-800 flex justify-between items-center mb-4">
