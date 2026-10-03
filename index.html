@@ -1412,8 +1412,8 @@
                              <span>學生詳情</span>
                          </button>
                          
-                                                  <!-- 3.5 成績系統 -->
-                         <button id="exam-scores-system-btn" class="glass-card border border-teal-200/80 bg-teal-50/50 text-teal-700 hover:text-teal-800 font-black py-2.5 sm:py-3 px-4 sm:px-5 text-sm sm:text-base rounded-2xl shadow-xs hover:bg-teal-100/60 hover:border-teal-300 transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer" title="進入全螢幕成績系統（統一發布考試、全班成績、多元格式匯出）">
+                                                  <!-- 3.5 成績系統 (已依規範隱藏，保留按鈕結構與事件以利隨時復原) -->
+                         <button id="exam-scores-system-btn" class="glass-card hidden border border-teal-200/80 bg-teal-50/50 text-teal-700 hover:text-teal-800 font-black py-2.5 sm:py-3 px-4 sm:px-5 text-sm sm:text-base rounded-2xl shadow-xs hover:bg-teal-100/60 hover:border-teal-300 transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer" title="進入全螢幕成績系統（統一發布考試、全班成績、多元格式匯出）">
                              <i class="fa-solid fa-chart-line text-teal-600"></i>
                              <span>成績系統</span>
                          </button>
@@ -2349,7 +2349,7 @@
                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800">最新升級</span>
                 </div>
                 <p class="text-xs text-slate-600 mb-3 leading-relaxed">
-                    家長與學生輸入班級權限碼即可直達專屬系統。家長端具備學生端 4 位數 PIN 密碼隱私保護；學生端支援自主填寫小考成績與作業自我檢核。
+                    家長與學生輸入班級權限碼即可直達專屬系統。家長端具備學生端專屬 PIN 密碼隱私保護；學生端支援作業自主檢核與數位聯絡簿札記。
                 </p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <a id="goto-parent-dashboard-btn" href="https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/" target="_blank" rel="noopener noreferrer" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-3 text-xs rounded-xl shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer">
@@ -2885,11 +2885,32 @@
 
                 <!-- 版本歷程時間軸 -->
                 <div class="space-y-6">
-                    <!-- v3.5 最新發布 -->
+                    <!-- v3.5.2 最新優化 -->
+                    <div class="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/90 via-purple-50/60 to-pink-50/40 border-2 border-indigo-500 shadow-md relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs animate-pulse">v3.5.2 最新優化</span>
+                                <span class="text-xs font-bold text-indigo-950">成績系統功能模組化暫隱（具備一鍵無損還原機制）、介面淨化聚焦核心作業點收與黑板聯絡簿</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-400">2026-10-03</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-500 shrink-0 mt-0.5"></i>
+                                <span><b>成績系統功能模組化隱藏（確保隨時無損復原）</b>：因應使用需求，將教師端導覽列「成績系統」、學生端「小考成績」分頁及家長端「成績與學習分析」介面隱藏，所有底層邏輯與雲端資料 100% 完整保留，開關一鍵即可秒級還原。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-500 shrink-0 mt-0.5"></i>
+                                <span><b>親師端介面聚焦與版面自適應</b>：隱藏成績入口後，學生端與家長端分頁按鈕及速報卡片自動以等寬黃金比例呈現，使作業點收與黑板聯絡簿流程更加簡潔直覺。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- v3.5 發布 -->
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-emerald-50/90 via-teal-50/60 to-indigo-50/40 border-2 border-emerald-500 shadow-md relative">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                             <div class="flex items-center gap-2">
-                                <span class="px-3 py-1 rounded-full bg-emerald-600 text-white text-xs font-black uppercase tracking-wider shadow-xs animate-pulse">v3.5 最新發布</span>
+                                <span class="px-3 py-1 rounded-full bg-emerald-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v3.5 正式版</span>
                                 <span class="text-xs font-bold text-emerald-950">三端系統全面升級定名為「班級經營系統」、首頁初次拜訪自動呈現「給老師的話」心聲視窗、版本號全面統一為 v3.5</span>
                             </div>
                             <span class="text-xs font-mono font-bold text-slate-400">2026-10-03</span>
@@ -3994,7 +4015,7 @@
             </div>
             <p class="text-[11px] text-slate-500 font-medium text-left flex items-start gap-1.5">
                 <i class="fa-solid fa-lightbulb text-amber-500 mt-0.5 shrink-0"></i>
-                <span>說明：若班級中有轉出或無人使用的跳號，請以逗號分隔填寫（例如：5, 12），點收矩陣與成績系統將自動為您標記或排除。</span>
+                <span>說明：若班級中有轉出或無人使用的跳號，請以逗號分隔填寫（例如：5, 12），點收矩陣將自動為您標記或排除。</span>
             </p>
             <button type="button" id="btn-save-initial-max-seat" class="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm shadow-md shadow-indigo-600/20 transition-all cursor-pointer">
                 確認並完成設定
