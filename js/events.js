@@ -438,6 +438,47 @@ export function setupButtonEvents() {
         });
     }
 
+    // 第一次進入首頁彈出的專屬「給老師的話」視窗
+    const openLetterToTeacherModal = () => {
+        const modal = document.getElementById('letter-to-teacher-modal');
+        if (modal) openModal(modal);
+    };
+    const closeLetterToTeacherModal = () => {
+        const modal = document.getElementById('letter-to-teacher-modal');
+        if (modal) closeModal(modal);
+        try {
+            localStorage.setItem('has_seen_letter_to_teacher', 'true');
+        } catch (e) {
+            console.error('Error setting localStorage:', e);
+        }
+    };
+
+    bindClick('portal-nav-letter-btn', openLetterToTeacherModal);
+    bindClick('portal-footer-letter-btn', openLetterToTeacherModal);
+    bindClick('close-letter-modal-btn', closeLetterToTeacherModal);
+    bindClick('btn-know-letter', closeLetterToTeacherModal);
+
+    const letterModalEl = document.getElementById('letter-to-teacher-modal');
+    if (letterModalEl) {
+        letterModalEl.addEventListener('click', (e) => {
+            if (e.target === letterModalEl) closeLetterToTeacherModal();
+        });
+    }
+
+    // 初次拜訪首頁自動彈出「給老師的話」
+    try {
+        if (!localStorage.getItem('has_seen_letter_to_teacher')) {
+            setTimeout(() => {
+                const portal = document.getElementById('portal-page');
+                if (portal && !portal.classList.contains('hidden')) {
+                    openLetterToTeacherModal();
+                }
+            }, 600);
+        }
+    } catch (e) {
+        console.error('Error checking has_seen_letter_to_teacher:', e);
+    }
+
     // 功能介面截圖大圖放大預覽 Lightbox
     const lightboxModal = document.getElementById('feature-lightbox-modal');
     const lightboxImg = document.getElementById('lightbox-modal-img');

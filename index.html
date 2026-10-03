@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="google" content="notranslate">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>親師作業點收X聯絡簿系統 3.0</title>
-    <meta name="description" content="親師作業點收X聯絡簿系統 3.0 - 支援實體條碼掃描槍、雲端備份與親師聯絡簿整合的全方位作業點收系統">
-    <meta property="og:title" content="親師作業點收X聯絡簿系統 3.0">
-    <meta property="og:description" content="親師作業點收X聯絡簿系統 3.0 - 支援實體條碼掃描槍、雲端備份與親師聯絡簿整合的全方位作業點收系統">
+    <title>班級經營系統 3.0</title>
+    <meta name="description" content="班級經營系統 3.0 - 支援實體條碼掃描槍、雲端備份、親師聯絡簿與成績登記的全方位班級經營系統">
+    <meta property="og:title" content="班級經營系統 3.0">
+    <meta property="og:description" content="班級經營系統 3.0 - 支援實體條碼掃描槍、雲端備份、親師聯絡簿與成績登記的全方位班級經營系統">
     
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#4f46e5">
@@ -135,10 +135,10 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-10 h-16 sm:h-20 flex items-center justify-between gap-2">
                 <!-- 左側：網站 Logo 與名稱 (點擊返回首頁頂端) -->
                 <button id="portal-nav-logo-btn" class="flex items-center gap-2 sm:gap-3.5 cursor-pointer group select-none text-left min-w-0" title="返回首頁頂端">
-                    <img src="icon.svg" class="w-8 h-8 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl shadow-md shadow-indigo-600/20 group-hover:scale-105 transition-transform shrink-0" alt="親師作業點收X聯絡簿系統 3.0">
+                    <img src="icon.svg" class="w-8 h-8 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl shadow-md shadow-indigo-600/20 group-hover:scale-105 transition-transform shrink-0" alt="班級經營系統 3.0">
                     <div class="min-w-0">
-                        <span class="text-sm sm:text-2xl font-black text-stone-900 tracking-tight block truncate max-w-[140px] xs:max-w-[190px] sm:max-w-none">親師作業點收系統</span>
-                        <span class="text-[9px] sm:text-xs font-extrabold text-amber-700 tracking-wide block -mt-0.5 truncate">國一生獨立開發 • 3.0 版</span>
+                        <span class="text-sm sm:text-2xl font-black text-stone-900 tracking-tight block truncate max-w-[140px] xs:max-w-[190px] sm:max-w-none">班級經營系統</span>
+                        <span class="text-[9px] sm:text-xs font-extrabold text-amber-700 tracking-wide block -mt-0.5 truncate">國一生獨立開發 • v3.5</span>
                     </div>
                 </button>
 
@@ -155,6 +155,12 @@
                         <i class="fa-solid fa-graduation-cap text-emerald-600"></i>
                         <span class="hidden sm:inline">學生端</span>
                     </a>
+
+                    <!-- 給老師的話 按鈕 -->
+                    <button id="portal-nav-letter-btn" class="text-xs sm:text-sm font-bold text-amber-950 bg-amber-50 hover:bg-amber-100 border border-amber-300/80 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full transition-all flex items-center gap-1 shadow-2xs cursor-pointer" title="閱讀作者給老師的話">
+                        <i class="fa-solid fa-envelope-open-text text-amber-700"></i>
+                        <span class="hidden xl:inline">給老師的話</span>
+                    </button>
 
                     <!-- 提供意見 / 聯絡作者按鈕 -->
                     <button id="portal-nav-feedback-btn" class="text-xs sm:text-sm font-bold text-amber-900 bg-amber-100/90 hover:bg-amber-200/90 border border-amber-300/80 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full transition-all flex items-center gap-1 shadow-xs cursor-pointer" title="聯絡作者：ianw.solar@gmail.com">
@@ -227,9 +233,9 @@
                         <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700">一連，串起親師</span>
                     </h1>
 
-                    <!-- 副標題說明 (針對本作業點收系統真實特色) -->
+                    <!-- 副標題說明 (針對本班級經營系統真實特色) -->
                     <p class="text-stone-600 text-base sm:text-lg leading-relaxed max-w-xl">
-                        親師作業點收X聯絡簿系統 3.0 提供全方位的班級作業點收、條碼掃描辨識與雲端/本地即時同步解決方案。由國一生獨立編程設計，結合即時缺繳名單統計、親師聯絡簿整合與多元存儲，助您輕鬆搞定每日點收作業。
+                        班級經營系統 3.0 (v3.5) 提供全方位的班級作業點收、條碼掃描辨識、小考成績登記與雲端/本地即時同步解決方案。由國一生獨立編程設計，結合即時缺繳名單統計、親師聯絡簿整合與多元存儲，助您輕鬆搞定每日班級經營與點收作業。
                     </p>
 
                     <!-- 行動按鈕列 -->
@@ -378,7 +384,7 @@
                                 </span>
                                 <div>
                                     <h3 class="font-black text-stone-900 text-lg">系統更新紀錄 (Changelog)</h3>
-                                    <span class="text-xs text-stone-400 font-bold">最新版本 v4.2.3 • 2026/10/03</span>
+                                    <span class="text-xs text-stone-400 font-bold">最新版本 v3.5 • 2026/10/03</span>
                                 </div>
                             </div>
                             <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-200">最新版本</span>
@@ -387,20 +393,20 @@
                         <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100/80 space-y-2 text-xs sm:text-sm text-stone-700 font-medium">
                             <div class="font-bold text-emerald-950 flex items-center gap-1.5">
                                 <i class="fa-solid fa-bullhorn text-emerald-600"></i>
-                                <span>v4.2.3 核心更新亮點：</span>
+                                <span>v3.5 核心更新亮點：</span>
                             </div>
                             <ul class="space-y-1.5 text-xs text-stone-600 pl-2">
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-school text-indigo-600 mt-0.5"></i> <span><b>三端系統統一改名為「班級經營系統」</b>：全面統一品牌與名稱，定位為全方位班級經營系統，版本全面統一為 v3.5。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-envelope-open-text text-amber-600 mt-0.5"></i> <span><b>首頁新增「給老師的話」心聲視窗</b>：初次進入首頁自動彈出作者王禹硯的致敬心聲，並附帶一鍵「我知道了！」按鈕。</span></li>
                                 <li class="flex items-start gap-1.5"><i class="fa-solid fa-square-check text-emerald-600 mt-0.5"></i> <span><b>聯絡簿打勾移除刪除線</b>：學生端聯絡簿事項打勾完成後不再覆蓋刪除線，完整保留條目清晰可讀性。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-ban text-rose-600 mt-0.5"></i> <span><b>聯絡簿移除重複作業檢核</b>：移除聯絡簿區塊內重複之作業清單，專注於導師聯絡事項與心情隨筆，避免重複干擾。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-compress text-teal-600 mt-0.5"></i> <span><b>打勾按鈕微型化與行高貼合</b>：打勾按鈕縮小至高約比一行字稍高（22px 精緻微型方塊），與內文行高完美平齊。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-table-cells-large text-indigo-600 mt-0.5"></i> <span><b>事項方格淨化消除過多空白</b>：精簡聯絡簿事項卡片上下內距，消除大面積空隙，單行與多行記事皆緊湊俐落。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-compress text-teal-600 mt-0.5"></i> <span><b>打勾按鈕微型化與行高貼合</b>：打勾按鈕縮小為 22px 微型方塊，與單行內文平齊，消除大面積多餘空白。</span></li>
                             </ul>
                         </div>
 
                         <div class="flex items-center justify-between pt-1">
                             <button type="button" id="portal-card-changelog-btn" class="w-full py-2.5 px-4 bg-emerald-100/80 hover:bg-emerald-200/80 text-emerald-950 font-bold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-clock-rotate-left text-emerald-700"></i>
-                                <span>查看完整版本演進日誌 (v3.0 ~ v4.2.3)</span>
+                                <span>查看完整版本演進日誌 (v3.0 ~ v3.5)</span>
                             </button>
                         </div>
                     </div>
@@ -902,7 +908,7 @@
                 <div class="mb-8">
                     <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mb-2">系統公告與動態</h2>
                     <p class="text-stone-500 text-sm sm:text-base">
-                        隨時掌握親師作業點收X聯絡簿系統 3.0 最新功能與重要訊息。
+                        隨時掌握班級經營系統 3.0 (v3.5) 最新功能與重要訊息。
                     </p>
                 </div>
 
@@ -913,9 +919,9 @@
                             <span class="px-2.5 py-0.5 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">最新版本</span>
                             <span class="text-xs text-stone-400 font-medium">2026 年最新發布</span>
                         </div>
-                        <h3 class="text-base sm:text-lg font-black text-stone-900">親師作業點收X聯絡簿系統 3.0 正式上線！全新首頁導覽與親師聯絡簿全面升級</h3>
+                        <h3 class="text-base sm:text-lg font-black text-stone-900">班級經營系統 3.0 (v3.5) 正式上線！全新首頁導覽與親師生三端全面升級</h3>
                         <p class="text-stone-500 text-sm leading-relaxed">
-                            重構全站視覺與首頁入口，引進實體條碼槍秒速辨識、雲端帳號備份、親師聯絡簿整合等多項強大功能。
+                            重構全站視覺與首頁入口，引進實體條碼槍秒速辨識、雲端帳號備份、親師聯絡簿整合、小考成績登記等多項強大功能。
                         </p>
                     </div>
 
@@ -953,10 +959,10 @@
                     <div class="absolute -bottom-24 -right-24 w-60 h-60 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
                     
                     <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-4 relative z-10">
-                        準備好提升點收效率了嗎？
+                        準備好提升班級經營效率了嗎？
                     </h2>
                     <p class="text-slate-300 text-sm sm:text-base max-w-xl mx-auto mb-8 relative z-10 leading-relaxed">
-                        加入 親師作業點收X聯絡簿系統 3.0，立即體驗無縫銜接的數位化作業管理環境。只需一分鐘即可完成設定並開始點收。
+                        加入 班級經營系統 3.0，立即體驗無縫銜接的數位化作業管理與班級經營環境。只需一分鐘即可完成設定並開始使用。
                     </p>
                     <button id="portal-cta-start-btn" class="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-white hover:bg-slate-100 active:bg-slate-200 text-slate-900 font-black text-base shadow-lg hover:shadow-xl active:shadow-inner active:scale-[0.96] active:translate-y-1 transition-all duration-150 transform relative z-20 cursor-pointer select-none focus:outline-none focus:ring-4 focus:ring-white/40">
                         <span class="pointer-events-none select-none inline-block">免費建立帳號 / 立即開始使用</span>
@@ -973,7 +979,7 @@
                 <div class="flex flex-col sm:flex-row items-center gap-3.5 text-center sm:text-left">
                     <button id="portal-footer-logo-btn" class="flex items-center gap-2 cursor-pointer group" title="返回首頁頂端">
                         <img src="icon.svg" class="w-8 h-8 rounded-xl shadow-xs group-hover:scale-105 transition-transform" alt="Logo">
-                        <span class="font-black text-stone-900 text-base">親師作業點收X聯絡簿系統 3.0</span>
+                        <span class="font-black text-stone-900 text-base">班級經營系統 3.0</span>
                     </button>
                     <span class="hidden sm:inline text-stone-300">|</span>
                     <p class="font-semibold text-stone-700">
@@ -983,6 +989,10 @@
 
                 <!-- 右側：提供意見 / 聯絡作者按鈕與信箱 -->
                 <div class="flex flex-wrap items-center justify-center gap-3">
+                    <button id="portal-footer-letter-btn" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-950 font-bold border border-amber-300 shadow-xs hover:shadow transition-all cursor-pointer">
+                        <i class="fa-solid fa-envelope-open-text text-amber-700"></i>
+                        <span>給老師的話</span>
+                    </button>
                     <button id="portal-footer-feedback-btn" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-amber-50 text-amber-900 font-bold border border-amber-300 shadow-xs hover:shadow transition-all cursor-pointer">
                         <i class="fa-solid fa-envelope text-amber-600"></i>
                         <span>提供意見 / 聯絡作者</span>
@@ -991,7 +1001,7 @@
                         <i class="fa-solid fa-copy text-stone-500"></i>
                         <span class="font-mono text-xs">ianw.solar@gmail.com</span>
                     </button>
-                    <p class="text-stone-400 text-xs w-full text-center md:w-auto">Created by 七賢國中107 王禹硯（<a href="mailto:ianw.solar@gmail.com" class="hover:underline">ianw.solar@gmail.com</a>） • © 2026 親師作業點收X聯絡簿系統 3.0</p>
+                    <p class="text-stone-400 text-xs w-full text-center md:w-auto">Created by 七賢國中107 王禹硯（<a href="mailto:ianw.solar@gmail.com" class="hover:underline">ianw.solar@gmail.com</a>） • © 2026 班級經營系統 3.0 (v3.5)</p>
                 </div>
             </div>
         </footer>
@@ -1018,6 +1028,45 @@
         <span class="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-md font-bold tracking-wide">體驗中</span>
     </button>
 
+    <!-- 第一次進入首頁彈出的專屬致敬視窗 (Letter to Teacher Modal) -->
+    <div id="letter-to-teacher-modal" class="fixed inset-0 z-[125] flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-md hidden modal transition-all duration-300">
+        <div class="modal-content w-full max-w-[540px] relative my-auto">
+            <div class="bg-white rounded-[2.25rem] border border-amber-200/90 shadow-2xl p-7 sm:p-9 relative">
+                <!-- 關閉彈窗按鈕 -->
+                <button id="close-letter-modal-btn" class="absolute top-5 right-5 text-stone-400 hover:text-stone-700 text-xl font-bold w-9 h-9 rounded-full flex items-center justify-center hover:bg-stone-100 transition-colors cursor-pointer" title="關閉視窗"><i class="fa-solid fa-xmark"></i></button>
+
+                <!-- 頂部圖示與標題 -->
+                <div class="flex items-center gap-3.5 mb-5">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 via-orange-500 to-amber-600 text-white flex items-center justify-center text-2xl shadow-md shadow-amber-500/25 flex-shrink-0">
+                        <i class="fa-solid fa-envelope-open-text"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[11px] font-black uppercase tracking-wider border border-amber-200">
+                                專案作者的心聲
+                            </span>
+                            <span class="text-xs text-stone-400 font-medium">班級經營系統 3.0</span>
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-black text-stone-900 tracking-tight mt-0.5">給老師的話：</h3>
+                    </div>
+                </div>
+
+                <!-- 內容卡片 -->
+                <div class="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-amber-50/90 via-orange-50/40 to-amber-50/80 border border-amber-200/90 mb-6 text-stone-800 text-sm sm:text-base leading-relaxed space-y-3 font-medium shadow-xs">
+                    <p class="indent-2">
+                        老師好，我是就讀七賢國中的王禹硯，目前就讀一年七班，這是我從五年級（2024/10）開始製作的專案，從一開始陽春的頁面到現在的版本已經進步了非常多，期盼能夠帶給教師、家長、學生更棒的班級經營系統，若您認為本系統讓你能夠更加便利的管理班級事務，懇請您推薦給有同樣需求教師，我會持續更新、精進，謝謝您的支持！
+                    </p>
+                </div>
+
+                <!-- 底部「我知道了！」按鈕 -->
+                <button id="btn-know-letter" type="button" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-black text-base shadow-lg shadow-orange-500/25 hover:shadow-orange-500/35 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2 text-center">
+                    <span>我知道了！</span>
+                    <i class="fa-solid fa-check text-sm ml-1"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- 提供意見 / 聯絡作者專屬彈窗 (Author Feedback Modal) -->
     <div id="author-feedback-modal" class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm hidden transition-all duration-300">
         <div class="w-full max-w-[520px] relative my-auto">
@@ -1032,10 +1081,10 @@
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[11px] font-black uppercase tracking-wider border border-amber-200">
+                            <span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[11px] font-black uppercase tracking-wider border border-amber-200">
                                 國一生獨立開發者
                             </span>
-                            <span class="text-xs text-stone-400 font-medium">親師作業點收X聯絡簿系統 3.0</span>
+                            <span class="text-xs text-stone-400 font-medium">班級經營系統 3.0</span>
                         </div>
                         <h3 class="text-xl sm:text-2xl font-black text-stone-900 tracking-tight mt-0.5">提供意見 / 聯絡作者</h3>
                     </div>
@@ -1048,7 +1097,7 @@
                         <span>感謝您的使用與支持！</span>
                     </p>
                     <p>
-                        這套「親師作業點收X聯絡簿系統 3.0」是由我身為國中一年級學生，針對國中、國小教學現場的點收痛點，<b>經歷多次版本更新反覆打磨、獨自一人用心打造而成</b>。
+                        這套「班級經營系統 3.0」是由我身為國中一年級學生，針對國中、國小教學現場的點收痛點，<b>經歷多次版本更新反覆打磨、獨自一人用心打造而成</b>。
                     </p>
                     <p class="text-stone-600">
                         若您在使用過程中有任何問題、建議、操作疑問或功能許願，非常歡迎直接與我聯絡！
@@ -1117,7 +1166,7 @@
                 </div>
                 <h3 id="usage-inquiry-title" class="text-2xl font-black text-stone-900 tracking-tight mb-2">是否使用過此系統？</h3>
                 <p id="usage-inquiry-desc" class="text-stone-500 text-sm font-medium leading-relaxed mb-6">
-                    請問您以前是否使用過本作業點收系統？<br>請選擇您目前的帳號狀態以利快速導向：
+                    請問您以前是否使用過本班級經營系統？<br>請選擇您目前的帳號狀態以利快速導向：
                 </p>
 
                 <div class="grid grid-cols-2 gap-3.5">
@@ -1143,13 +1192,13 @@
 
                 <!-- 頂部 Logo -->
                 <div class="flex justify-center mb-4">
-                    <img src="icon.svg" class="w-16 h-16 rounded-[1.2rem] shadow-lg shadow-indigo-600/20" alt="親師作業點收X聯絡簿系統 3.0">
+                    <img src="icon.svg" class="w-16 h-16 rounded-[1.2rem] shadow-lg shadow-indigo-600/20" alt="班級經營系統 3.0">
                 </div>
 
                 <!-- 1. 登入視圖 (Sign In View) -->
                 <div id="portal-view-signin" class="space-y-3.5">
                     <div class="text-center">
-                        <h2 class="text-2xl font-black text-stone-900 tracking-tight">登入 親師作業點收X聯絡簿系統 3.0</h2>
+                        <h2 class="text-2xl font-black text-stone-900 tracking-tight">登入 班級經營系統 3.0</h2>
                         <p class="text-xs sm:text-sm text-stone-500 font-medium mt-1">輕鬆點收作業，雲端同步與條碼快速登記。</p>
                     </div>
 
@@ -1226,7 +1275,7 @@
                 <!-- 2. 註冊視圖 (Sign Up View) -->
                 <div id="portal-view-signup" class="space-y-3.5 hidden">
                     <div class="text-center">
-                        <h2 class="text-2xl font-black text-stone-900 tracking-tight">註冊 親師作業點收X聯絡簿系統 3.0 帳號</h2>
+                        <h2 class="text-2xl font-black text-stone-900 tracking-tight">註冊 班級經營系統 3.0 帳號</h2>
                         <p class="text-xs sm:text-sm text-stone-500 font-medium mt-1">建立帳號，雲端自動備份您的所有作業與班級資料。</p>
                     </div>
 
@@ -1318,7 +1367,7 @@
                     </div>
                     <div class="space-y-2.5 pt-2">
                         <button type="button" id="portal-enter-app-btn" class="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm sm:text-base rounded-xl shadow-md shadow-indigo-600/25 transition-all active:scale-[0.99] flex items-center justify-center gap-2">
-                            <span class="flex items-center justify-center gap-1.5"><i class="fa-solid fa-arrow-right-to-bracket"></i> 進入作業點收系統</span>
+                            <span class="flex items-center justify-center gap-1.5"><i class="fa-solid fa-arrow-right-to-bracket"></i> 進入班級經營系統</span>
                         </button>
                         <button type="button" id="portal-switch-account-btn" class="w-full py-2.5 px-4 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs sm:text-sm rounded-xl transition-all">
                             使用其他帳號登入
@@ -1338,9 +1387,9 @@
             <div class="flex flex-col 2xl:flex-row justify-between items-start 2xl:items-center gap-5 2xl:gap-8 w-full">
                 <!-- 左側：標題與班級選單 -->
                 <div class="flex items-center gap-4 flex-shrink-0">
-                     <button id="main-logo-btn" class="cursor-pointer group flex items-center gap-2.5 sm:gap-3 select-none text-left shrink-0" title="作業點收系統">
-                         <img src="icon.svg" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl drop-shadow-sm inline-block group-hover:scale-105 transition-transform" alt="作業點收系統">
-                         <span class="text-xl sm:text-2xl xl:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-500 to-indigo-600 animated-gradient-text tracking-tight drop-shadow-sm group-hover:opacity-90 transition-opacity whitespace-nowrap">作業點收系統</span>
+                     <button id="main-logo-btn" class="cursor-pointer group flex items-center gap-2.5 sm:gap-3 select-none text-left shrink-0" title="班級經營系統">
+                         <img src="icon.svg" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl drop-shadow-sm inline-block group-hover:scale-105 transition-transform" alt="班級經營系統">
+                         <span class="text-xl sm:text-2xl xl:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-500 to-indigo-600 animated-gradient-text tracking-tight drop-shadow-sm group-hover:opacity-90 transition-opacity whitespace-nowrap">班級經營系統</span>
                      </button>
                      <select id="class-selector" class="rounded-xl border-slate-200/80 shadow-sm shadow-slate-100/50 focus:border-indigo-500 focus:ring-indigo-500 py-2.5 px-4 text-base sm:text-lg bg-white font-extrabold text-indigo-600 cursor-pointer transition-all"></select>
                 </div>
@@ -1769,7 +1818,7 @@
             <div class="bg-slate-50 px-6 py-4 sm:px-8 sm:py-6 border-b border-slate-200 flex justify-between items-center flex-shrink-0">
                 <h2 class="text-xl sm:text-2xl font-extrabold text-slate-800 flex items-center gap-3">
                     <span class="bg-indigo-100 text-indigo-600 p-2 rounded-xl"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253"></path></svg></span>
-                    作業點收系統 - 終極功能指南
+                    班級經營系統 - 終極功能指南
                 </h2>
                 <button class="cancel-btn text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 p-2 rounded-full transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -1778,7 +1827,7 @@
             <div class="overflow-y-auto p-6 sm:p-8 space-y-6 sm:space-y-8 text-sm text-slate-600 flex-grow font-medium custom-scrollbar">
                 
                 <div class="mb-4">
-                    <p class="text-base text-slate-700 leading-relaxed font-bold mb-4">這是一套專為教育現場打造的「精緻化作業點收系統」，結合智慧條碼掃描功能、雙軌儲存機制與離線 PWA 支援，為您帶來極致流暢的教學管理體驗。</p>
+                    <p class="text-base text-slate-700 leading-relaxed font-bold mb-4">這是一套專為教育現場打造的「全方位班級經營系統」，結合智慧條碼掃描功能、雙軌儲存機制、小考成績登記與離線 PWA 支援，為您帶來極致流暢的教學與班級經營管理體驗。</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1855,7 +1904,7 @@
                 <div class="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 mx-auto sm:mx-0">
                     <svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
                 </div>
-                <h2 class="text-3xl font-black mb-3 text-slate-900 tracking-tight">歡迎使用作業點收系統</h2>
+                <h2 class="text-3xl font-black mb-3 text-slate-900 tracking-tight">歡迎使用班級經營系統</h2>
                 <p class="text-slate-500 mb-6 leading-relaxed font-medium">
                     請先選擇您的資料儲存方式。本系統支援綁定本機硬碟檔案，以及 <b>Google 帳號雲端備份</b> 功能！
                 </p>
@@ -1975,7 +2024,7 @@
                    </p>
                    <button id="install-pwa-btn" type="button" class="w-full bg-gradient-to-r from-pink-500 via-rose-500 to-pink-600 hover:from-pink-600 hover:to-rose-600 text-white font-black py-3 px-4 rounded-xl shadow-md shadow-pink-500/20 hover:shadow-lg transition-all flex items-center justify-center gap-2 text-sm transform hover:-translate-y-0.5 active:translate-y-0">
                        <i class="fa-solid fa-download text-sm"></i>
-                       <span>安裝作業點收系統 App</span>
+                       <span>安裝班級經營系統 App</span>
                    </button>
                    <p id="install-pwa-tip" class="text-[11px] text-slate-400 mt-2 font-medium text-center">
                        提示：若未出現提示，亦可透過瀏覽器選單點擊「加到主畫面」或「安裝應用程式」
@@ -2826,7 +2875,7 @@
                         </div>
                         <div>
                             <h3 class="text-xl sm:text-2xl font-black text-stone-900 tracking-tight">系統版本更新日誌 (Changelog)</h3>
-                            <p class="text-xs text-stone-500 font-medium">記錄親師作業點收系統的每一次進化與功能更新</p>
+                            <p class="text-xs text-stone-500 font-medium">記錄班級經營系統的每一次進化與功能更新</p>
                         </div>
                     </div>
                     <button id="close-changelog-modal-btn" type="button" class="cancel-btn text-stone-400 hover:text-stone-700 p-2 rounded-xl hover:bg-stone-100 transition-colors text-xl leading-none">
@@ -2836,12 +2885,45 @@
 
                 <!-- 版本歷程時間軸 -->
                 <div class="space-y-6">
-                    <!-- v4.2.3 最新發布 -->
+                    <!-- v3.5 最新發布 -->
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-emerald-50/90 via-teal-50/60 to-indigo-50/40 border-2 border-emerald-500 shadow-md relative">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                             <div class="flex items-center gap-2">
-                                <span class="px-3 py-1 rounded-full bg-emerald-600 text-white text-xs font-black uppercase tracking-wider shadow-xs animate-pulse">v4.2.3 最新發布</span>
-                                <span class="text-xs font-bold text-emerald-950">學生端聯絡簿排版與打勾體驗極致升級：移除刪除線、打勾按鈕微型化與行高齊平、緊湊化事項方格消除多餘空白</span>
+                                <span class="px-3 py-1 rounded-full bg-emerald-600 text-white text-xs font-black uppercase tracking-wider shadow-xs animate-pulse">v3.5 最新發布</span>
+                                <span class="text-xs font-bold text-emerald-950">三端系統全面升級定名為「班級經營系統」、首頁初次拜訪自動呈現「給老師的話」心聲視窗、版本號全面統一為 v3.5</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-400">2026-10-03</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-emerald-500 shrink-0 mt-0.5"></i>
+                                <span><b>全站品牌體系正式定名「班級經營系統」</b>：全系統從「作業點收」單一維度正式升級為「班級經營系統」，涵蓋作業點收、親師聯絡簿、小考成績登記與多端即時查核，三端版本統一為 v3.5。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-emerald-500 shrink-0 mt-0.5"></i>
+                                <span><b>初次進入首頁自動彈出「給老師的話」</b>：向現場教師傳遞由七賢國中王禹硯從國小五年級（2024/10）至今用心打造與持續精進的心路歷程，並提供「我知道了！」一鍵確認記憶。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-emerald-500 shrink-0 mt-0.5"></i>
+                                <span><b>聯絡簿事項打勾完畢自動隱藏綠色小點</b>：學生端聯絡簿當日事項全部打勾完成後，日期按鈕右上角的綠色小點即時自動消失，完成狀態一目了然。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-emerald-500 shrink-0 mt-0.5"></i>
+                                <span><b>聯絡簿事項方格緊湊化與打勾方格置中</b>：聯絡簿事項方格高度精簡至約略高於單行文字，打勾框居中對齊，消除大面積多餘垂直空白。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-emerald-500 shrink-0 mt-0.5"></i>
+                                <span><b>學生端與家長端同步定名 (v3.5)</b>：分別定名為「班級經營系統 — 學生端 (v3.5)」與「班級經營系統 — 家長端 (v3.5)」，嚴格保持各端專屬連結不變。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- v4.2.3 歷史更新 -->
+                    <div class="p-5 rounded-2xl bg-gradient-to-br from-teal-50/90 via-emerald-50/60 to-indigo-50/40 border border-teal-300 shadow-xs relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-teal-700 text-white text-xs font-black uppercase tracking-wider shadow-xs">v4.2.3</span>
+                                <span class="text-xs font-bold text-teal-950">學生端聯絡簿排版與打勾體驗極致升級：移除刪除線、打勾按鈕微型化與行高齊平、緊湊化事項方格消除多餘空白</span>
                             </div>
                             <span class="text-xs font-mono font-bold text-slate-400">2026-10-03</span>
                         </div>
@@ -3539,7 +3621,7 @@
 
 <script src="js/lib/qrcode.min.js"></script>
 <script src="js/lib/html5-qrcode.min.js"></script>
-<script type="module" src="js/app.js?v=3.8.2"></script>
+<script type="module" src="js/app.js?v=3.5"></script>
 
     <!-- ============================================================== -->
     <!-- 全螢幕班級成績與測驗管理系統 (Fullscreen Exam Scores System)   -->
