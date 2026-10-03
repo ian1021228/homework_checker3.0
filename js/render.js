@@ -122,15 +122,20 @@ export function renderClassList() {
                 </div>
                 <div class="flex items-center gap-2 flex-wrap">
                     <div class="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 focus-within:border-indigo-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider whitespace-nowrap">座號人數</span>
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider whitespace-nowrap">最後座號</span>
                         <input type="number" min="1" max="100" data-class-id="${c.id}" class="class-max-seat-input w-12 bg-transparent text-xs font-mono font-black text-indigo-700 focus:outline-none text-center" value="${c.lastMaxSeat || 30}">
                         <button type="button" data-class-id="${c.id}" class="save-class-max-seat-btn text-xs font-bold text-indigo-600 hover:text-indigo-800 px-1.5 py-0.5 rounded hover:bg-indigo-50 transition-colors whitespace-nowrap" title="儲存最後座號">儲存</button>
+                    </div>
+                    <div class="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 focus-within:border-amber-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-amber-500/20 transition-all">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider whitespace-nowrap">缺號</span>
+                        <input type="text" data-class-id="${c.id}" class="class-skipped-seats-input w-20 sm:w-24 bg-transparent text-xs font-mono font-bold text-amber-700 focus:outline-none placeholder:text-slate-300" placeholder="無" value="${Array.isArray(c.skippedSeats) ? c.skippedSeats.join(', ') : (c.lastMissingSeats || '')}" title="缺號/轉出座號（例如：5, 12）">
+                        <button type="button" data-class-id="${c.id}" class="save-class-skipped-seats-btn text-xs font-bold text-amber-600 hover:text-amber-800 px-1.5 py-0.5 rounded hover:bg-amber-50 transition-colors whitespace-nowrap" title="儲存缺號設定">儲存</button>
                     </div>
                     <div class="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 focus-within:border-indigo-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
                         <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider whitespace-nowrap">權限碼</span>
                         <input type="text" data-class-id="${c.id}" class="class-code-input w-24 sm:w-28 bg-transparent text-xs font-mono font-black text-indigo-700 focus:outline-none uppercase" placeholder="未設定" value="${code}" maxlength="16">
                         <button type="button" data-class-id="${c.id}" class="save-class-code-btn text-xs font-bold text-indigo-600 hover:text-indigo-800 px-1.5 py-0.5 rounded hover:bg-indigo-50 transition-colors whitespace-nowrap" title="儲存權限碼">儲存</button>
-                        <button type="button" data-class-id="${c.id}" class="regen-class-code-btn text-xs font-bold text-slate-400 hover:text-slate-700 px-1 py-0.5 rounded hover:bg-slate-200 transition-colors shrink-0" title="隨機產生權限碼">🎲</button>
+                        <button type="button" data-class-id="${c.id}" class="regen-class-code-btn text-xs font-bold text-slate-400 hover:text-slate-700 px-1.5 py-0.5 rounded hover:bg-slate-200 transition-colors shrink-0 flex items-center justify-center" title="隨機產生權限碼"><i class="fa-solid fa-dice"></i></button>
                     </div>
                     ${code ? `
                         <button type="button" data-code="${code}" data-name="${c.name}" class="copy-class-code-btn px-2.5 py-1.5 text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl transition-colors font-bold flex items-center gap-1.5 shrink-0" title="複製此班級權限代碼">
@@ -144,10 +149,6 @@ export function renderClassList() {
                         <button type="button" data-code="${code}" data-name="${c.name}" class="copy-student-link-btn px-2.5 py-1.5 text-xs bg-sky-50 hover:bg-sky-100 text-sky-700 rounded-xl transition-colors font-bold flex items-center gap-1.5 shrink-0 shadow-2xs" title="複製此班級專屬學生端數位聯絡簿連結（已包含此班級代碼）">
                             <i class="fa-solid fa-graduation-cap"></i>
                             <span class="text-[11px] hidden sm:inline">複製學生端連結</span>
-                        </button>
-                        <button type="button" data-class-id="${c.id}" data-name="${c.name}" class="manage-student-pins-btn px-2.5 py-1.5 text-xs bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200/80 rounded-xl transition-colors font-bold flex items-center gap-1.5 shrink-0 shadow-2xs cursor-pointer" title="管理此班級學生 6 位數成績 PIN 碼與重設後門">
-                            <i class="fa-solid fa-key text-amber-600"></i>
-                            <span class="text-[11px] hidden sm:inline">成績 PIN 碼</span>
                         </button>
                     ` : ''}
                     <button data-id="${c.id}" data-name="${c.name}" class="delete-class-btn text-slate-300 hover:text-rose-500 font-bold p-1.5 rounded-xl hover:bg-rose-50 transition-colors text-lg leading-none shrink-0 ml-0.5" title="刪除班級">&times;</button>
@@ -223,7 +224,7 @@ export function renderHomeworkList() {
 
     homeworkList.innerHTML = '';
     if (filteredHomeworks.length === 0) {
-        homeworkList.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center py-16 px-4"><div class="w-20 h-20 bg-gradient-to-tr from-indigo-50 to-rose-50 rounded-3xl flex items-center justify-center mb-4 border border-white/60 shadow-lg shadow-indigo-500/10 animate-[bounce_3s_infinite]"><svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div><p class="text-center text-slate-400 font-semibold tracking-wide text-xs">目前的班級沒有點收項目，請點擊右上角 ✨ 新增作業</p></div>`;
+        homeworkList.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center py-16 px-4"><div class="w-20 h-20 bg-gradient-to-tr from-indigo-50 to-rose-50 rounded-3xl flex items-center justify-center mb-4 border border-white/60 shadow-lg shadow-indigo-500/10 animate-[bounce_3s_infinite]"><svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div><p class="text-center text-slate-400 font-semibold tracking-wide text-xs">目前的班級沒有點收項目，請點擊右上角「新增作業」按鈕</p></div>`;
     } else {
         filteredHomeworks.forEach(hw => {
             const typeId = hw.typeId || 'default'; 
@@ -235,7 +236,7 @@ export function renderHomeworkList() {
             const completedCount = (hw.students || []).filter(s => isStudentCompleted(s, typeId)).length;
             let summaryHtml = '';
             if (completedCount === (hw.students || []).length && (hw.students || []).length > 0) {
-                summaryHtml = `<div class="text-emerald-600 font-black bg-emerald-50/70 border border-emerald-200/50 px-4 py-2 rounded-2xl text-base inline-flex items-center gap-1">🎉 全班已到齊</div>`;
+                summaryHtml = `<div class="text-emerald-600 font-black bg-emerald-50/70 border border-emerald-200/50 px-4 py-2 rounded-2xl text-base inline-flex items-center gap-1"><i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> 全班已到齊</div>`;
             } else {
                 summaryHtml = typeConfig.statuses.filter(s => statusCounts[s.key] > 0).map(s => {
                     let textClass = 'text-slate-600 bg-slate-100/80';
@@ -266,7 +267,7 @@ export function renderHomeworkList() {
                         <button type="button" data-id="${hw.id}" class="delete-hw-btn hide-on-admin-view text-slate-400 hover:text-rose-600 p-2.5 rounded-2xl hover:bg-rose-50 transition-all cursor-pointer" title="刪除作業"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg></button>
                     </div>
                 </div>
-                <div class="flex justify-between items-center text-sm font-bold text-slate-400 mt-4 tracking-wider relative z-10"><span>👥 名單 ${(hw.students || []).length} 人</span><span>📅 ${createdDate}</span></div>
+                <div class="flex justify-between items-center text-sm font-bold text-slate-400 mt-4 tracking-wider relative z-10"><span><i class="fa-solid fa-users mr-1"></i> 名單 ${(hw.students || []).length} 人</span><span><i class="fa-regular fa-calendar mr-1"></i> ${createdDate}</span></div>
                 <div class="mt-5 flex flex-wrap gap-2 relative z-10">${summaryHtml}</div>
             `;
             homeworkList.appendChild(hwItem);
@@ -443,7 +444,7 @@ export function renderStudentDetailsPage() {
     });
     
     if (!hasIssues) {
-        studentDetailsList.innerHTML = `<div class="col-span-full bg-emerald-50 border border-emerald-100 rounded-3xl p-8 text-center shadow-inner"><div class="text-3xl mb-2">🏆</div><p class="text-emerald-700 font-extrabold text-base">全班所有作業均已準時點收完成！</p></div>`;
+        studentDetailsList.innerHTML = `<div class="col-span-full bg-emerald-50 border border-emerald-100 rounded-3xl p-8 text-center shadow-inner"><div class="text-3xl mb-2 text-amber-500"><i class="fa-solid fa-trophy"></i></div><p class="text-emerald-700 font-extrabold text-base">全班所有作業均已準時點收完成！</p></div>`;
     }
 }
 
@@ -510,8 +511,8 @@ export function renderContactBookItems() {
             <div class="flex gap-1.5 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all ml-3 flex-shrink-0 bg-slate-900/60 backdrop-blur-md rounded-xl p-1 border border-white/10 shadow-xl">
                 <button class="move-up-contact-btn hide-on-admin-view w-7 h-7 flex items-center justify-center rounded-lg ${isFirst ? 'bg-white/5 text-white/20 cursor-not-allowed opacity-30' : 'bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500 hover:text-white cursor-pointer active:scale-90'} transition-all font-bold text-xs" data-index="${index}" ${isFirst ? 'disabled' : ''} title="向上移動"><i class="fa-solid fa-arrow-up text-xs"></i></button>
                 <button class="move-down-contact-btn hide-on-admin-view w-7 h-7 flex items-center justify-center rounded-lg ${isLast ? 'bg-white/5 text-white/20 cursor-not-allowed opacity-30' : 'bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500 hover:text-white cursor-pointer active:scale-90'} transition-all font-bold text-xs" data-index="${index}" ${isLast ? 'disabled' : ''} title="向下移動"><i class="fa-solid fa-arrow-down text-xs"></i></button>
-                <button class="to-hw-btn hide-on-admin-view w-7 h-7 flex items-center justify-center rounded-lg bg-teal-500/20 text-teal-300 hover:bg-teal-500 hover:text-white transition-all font-bold text-sm cursor-pointer" data-index="${index}" title="轉為作業">📖</button>
-                <button class="edit-contact-btn hide-on-admin-view w-7 h-7 flex items-center justify-center rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500 hover:text-white transition-all font-bold text-sm cursor-pointer" data-index="${index}" title="編輯內文">✏️</button>
+                <button class="to-hw-btn hide-on-admin-view w-7 h-7 flex items-center justify-center rounded-lg bg-teal-500/20 text-teal-300 hover:bg-teal-500 hover:text-white transition-all font-bold text-sm cursor-pointer" data-index="${index}" title="轉為作業"><i class="fa-solid fa-book text-xs"></i></button>
+                <button class="edit-contact-btn hide-on-admin-view w-7 h-7 flex items-center justify-center rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500 hover:text-white transition-all font-bold text-sm cursor-pointer" data-index="${index}" title="編輯內文"><i class="fa-solid fa-pen text-xs"></i></button>
                 <button class="delete-contact-item-btn w-7 h-7 flex items-center justify-center rounded-lg bg-rose-500/20 text-rose-300 hover:bg-rose-500 hover:text-white transition-all font-bold text-base leading-none cursor-pointer" data-index="${index}" title="擦除">&times;</button>
             </div>
         `;
@@ -603,14 +604,14 @@ export function updateDataManagementUI(onRestoreBackup) {
     if ((state.currentUser && fbAuth?.currentUser) || (state.currentUser && isQrAuth)) {
         const isGoogle = isGoogleAuthUser(state.currentUser) || sessionStorage.getItem('auth_provider') === 'google';
         const badgeLabel = isGoogle ? '已登入 Google 雲端帳號' : '已安全登入雲端';
-        if (cloudStatus) cloudStatus.innerHTML = `狀態：${badgeLabel} <br><span class="text-sky-900 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-sky-100 text-[11px] tracking-wide">👤 ${state.currentUser.displayName || state.currentUser.email}</span>`;
+        if (cloudStatus) cloudStatus.innerHTML = `狀態：${badgeLabel} <br><span class="text-sky-900 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-sky-100 text-[11px] tracking-wide"><i class="fa-solid fa-user mr-1"></i> ${state.currentUser.displayName || state.currentUser.email}</span>`;
         if (loginBtn) loginBtn.classList.add('hidden');
         if (cloudActions) cloudActions.classList.remove('hidden');
         const storageContainer = document.getElementById('cloud-storage-container'); 
         if (storageContainer) storageContainer.classList.remove('hidden');
         updateStorageUsage();
     } else if (state.currentUser) {
-        if (cloudStatus) cloudStatus.innerHTML = `狀態：本地離線模式 <br><span class="text-slate-700 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-slate-200 text-[11px] tracking-wide">👤 ${state.currentUser.displayName || state.currentUser.email}</span><br><span class="text-[11px] text-sky-600 mt-1 inline-block">點擊下方按鈕登入 Google 帳號以啟用雲端備份</span>`;
+        if (cloudStatus) cloudStatus.innerHTML = `狀態：本地離線模式 <br><span class="text-slate-700 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-slate-200 text-[11px] tracking-wide"><i class="fa-solid fa-user mr-1"></i> ${state.currentUser.displayName || state.currentUser.email}</span><br><span class="text-[11px] text-sky-600 mt-1 inline-block">點擊下方按鈕登入 Google 帳號以啟用雲端備份</span>`;
         if (loginBtn) loginBtn.classList.remove('hidden');
         if (cloudActions) cloudActions.classList.add('hidden');
         const storageContainer = document.getElementById('cloud-storage-container'); 
@@ -636,7 +637,7 @@ export function updateDataManagementUI(onRestoreBackup) {
 
     if (!statusText) return;
     if (state.fileHandle) {
-        statusText.innerHTML = `狀態：已安全對齊本地檔案 <br><span class="text-indigo-900 font-bold bg-white px-2 py-1 rounded-lg inline-block mt-2 shadow-sm border border-indigo-100 text-[11px] tracking-wide">📄 ${state.fileHandle.name}</span>`;
+        statusText.innerHTML = `狀態：已安全對齊本地檔案 <br><span class="text-indigo-900 font-bold bg-white px-2 py-1 rounded-lg inline-block mt-2 shadow-sm border border-indigo-100 text-[11px] tracking-wide"><i class="fa-solid fa-file mr-1 text-indigo-600"></i> ${state.fileHandle.name}</span>`;
         if (linkBtn) linkBtn.textContent = "變更硬碟資料檔"; 
         if (unlinkBtn) unlinkBtn.classList.remove('hidden');
     } else {
@@ -678,7 +679,7 @@ export function updateDataManagementUI(onRestoreBackup) {
                 const k = dateKeyMap.get(dateStr);
                 const btn = document.createElement('button');
                 btn.className = 'w-full glass-card border border-white/60 text-slate-700 text-[11px] font-bold py-2 px-3 rounded-xl hover:bg-slate-50 transition-colors flex justify-between items-center shadow-sm cursor-pointer';
-                btn.innerHTML = `<span class="flex items-center gap-1.5 text-slate-600">📅 ${dateStr}</span> <span class="bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded-lg text-[9px] shadow-sm transition-colors">倒退還原</span>`;
+                btn.innerHTML = `<span class="flex items-center gap-1.5 text-slate-600"><i class="fa-regular fa-calendar mr-1 text-indigo-500"></i> ${dateStr}</span> <span class="bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded-lg text-[9px] shadow-sm transition-colors">倒退還原</span>`;
                 btn.onclick = () => {
                     showConfirmModal('自動備份覆蓋還原', `確定要將所有班級與作業還原至 ${dateStr} 嗎？目前的修改將被完全洗掉！`, async () => {
                         const dataStr = localStorage.getItem(k);

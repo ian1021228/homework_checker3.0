@@ -81,7 +81,7 @@ export function applyCheckMode(mode) {
     // 更新頂部導覽列標籤
     const topLabel = document.getElementById('top-check-mode-label');
     if (topLabel) {
-        const icon = mode === 'manual' ? '👆' : '📠';
+        const icon = mode === 'manual' ? '<i class="fa-solid fa-hand-pointer"></i>' : '<i class="fa-solid fa-barcode"></i>';
         topLabel.innerHTML = `<span class="text-base">${icon}</span><span>點收方式</span>`;
     }
 }

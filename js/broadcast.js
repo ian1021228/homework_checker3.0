@@ -147,11 +147,11 @@ export function toggleBroadcastPanel(forceOpen) {
         if (currentUser.isAdmin) {
             if (publishTab) publishTab.classList.remove('hidden');
             if (adminBadge) adminBadge.classList.remove('hidden');
-            if (repliesLabel) repliesLabel.textContent = '💬 使用者回覆';
+            if (repliesLabel) repliesLabel.innerHTML = '<i class="fa-solid fa-comments mr-1"></i> 使用者回覆';
         } else {
             if (publishTab) publishTab.classList.add('hidden');
             if (adminBadge) adminBadge.classList.add('hidden');
-            if (repliesLabel) repliesLabel.textContent = '💬 我的回覆';
+            if (repliesLabel) repliesLabel.innerHTML = '<i class="fa-solid fa-comment-dots mr-1"></i> 我的回覆';
         }
 
         // 記錄最後檢視時間，消除未讀紅點
@@ -390,7 +390,7 @@ export function renderBroadcastPanel() {
 
     const user = getCurrentUserIdentity();
     if (identitySpan) {
-        identitySpan.textContent = user.isAdmin ? `👑 管理者 (${user.email})` : `👤 ${user.displayName}`;
+        identitySpan.innerHTML = user.isAdmin ? `<i class="fa-solid fa-crown text-amber-500 mr-1"></i> 管理者 (${user.email})` : `<i class="fa-solid fa-user text-slate-500 mr-1"></i> ${user.displayName}`;
     }
 
     if (state.activeBellTab === 'notices') {
@@ -430,7 +430,7 @@ function renderNoticesView(container, user) {
     if (allBroadcasts.length === 0) {
         container.innerHTML = `
             <div class="text-center py-12 px-4">
-                <div class="text-4xl mb-3">📭</div>
+                <div class="text-4xl mb-3 text-slate-300"><i class="fa-solid fa-envelope-open"></i></div>
                 <h5 class="font-black text-stone-800 text-sm mb-1">目前尚無廣播通知</h5>
                 <p class="text-xs text-stone-400 font-medium">系統發布最新消息或個別通知時，將自動在此呈現。</p>
             </div>
@@ -447,7 +447,7 @@ function renderNoticesView(container, user) {
         const isTargeted = item.isTargeted;
         const cardBorder = isTargeted ? 'border-orange-300 bg-orange-50/30' : 'border-amber-100/90 bg-white';
         const tagClass = isTargeted ? 'bg-orange-500 text-white' : 'bg-amber-100 text-amber-900';
-        const tagText = isTargeted ? '🎯 個人專屬通知' : '📢 系統全體廣播';
+        const tagText = isTargeted ? '<i class="fa-solid fa-bullseye text-indigo-500 mr-1"></i> 個人專屬通知' : '<i class="fa-solid fa-bullhorn text-teal-600 mr-1"></i> 系統全體廣播';
 
         html += `
             <div class="rounded-2xl border ${cardBorder} shadow-xs p-3.5 transition-all hover:border-amber-300">
@@ -482,7 +482,7 @@ function renderNoticesView(container, user) {
                 <!-- 折疊的回覆輸入表單 -->
                 <div id="reply-form-${item.id}" class="hidden mt-3 pt-3 border-t border-amber-200/60">
                     <label class="block text-[11px] font-bold text-amber-900 mb-1">
-                        💬 回覆此廣播給管理員：
+                        <i class="fa-solid fa-reply text-indigo-500 mr-1"></i> 回覆此廣播給管理員：
                     </label>
                     <textarea id="reply-input-${item.id}" rows="2" class="w-full text-xs p-2.5 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none resize-none bg-stone-50/80" placeholder="請輸入您的回覆或疑問（管理者會收到此則回覆）..."></textarea>
                     <div class="flex justify-end items-center gap-2 mt-2">
@@ -587,7 +587,7 @@ function renderRepliesView(container, user) {
     if (displayReplies.length === 0) {
         container.innerHTML = `
             <div class="text-center py-12 px-4">
-                <div class="text-4xl mb-3">💬</div>
+                <div class="text-4xl mb-3 text-slate-300"><i class="fa-regular fa-comment-dots"></i></div>
                 <h5 class="font-black text-stone-800 text-sm mb-1">目前尚無回覆紀錄</h5>
                 <p class="text-xs text-stone-400 font-medium">
                     ${user.isAdmin ? '當其他使用者對廣播發表回覆或提問時，會即時顯示於此。' : '在廣播公告中點選「回覆廣播」，即可在此檢視您送出的回覆訊息。'}
@@ -607,7 +607,7 @@ function renderRepliesView(container, user) {
                 </span>
                 ${unreadCount > 0 ? `
                     <button id="mark-all-read-btn" class="text-[11px] font-bold text-amber-700 hover:text-amber-800 bg-amber-100/70 hover:bg-amber-200/80 px-2 py-1 rounded-lg transition-colors cursor-pointer">
-                        ✓ 全部標示已讀
+                        <i class="fa-solid fa-check-double mr-1"></i> 全部標示已讀
                     </button>
                 ` : ''}
             </div>
@@ -624,7 +624,7 @@ function renderRepliesView(container, user) {
                 <div class="flex items-center justify-between gap-2 mb-1.5">
                     <div class="flex items-center gap-1.5 flex-wrap">
                         <span class="text-xs font-black text-stone-900 flex items-center gap-1">
-                            👤 ${escapeHtml(reply.userName || reply.userEmail || '使用者')}
+                            <i class="fa-solid fa-user mr-1 text-slate-400"></i> ${escapeHtml(reply.userName || reply.userEmail || '使用者')}
                         </span>
                         ${reply.userEmail ? `<span class="text-[10px] text-stone-400">(${escapeHtml(reply.userEmail)})</span>` : ''}
                         ${isUnread ? '<span class="text-[9px] bg-rose-500 text-white font-black px-1.5 py-0.2 rounded-full shadow-xs animate-pulse">NEW</span>' : ''}
@@ -715,7 +715,7 @@ function renderPublishView(container, user) {
     container.innerHTML = `
         <div class="bg-white rounded-2xl border border-amber-200/90 p-4 shadow-sm">
             <h5 class="font-black text-xs text-amber-900 mb-1.5 flex items-center gap-1.5">
-                <span>📢 發布全體系統廣播</span>
+                <span class="flex items-center justify-center gap-1.5"><i class="fa-solid fa-bullhorn"></i> 發布全體系統廣播</span>
                 <span class="text-[10px] text-amber-600 font-normal">（所有在線使用者小鈴鐺即時同步）</span>
             </h5>
             <p class="text-[11px] text-stone-500 mb-3">
@@ -725,7 +725,7 @@ function renderPublishView(container, user) {
             
             <div class="flex items-center justify-between gap-2">
                 <button id="admin-broadcast-clear-btn" type="button" class="text-xs text-stone-500 hover:text-rose-600 bg-stone-100 hover:bg-rose-50 px-3 py-2 rounded-xl font-bold transition-all cursor-pointer">
-                    📴 撤除目前全體廣播
+                    <i class="fa-solid fa-ban mr-1"></i> 撤除目前全體廣播
                 </button>
                 <button id="admin-broadcast-send-btn" type="button" class="text-xs bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 active:scale-95 text-white font-bold px-4 py-2 rounded-xl shadow-md shadow-amber-600/25 transition-all flex items-center gap-1.5 cursor-pointer">
                     <i class="fa-solid fa-bullhorn text-xs"></i>

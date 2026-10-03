@@ -929,7 +929,7 @@
       setLoginLoading(true);
       elements.loginErrorBox.classList.add("hidden");
 
-      // ⚡ Step 1: Check fast local cache to instantly display dashboard on mobile (0ms perceived latency)
+      // Step 1: Check fast local cache to instantly display dashboard on mobile (0ms perceived latency)
       try {
         const cachedRaw = localStorage.getItem(LS_CLASS_CACHE_PREFIX + cleanCode);
         if (cachedRaw) {
@@ -951,7 +951,7 @@
         state.unsubscribeSnapshot = null;
       }
 
-      // ⚡ Step 2: Ultra-fast direct REST probe (returns in ~150ms on mobile 4G/5G, bypassing WebSocket handshake)
+      // Step 2: Ultra-fast direct REST probe (returns in ~150ms on mobile 4G/5G, bypassing WebSocket handshake)
       let resolvedByFastRest = false;
       const fetchDirectData = async () => {
         try {
@@ -994,7 +994,7 @@
 
       fetchDirectData();
 
-      // ⚡ Step 3: Concurrently connect real-time onSnapshot for continuous live updates
+      // Step 3: Concurrently connect real-time onSnapshot for continuous live updates
       const classDocRef = doc(db, 'artifacts', APP_COLLECTION_ID, 'public', 'data', 'parentClasses', cleanCode);
 
       state.unsubscribeSnapshot = onSnapshot(classDocRef, (docSnap) => {
@@ -1540,7 +1540,7 @@
 
           seatBox.className = `p-2 rounded-xl ${colorClass} border text-center transition-all ${myBadge} flex flex-col items-center justify-center min-h-[56px]`;
           seatBox.innerHTML = `
-            <div class="text-xs font-black">${seatNum} 號 ${isMyStudent ? '★' : ''}</div>
+            <div class="text-xs font-black flex items-center justify-center gap-1"><span>${seatNum} 號</span>${isMyStudent ? '<i class="fa-solid fa-star text-amber-300"></i>' : ''}</div>
             <div class="text-[10px] font-bold truncate max-w-full mt-0.5">${escapeHtml(meta.text)}</div>
           `;
         }

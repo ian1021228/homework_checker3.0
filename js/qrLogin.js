@@ -121,7 +121,7 @@ export async function startDeviceQrLoginSession() {
         } catch(e) {}
     } catch (err) {
         console.error("Failed to create QR login challenge:", err);
-        showToast("⚠️ 建立掃碼登入連線失敗，請稍後重試", "error");
+        showToast("建立掃碼登入連線失敗，請稍後重試", "error");
         return;
     }
 
@@ -179,7 +179,7 @@ export async function startDeviceQrLoginSession() {
         if (remainingSeconds <= 0) {
             clearInterval(activeQrCountdownInterval);
             activeQrCountdownInterval = null;
-            if (statusText) statusText.textContent = "⚠️ QR Code 已過期，請點擊重新產生";
+            if (statusText) statusText.textContent = "QR Code 已過期，請點擊重新產生";
             if (statusIndicator) statusIndicator.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
             if (refreshBtn) refreshBtn.classList.remove('hidden');
         } else {
@@ -193,13 +193,13 @@ export async function startDeviceQrLoginSession() {
         const data = snap.data();
 
         if (data.status === 'scanned') {
-            if (statusText) statusText.textContent = "📱 手機已掃描，等待手機端確認授權...";
+            if (statusText) statusText.textContent = "手機已掃描，等待手機端確認授權...";
             if (statusIndicator) statusIndicator.className = "w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse";
         } else if (data.status === 'authorized' && data.userObj) {
             // 手機已授權！開始執行登入程序
             const authProvider = data.authProvider || (data.userObj.isGoogleAuth ? 'google' : 'password');
             const providerName = authProvider === 'google' ? 'Google 帳號' : '雲端帳號';
-            if (statusText) statusText.textContent = `🎉 手機已授權！正在登入 ${data.userObj.displayName || data.userObj.email} (${providerName})...`;
+            if (statusText) statusText.textContent = `手機已授權！正在登入 ${data.userObj.displayName || data.userObj.email} (${providerName})...`;
             if (statusIndicator) statusIndicator.className = "w-2.5 h-2.5 rounded-full bg-emerald-500";
 
             // 停止監聽與計時
@@ -300,7 +300,7 @@ export async function startDeviceQrLoginSession() {
 
                 // 8. 關閉彈窗並提示
                 closeModal(qrModal);
-                showToast(`🎉 掃碼授權成功！歡迎 ${data.userObj.displayName || data.userObj.email}（已同步 ${providerName}）`, "success");
+                showToast(`掃碼授權成功！歡迎 ${data.userObj.displayName || data.userObj.email}（已同步 ${providerName}）`, "success");
 
                 // 9. 若已注入 Firebase Auth Session (例如 Google 帳號)，重新載入頁面使 Firebase Web SDK 完整識別同一個帳號
                 if (sessionInjected) {
@@ -312,7 +312,7 @@ export async function startDeviceQrLoginSession() {
                 }
             } catch (loginErr) {
                 console.error("QR login finalize error:", loginErr);
-                showToast("⚠️ 登入程序發生異常，請重試", "error");
+                showToast("登入程序發生異常，請重試", "error");
             }
         }
     });
@@ -343,7 +343,7 @@ export function stopDeviceQrLoginSession(closeTheModal = true) {
  */
 export async function openPhoneQrScannerModal() {
     if (!state.currentUser) {
-        showToast("⚠️ 請先在手機登入帳號，才能掃碼授權其他裝置登入！", "warning");
+        showToast("請先在手機登入帳號，才能掃碼授權其他裝置登入！", "warning");
         const portalModal = document.getElementById('portal-auth-modal');
         if (portalModal) openModal(portalModal);
         return;
@@ -450,7 +450,7 @@ export async function promptAuthorizeChallenge(challengeId) {
     if (!fbDb) return;
     if (!state.currentUser) {
         sessionStorage.setItem('pending_qr_login_challenge', challengeId);
-        showToast("📱 請先在手機登入您的帳號，登入後將自動授權該裝置登入！", "info");
+        showToast("請先在手機登入您的帳號，登入後將自動授權該裝置登入！", "info");
         const portalModal = document.getElementById('portal-auth-modal');
         if (portalModal) openModal(portalModal);
         return;
@@ -557,10 +557,10 @@ export async function promptAuthorizeChallenge(challengeId) {
                     }
 
                     closeModal(confirmModal);
-                    showToast("🎉 已成功授權！該裝置現已自動登入系統。", "success");
+                    showToast("已成功授權！該裝置現已自動登入系統。", "success");
                 } catch (err) {
                     console.error("Authorize error:", err);
-                    showToast("⚠️ 授權失敗，請確認網路連線後重試", "error");
+                    showToast("授權失敗，請確認網路連線後重試", "error");
                 } finally {
                     confirmBtn.disabled = false;
                     confirmBtn.innerHTML = origText;
@@ -607,7 +607,7 @@ export async function checkUrlForQrLogin() {
  */
 export async function verifyAndLoginWithOtp(inputCode) {
     if (!fbDb) {
-        showToast("⚠️ 尚未連線至雲端服務，請檢查網路", "error");
+        showToast("尚未連線至雲端服務，請檢查網路", "error");
         return;
     }
     const cleanCode = (inputCode || '').toString().trim();
@@ -634,7 +634,7 @@ export async function verifyAndLoginWithOtp(inputCode) {
 
         if (!snap.exists()) {
             if (errorEl) {
-                errorEl.textContent = "⚠️ 找不到此認證碼，請確認已登入裝置上的代碼是否正確。";
+                errorEl.textContent = "找不到此認證碼，請確認已登入裝置上的代碼是否正確。";
                 errorEl.classList.remove('hidden');
             }
             return;
@@ -643,7 +643,7 @@ export async function verifyAndLoginWithOtp(inputCode) {
         const data = snap.data();
         if (data.status === 'consumed') {
             if (errorEl) {
-                errorEl.textContent = "⚠️ 此認證碼已被使用過，請在已登入裝置重新產生！";
+                errorEl.textContent = "此認證碼已被使用過，請在已登入裝置重新產生！";
                 errorEl.classList.remove('hidden');
             }
             return;
@@ -652,7 +652,7 @@ export async function verifyAndLoginWithOtp(inputCode) {
         const expiresAt = new Date(data.expiresAt).getTime();
         if (Date.now() > expiresAt) {
             if (errorEl) {
-                errorEl.textContent = "⚠️ 此認證碼已超過 5 分鐘有效時間，請重新產生！";
+                errorEl.textContent = "此認證碼已超過 5 分鐘有效時間，請重新產生！";
                 errorEl.classList.remove('hidden');
             }
             return;
@@ -669,7 +669,7 @@ export async function verifyAndLoginWithOtp(inputCode) {
         // 執行無縫登入 (與掃碼登入相同的高規格注入)
         const authProvider = data.authProvider || 'password';
         const providerName = authProvider === 'google' ? 'Google 帳號' : '雲端帳號';
-        showToast(`🎉 認證碼驗證成功！正在登入 ${data.userObj.displayName || data.userObj.email}...`, "success");
+        showToast(`認證碼驗證成功！正在登入 ${data.userObj.displayName || data.userObj.email}...`, "success");
 
         stopDeviceQrLoginSession(false);
 
@@ -718,7 +718,7 @@ export async function verifyAndLoginWithOtp(inputCode) {
         const qrModal = document.getElementById('qr-login-modal');
         if (qrModal) closeModal(qrModal);
 
-        showToast(`🎉 快速登入成功！歡迎 ${data.userObj.displayName || data.userObj.email}`, "success");
+        showToast(`快速登入成功！歡迎 ${data.userObj.displayName || data.userObj.email}`, "success");
 
         if (sessionInjected) {
             setTimeout(() => window.location.reload(), 400);
@@ -729,7 +729,7 @@ export async function verifyAndLoginWithOtp(inputCode) {
     } catch (err) {
         console.error("verifyAndLoginWithOtp error:", err);
         if (errorEl) {
-            errorEl.textContent = "⚠️ 連線雲端驗證失敗，請重試";
+            errorEl.textContent = "連線雲端驗證失敗，請重試";
             errorEl.classList.remove('hidden');
         }
     } finally {
@@ -745,7 +745,7 @@ export async function verifyAndLoginWithOtp(inputCode) {
  */
 export async function generatePhoneOtpCode() {
     if (!state.currentUser) {
-        showToast("⚠️ 請先在手機登入帳號，才能產生登入認證碼！", "warning");
+        showToast("請先在手機登入帳號，才能產生登入認證碼！", "warning");
         return;
     }
     if (!fbDb) {
@@ -819,7 +819,7 @@ export async function generatePhoneOtpCode() {
                 activePhoneOtpCountdownInterval = null;
                 if (noticeEl) {
                     noticeEl.className = "p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-xs font-bold text-rose-700 flex items-center justify-center gap-1.5";
-                    noticeEl.innerHTML = `<span>⚠️ 認證碼已過期，請點擊重新產生</span>`;
+                    noticeEl.innerHTML = `<span>認證碼已過期，請點擊重新產生</span>`;
                 }
             } else {
                 updateCountdown();
@@ -833,9 +833,9 @@ export async function generatePhoneOtpCode() {
             if (data.status === 'consumed') {
                 if (noticeEl) {
                     noticeEl.className = "p-2.5 rounded-xl bg-emerald-100 border border-emerald-300 text-xs font-black text-emerald-900 flex items-center justify-center gap-1.5";
-                    noticeEl.innerHTML = `<span>🎉 公用電腦已成功登入！</span>`;
+                    noticeEl.innerHTML = `<span>公用電腦已成功登入！</span>`;
                 }
-                showToast("🎉 恭喜！目標電腦已成功完成認證碼登入。", "success");
+                showToast("恭喜！目標電腦已成功完成認證碼登入。", "success");
                 stopPhoneOtpSession();
                 setTimeout(() => {
                     closePhoneQrScannerModal();
@@ -845,7 +845,7 @@ export async function generatePhoneOtpCode() {
 
     } catch (err) {
         console.error("Failed to generate OTP code:", err);
-        showToast("⚠️ 產生認證碼失敗，請確認網路連線", "error");
+        showToast("產生認證碼失敗，請確認網路連線", "error");
     }
 }
 
@@ -927,7 +927,7 @@ export function setupQrLoginEvents() {
                 await closePhoneQrScannerModal();
                 await promptAuthorizeChallenge(targetChallengeId);
             } catch (err) {
-                showToast("⚠️ 查詢配對碼失敗，請檢查網路", "error");
+                showToast("查詢配對碼失敗，請檢查網路", "error");
             }
         });
     }

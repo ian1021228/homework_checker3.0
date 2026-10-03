@@ -261,7 +261,7 @@ export function setupButtonEvents() {
             state.currentClassId = state.appData.classes?.[0]?.id || null;
             await saveData();
             fullRender();
-            showToast("✅ 已成功倒退還原備份資料！", "success");
+            showToast("已成功倒退還原備份資料！", "success");
         } catch(e) {
             showAlertModal("還原失敗", "備份資料損壞或格式不符：" + (e.message || e));
         }
@@ -368,7 +368,7 @@ export function setupButtonEvents() {
         inputs.forEach((input, idx) => {
             input.value = val1 + (diff * idx);
         });
-        showToast("⚡ 條碼已自動推算完成！請記得點選「儲存配置」", "success");
+        showToast("條碼已自動推算完成！請記得點選「儲存配置」", "success");
     });
 
     bindClick('save-barcodes-btn', async () => {
@@ -386,7 +386,7 @@ export function setupButtonEvents() {
         if (maxSeatInput) currentClass.lastMaxSeat = parseInt(maxSeatInput.value, 10) || 30;
         await saveData();
         closeModal(document.getElementById('barcodes-modal'));
-        showToast("✅ 班級條碼配置已成功儲存！", "success");
+        showToast("班級條碼配置已成功儲存！", "success");
     });
 
     // 8. 各子分頁返回按鈕
@@ -647,9 +647,9 @@ export function setupButtonEvents() {
             }
         } catch(e) { console.warn("Update boundAccount verified status err:", e); }
 
-        showToast("🎉 信箱驗證成功！歡迎進入系統", "success");
+        showToast("信箱驗證成功！歡迎進入系統", "success");
         showAlertModal(
-            "🎉 信箱驗證成功！",
+            "信箱驗證成功！",
             `恭喜您！您的電子信箱已通過驗證，帳號【${userObj.displayName}】已正式啟用！\n\n日後登入時，您只需輸入使用者名稱【${userObj.displayName}】與密碼即可快速進入系統。`
         );
 
@@ -715,9 +715,7 @@ export function setupButtonEvents() {
             const displayEmailStr = cand.email || '已綁定帳號';
             item.innerHTML = `
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-indigo-100/80 text-indigo-700 font-black flex items-center justify-center text-sm shadow-xs">
-                        👤
-                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-indigo-100/80 text-indigo-700 font-black flex items-center justify-center text-sm shadow-xs"><i class="fa-solid fa-user"></i></div>
                     <div>
                         <div class="font-black text-slate-800 text-sm group-hover:text-indigo-600 transition-colors">${cand.username || cand.displayName || cand.accountName || '一般帳號'}</div>
                         <div class="text-[11px] text-slate-400 font-medium mt-0.5">${displayEmailStr} · 建立於 ${dateStr}</div>
@@ -845,7 +843,7 @@ export function setupButtonEvents() {
                         }
                         if (signInErr.code === 'auth/invalid-credential' || signInErr.code === 'auth/wrong-password' || signInErr.code === 'auth/user-not-found') {
                             if ((cand.email || '').toLowerCase() === 'ianw.solar@gmail.com' || (cand.email || '').toLowerCase().includes('@gmail.com')) {
-                                showAlertModal("登入提示", "帳號或密碼不相符。\n\n💡 提示：若此帳號平時是使用 Google 授權登入，請直接點選下方「使用 Google 帳號快速登入」按鈕！");
+                                showAlertModal("登入提示", "帳號或密碼不相符。\n\n提示：若此帳號平時是使用 Google 授權登入，請直接點選下方「使用 Google 帳號快速登入」按鈕！");
                             } else {
                                 showAlertModal("登入失敗", "密碼錯誤或憑證無效，請確認後重試。若忘記密碼請點選下方「忘記密碼？」");
                             }
@@ -883,7 +881,7 @@ export function setupButtonEvents() {
                     document.getElementById('admin-modal-btn')?.classList.add('hidden');
                     document.getElementById('admin-btn')?.classList.add('hidden');
                 }
-                showToast(`✅ 登入成功！歡迎 ${userObj.displayName}`, "success");
+                showToast(`登入成功！歡迎 ${userObj.displayName}`, "success");
 
                 // 優先載入該帳號之本地資料；若本地有未綁定班級作業資料則予以綁定保留 (杜絕登入後資料消失)
                 const userKey = getUserStorageKey(userObj);
@@ -980,7 +978,7 @@ export function setupButtonEvents() {
                     localStorage.setItem('homeworkAppData', safeStringify(state.appData));
                     if (state.currentClassId) localStorage.setItem('currentClassId', state.currentClassId);
 
-                    showToast(`✅ 登入成功！歡迎 ${userObj.displayName}`, "success");
+                    showToast(`登入成功！歡迎 ${userObj.displayName}`, "success");
                     showToast("⏳ 正在同步雲端資料...", "info");
                     await loadDataFromCloud(true);
                     proceedIntoSystem();
@@ -995,7 +993,7 @@ export function setupButtonEvents() {
             let msg = err?.message || "登入失敗";
             if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
                 if (accountInput.toLowerCase().includes('@gmail.com') || accountInput.toLowerCase() === 'ianw.solar@gmail.com') {
-                    msg = "帳號或密碼不符。\n\n💡 提示：若您的帳號是透過 Google 快速授權建立的，請直接點選下方的「使用 Google 帳號快速登入」按鈕！";
+                    msg = "帳號或密碼不符。\n\n提示：若您的帳號是透過 Google 快速授權建立的，請直接點選下方的「使用 Google 帳號快速登入」按鈕！";
                 } else {
                     msg = "使用者名稱或密碼錯誤，請確認後重試。若忘記密碼請點選下方「忘記密碼？」";
                 }
@@ -1192,7 +1190,7 @@ export function setupButtonEvents() {
             closeModal(document.getElementById('portal-auth-modal'));
 
             // 啟動信箱驗證等待機制：註冊後需等待驗證完成才能進入系統
-            showToast("📧 驗證郵件已寄出！請至信箱開啟郵件並點選驗證連結", "info");
+            showToast("驗證郵件已寄出！請至信箱開啟郵件並點選驗證連結", "info");
             openEmailVerificationModal(email, cred.user, {
                 displayEmail: email,
                 authEmail: finalAuthEmail,
@@ -1246,7 +1244,7 @@ export function setupButtonEvents() {
                     `系統目前尚未收到 ${currentPendingVerification?.targetEmail || '您的信箱'} 的驗證確認。\n\n` +
                     "【請依下列步驟啟用帳號】：\n" +
                     "1. 前往您的電子信箱。\n" +
-                    "2. ⚠️ 特別注意：請務必查看【垃圾郵件匣 (Spam)】或【促銷內容】！\n" +
+                    "2. 特別注意：請務必查看【垃圾郵件匣 (Spam)】或【促銷內容】！\n" +
                     "3. 點選郵件中的「驗證連結」。\n" +
                     "4. 點選後，返回此視窗再次按下本按鈕即可順利進入系統！\n\n" +
                     "若仍未收到信件，可點選下方「重新發送驗證信」。"
@@ -1273,7 +1271,7 @@ export function setupButtonEvents() {
         }
         try {
             await sendEmailVerification(fbAuth.currentUser);
-            showToast("📧 驗證郵件已重新發送！請檢查信箱及垃圾郵件匣", "success");
+            showToast("驗證郵件已重新發送！請檢查信箱及垃圾郵件匣", "success");
 
             let remaining = 60;
             if (btn) {
@@ -1407,8 +1405,8 @@ export function setupButtonEvents() {
 
             await sendPasswordResetEmail(fbAuth, targetAuthEmail);
             showAlertModal(
-                "📧 重設密碼郵件已發送！", 
-                `系統已向下列信箱寄出繁體中文密碼重設信件：\n\n${targetEmail}\n\n==============================\n⚠️【最重要提醒 — 請至垃圾郵件匣查收】：\n信件極高機率會被 Gmail 或收件伺服器自動歸類到【垃圾郵件匣 (Spam)】或【促銷內容】！\n\n若 1~3 分鐘內未在收件匣看見信件，請務必前往【垃圾郵件匣】搜尋寄件者，點選信中專屬安全連結即可重設密碼！\n==============================`
+                "重設密碼郵件已發送！", 
+                `系統已向下列信箱寄出繁體中文密碼重設信件：\n\n${targetEmail}\n\n==============================\n【最重要提醒 — 請至垃圾郵件匣查收】：\n信件極高機率會被 Gmail 或收件伺服器自動歸類到【垃圾郵件匣 (Spam)】或【促銷內容】！\n\n若 1~3 分鐘內未在收件匣看見信件，請務必前往【垃圾郵件匣】搜尋寄件者，點選信中專屬安全連結即可重設密碼！\n==============================`
             );
             document.getElementById('portal-view-forgot')?.classList.add('hidden');
             document.getElementById('portal-view-signin')?.classList.remove('hidden');
@@ -1436,7 +1434,7 @@ export function setupButtonEvents() {
         signInWithPopup(fbAuth, new GoogleAuthProvider()).then(async (cred) => {
             sessionStorage.setItem('auth_provider', 'google');
             sessionStorage.removeItem('is_explicit_logout');
-            // ✨ 清除訪客體驗模式旗標與暫存，防止快速體驗帳號殘留到登入後帳戶
+            // 清除訪客體驗模式旗標與暫存，防止快速體驗帳號殘留到登入後帳戶
             sessionStorage.removeItem('app_is_guest_mode');
             localStorage.removeItem('visitor_id');
             localStorage.removeItem('visitor_name');
@@ -1457,11 +1455,11 @@ export function setupButtonEvents() {
             if (isAdmin) {
                 document.getElementById('admin-modal-btn')?.classList.remove('hidden');
                 document.getElementById('admin-btn')?.classList.remove('hidden');
-                showToast("🛡️ 歡迎最高管理員 (Google 帳號授權登入)", "success");
+                showToast("歡迎最高管理員 (Google 帳號授權登入)", "success");
             } else {
                 document.getElementById('admin-modal-btn')?.classList.add('hidden');
                 document.getElementById('admin-btn')?.classList.add('hidden');
-                showToast("✅ Google 帳號登入成功！", "success");
+                showToast("Google 帳號登入成功！", "success");
             }
 
             // 優先載入該帳號之本地資料；若本地有未綁定班級作業資料則予以綁定保留 (杜絕登入後資料消失)
@@ -1524,7 +1522,7 @@ export function setupButtonEvents() {
                     if (hasData) state.isLocalEmptyOnBoot = false;
                     await saveData();
                     localStorage.setItem('storageSelected', 'true');
-                    showToast("✅ 已成功綁定本機硬碟檔案", "success");
+                    showToast("已成功綁定本機硬碟檔案", "success");
                     showWelcomeStep2();
                 }
             });
@@ -1644,7 +1642,7 @@ export function setupButtonEvents() {
         showToast("已切換為「條碼掃描」模式", "success");
     });
 
-    // ✨ 管理員檢視模式 UI 狀態更新
+    // 管理員檢視模式 UI 狀態更新
     function updateAdminInspectionUI() {
         const topBanner = document.getElementById('admin-viewing-banner');
         const modalBanner = document.getElementById('admin-modal-active-inspection-banner');
@@ -1675,7 +1673,7 @@ export function setupButtonEvents() {
         }
     }
 
-    // ✨ 管理員進入檢視模式
+    // 管理員進入檢視模式
     async function enterAdminViewMode(targetId, targetEmail) {
         stopRealtimeCloudSync();
         if (!state.adminViewModeUserId) {
@@ -1695,7 +1693,7 @@ export function setupButtonEvents() {
         fullRender();
     }
 
-    // ✨ 管理員退出檢視模式，回到管理員自己的資料
+    // 管理員退出檢視模式，回到管理員自己的資料
     async function exitAdminViewMode() {
         if (!state.adminViewModeUserId && !sessionStorage.getItem('admin_backup_appData')) return;
         showToast("⏳ 正在退出檢視模式並還原您的資料...", "info");
@@ -1736,7 +1734,7 @@ export function setupButtonEvents() {
         await loadDataFromCloud(true);
         fullRender();
         closeModal(document.getElementById('admin-modal'));
-        showToast("✅ 已成功退出檢視模式，恢復管理員帳號與作業資料！", "success");
+        showToast("已成功退出檢視模式，恢復管理員帳號與作業資料！", "success");
     }
 
     // 系統管理中心 (Admin) Modal 開啟
@@ -1774,7 +1772,7 @@ export function setupButtonEvents() {
                     if (hasData) state.isLocalEmptyOnBoot = false;
                     await saveData();
                     localStorage.setItem('storageSelected', 'true');
-                    showToast("✅ 已成功綁定本機硬碟檔案", "success");
+                    showToast("已成功綁定本機硬碟檔案", "success");
                     syncUserProfile();
                     proceedIntoSystem();
                 }
@@ -1877,7 +1875,7 @@ export function setupButtonEvents() {
         if (syncBarcodes) items.push('條碼設定');
         if (syncContact) items.push('聯絡簿');
 
-        const confirmMsg = `確定要將「${sourceClass.name}」的【${items.join('、')}】同步至「${targetClass.name}」嗎？\n\n處理模式：${modeLabel}${mode === 'overwrite' ? '\n⚠️ 警告：目標班級勾選項目的現有資料將被清除並完全覆蓋！' : '\n💡 提示：相同作業或重複內容將自動略過。'}`;
+        const confirmMsg = `確定要將「${sourceClass.name}」的【${items.join('、')}】同步至「${targetClass.name}」嗎？\n\n處理模式：${modeLabel}${mode === 'overwrite' ? '\n警告：目標班級勾選項目的現有資料將被清除並完全覆蓋！' : '\n提示：相同作業或重複內容將自動略過。'}`;
 
         showConfirmModal('確認班級資料同步', confirmMsg, async () => {
             await executeCopyClassData(sourceClass, targetClass, { syncHw, syncTypes, syncBarcodes, syncContact }, mode);
@@ -2000,7 +1998,7 @@ export function setupButtonEvents() {
         if (targetId) {
             copyHomeworkDefaulters(targetId);
         } else {
-            showToast("⚠️ 請先選擇作業", "warning");
+            showToast("請先選擇作業", "warning");
         }
     });
 
@@ -2136,7 +2134,7 @@ export function setupButtonEvents() {
         }
         if(className) {
             if (enteredCode && state.appData.classes.some(c => c.accessCode && c.accessCode.toUpperCase() === enteredCode)) {
-                showToast(`⚠️ 班級代碼「${enteredCode}」已被其他班級使用，請更換其他代碼！`, "error");
+                showToast(`班級代碼「${enteredCode}」已被其他班級使用，請更換其他代碼！`, "error");
                 if (codeInput) { codeInput.focus(); codeInput.select(); }
                 return;
             }
@@ -2174,24 +2172,24 @@ export function setupButtonEvents() {
             homeworkId = state.currentHomeworkId;
         }
         if (!homeworkId) {
-            showToast("⚠️ 未指定作業項目", "warning");
+            showToast("未指定作業項目", "warning");
             return;
         }
         const hw = (state.appData.homeworks || []).find(h => String(h.id) === String(homeworkId));
         if (!hw) {
-            showToast("⚠️ 找不到該項作業資料", "warning");
+            showToast("找不到該項作業資料", "warning");
             return;
         }
         const cls = (state.appData.classes || []).find(c => String(c.id) === String(hw.classId));
         const clsName = cls ? cls.name : '本班';
         const missingStudents = (hw.students || []).filter(s => !isStudentCompleted(s, hw.typeId || 'default'));
         if (missingStudents.length === 0) {
-            showToast(`🎉「${hw.name}」全班皆已繳齊，無缺交名單！`, "success");
+            showToast(`「${hw.name}」全班皆已繳齊，無缺交名單！`, "success");
             return;
         }
         const missingSeatNums = missingStudents.map(s => `${s.seat}號`).join('、');
-        const text = `📢 【${clsName} ${hw.name} 未交名單】\n共 ${missingStudents.length} 人尚未繳交：${missingSeatNums}\n請同學於放學前儘速補交！`;
-        await safeCopyToClipboard(text, `📋 已複製「${hw.name}」未交名單（共 ${missingStudents.length} 人）`);
+        const text = `【${clsName} ${hw.name} 未交名單】\n共 ${missingStudents.length} 人尚未繳交：${missingSeatNums}\n請同學於放學前儘速補交！`;
+        await safeCopyToClipboard(text, `已複製「${hw.name}」未交名單（共 ${missingStudents.length} 人）`);
     }
 
     // 作業清單項目點擊
@@ -2300,7 +2298,7 @@ export function setupButtonEvents() {
                     if (cls) {
                         const oldCode = cls.accessCode;
                         if (newCode && state.appData.classes.some(c => c.id !== classId && c.accessCode && c.accessCode.toUpperCase() === newCode)) {
-                            showToast(`⚠️ 班級代碼「${newCode}」已被其他班級使用，請輸入其他代碼！`, "error");
+                            showToast(`班級代碼「${newCode}」已被其他班級使用，請輸入其他代碼！`, "error");
                             if (input) { input.focus(); input.select(); }
                             return;
                         }
@@ -2322,15 +2320,33 @@ export function setupButtonEvents() {
                 e.stopPropagation();
                 const classId = saveMaxSeatBtn.dataset.classId;
                 const input = classListEl.querySelector(`.class-max-seat-input[data-class-id="${classId}"]`);
+                const skippedInput = classListEl.querySelector(`.class-skipped-seats-input[data-class-id="${classId}"]`);
                 if (input) {
                     const val = parseInt(input.value, 10);
                     if (!val || val < 1 || val > 100) {
                         showToast("請輸入 1 至 100 之間的有效座號！", "warning");
                         return;
                     }
-                    await updateClassMaxSeat(classId, val);
+                    const skippedVal = skippedInput ? skippedInput.value.trim() : "";
+                    await updateClassMaxSeat(classId, val, skippedVal);
                     renderClassList();
-                    showToast(`已成功更新最後座號為 ${val} 號，並同步套用至全班作業！`, "success");
+                    showToast(`已成功更新最後座號為 ${val} 號與缺號設定，並同步套用至全班作業！`, "success");
+                }
+                return;
+            }
+
+            const saveSkippedSeatsBtn = e.target.closest('.save-class-skipped-seats-btn');
+            if (saveSkippedSeatsBtn) {
+                e.stopPropagation();
+                const classId = saveSkippedSeatsBtn.dataset.classId;
+                const skippedInput = classListEl.querySelector(`.class-skipped-seats-input[data-class-id="${classId}"]`);
+                const maxSeatInput = classListEl.querySelector(`.class-max-seat-input[data-class-id="${classId}"]`);
+                if (skippedInput) {
+                    const maxVal = maxSeatInput ? (parseInt(maxSeatInput.value, 10) || 35) : 35;
+                    const skippedVal = skippedInput.value.trim();
+                    await updateClassMaxSeat(classId, maxVal, skippedVal);
+                    renderClassList();
+                    showToast(`已成功更新缺號設定，並同步套用至全班作業！`, "success");
                 }
                 return;
             }
@@ -2340,7 +2356,7 @@ export function setupButtonEvents() {
                 e.stopPropagation();
                 const code = copyCodeBtn.dataset.code;
                 const name = copyCodeBtn.dataset.name;
-                await safeCopyToClipboard(code, `✅ 已複製「${name}」班級權限碼：${code}`);
+                await safeCopyToClipboard(code, `已複製「${name}」班級權限碼：${code}`);
                 return;
             }
 
@@ -2351,7 +2367,7 @@ export function setupButtonEvents() {
                 const code = copyParentBtn.dataset.code;
                 const name = copyParentBtn.dataset.name;
                 const parentUrl = `https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/?code=${encodeURIComponent(code)}`;
-                await safeCopyToClipboard(parentUrl, `✅ 已複製「${name}」專屬家長端連結（包含代碼）！`);
+                await safeCopyToClipboard(parentUrl, `已複製「${name}」專屬家長端連結（包含代碼）！`);
                 return;
             }
 
@@ -2362,7 +2378,7 @@ export function setupButtonEvents() {
                 const code = copyStudentBtn.dataset.code;
                 const name = copyStudentBtn.dataset.name;
                 const studentUrl = `https://ian1021228.github.io/ian_homework_checker2.0_online_student_dashboard/?code=${encodeURIComponent(code)}`;
-                await safeCopyToClipboard(studentUrl, `✅ 已複製「${name}」專屬學生端聯絡簿連結（包含代碼）！`);
+                await safeCopyToClipboard(studentUrl, `已複製「${name}」專屬學生端聯絡簿連結（包含代碼）！`);
                 return;
             }
 
@@ -2410,7 +2426,7 @@ export function setupButtonEvents() {
                 const handleSave = async () => {
                     const newName = input.value.trim();
                     if (!newName) {
-                        showToast("⚠️ 班級名稱不能為空白！", "warning");
+                        showToast("班級名稱不能為空白！", "warning");
                         input.focus();
                         return;
                     }
@@ -2420,7 +2436,7 @@ export function setupButtonEvents() {
                     }
                     const duplicate = state.appData.classes.some(c => c.id !== classId && c.name === newName);
                     if (duplicate) {
-                        showToast("⚠️ 已存在相同名稱的班級！", "warning");
+                        showToast("已存在相同名稱的班級！", "warning");
                         input.focus();
                         return;
                     }
@@ -2432,7 +2448,7 @@ export function setupButtonEvents() {
                     renderClassSelector();
                     renderClassList();
                     renderHomeworkList();
-                    showToast(`🎉 已成功將「${oldName}」更名為「${newName}」`, "success");
+                    showToast(`已成功將「${oldName}」更名為「${newName}」`, "success");
                 };
 
                 const handleCancel = () => {
@@ -2474,7 +2490,7 @@ export function setupButtonEvents() {
                 if (cls) {
                     const oldCode = cls.accessCode;
                     if (newCode && state.appData.classes.some(c => c.id !== classId && c.accessCode && c.accessCode.toUpperCase() === newCode)) {
-                        showToast("⚠️ 此權限碼已被其他班級使用！", "error");
+                        showToast("此權限碼已被其他班級使用！", "error");
                         return;
                     }
                     if (oldCode && oldCode !== newCode) {
@@ -2486,6 +2502,20 @@ export function setupButtonEvents() {
                     renderClassList();
                     showToast(newCode ? `已設定「${cls.name}」權限碼：${newCode}` : `已清除「${cls.name}」權限碼`, "success");
                 }
+            } else if (e.key === 'Enter' && (e.target.classList.contains('class-max-seat-input') || e.target.classList.contains('class-skipped-seats-input'))) {
+                e.preventDefault();
+                const classId = e.target.dataset.classId;
+                const maxSeatInput = classListEl.querySelector(`.class-max-seat-input[data-class-id="${classId}"]`);
+                const skippedInput = classListEl.querySelector(`.class-skipped-seats-input[data-class-id="${classId}"]`);
+                const val = maxSeatInput ? parseInt(maxSeatInput.value, 10) : 35;
+                if (!val || val < 1 || val > 100) {
+                    showToast("請輸入 1 至 100 之間的有效座號！", "warning");
+                    return;
+                }
+                const skippedVal = skippedInput ? skippedInput.value.trim() : "";
+                await updateClassMaxSeat(classId, val, skippedVal);
+                renderClassList();
+                showToast(`已成功更新最後座號為 ${val} 號與缺號設定！`, "success");
             }
         });
     }
@@ -2589,20 +2619,6 @@ export function setupButtonEvents() {
             closeModal(studentPinsModal);
         });
 
-        // Batch action: Enable all pins (classCode + seat)
-        document.getElementById('btn-batch-enable-pins')?.addEventListener('click', () => {
-            const cls = state.appData.classes.find(c => c.id === currentEditingPinsClassId);
-            if (!cls) return;
-            const maxSeat = typeof cls.lastMaxSeat === 'number' && cls.lastMaxSeat > 0 ? cls.lastMaxSeat : 30;
-            const code = String(cls.accessCode || '').trim();
-            cls.studentPins = cls.studentPins || {};
-            for (let s = 1; s <= maxSeat; s++) {
-                cls.studentPins[s] = `${code}${s}`;
-            }
-            renderStudentPinsList(cls);
-            showToast(`已為全班生成預設 PIN 碼（${code || '班級代碼'} + 座號），請點擊「儲存並同步至雲端」！`, "info");
-        });
-
         // Batch action: Random pins for all
         document.getElementById('btn-batch-random-pins')?.addEventListener('click', () => {
             const cls = state.appData.classes.find(c => c.id === currentEditingPinsClassId);
@@ -2638,7 +2654,7 @@ export function setupButtonEvents() {
                 rosterText += `座號 ${String(s).padStart(2, ' ')} 號：${p}\n`;
             }
             rosterText += `------------------------------------\n※ 預設密碼為【班級代碼 + 座號】（學生與家長共用相同 PIN 碼解鎖成績系統）。\n※ 學生手機在首次輸入驗證成功後將自動記憶憑證，日後免密直開！`;
-            await safeCopyToClipboard(rosterText, "✅ 已複製全班密碼對照表至剪貼簿！");
+            await safeCopyToClipboard(rosterText, "已複製全班密碼對照表至剪貼簿！");
         });
 
         // Seat row click delegation (Reset, Disable, Enable)
@@ -2717,7 +2733,7 @@ export function setupButtonEvents() {
             await saveData();
             await syncClassStudentPinsToCloud(cls);
 
-            showToast("🎉 已成功儲存並同步學生 PIN 碼至雲端！學生與家長端即刻生效。", "success");
+            showToast("已成功儲存並同步學生 PIN 碼至雲端！學生與家長端即刻生效。", "success");
             closeModal(studentPinsModal);
             renderClassList();
         });
@@ -2728,7 +2744,7 @@ export function setupButtonEvents() {
         const currentClass = state.appData.classes.find(c => c.id === state.currentClassId);
         const code = (currentClass && currentClass.accessCode) ? encodeURIComponent(currentClass.accessCode) : '';
         const url = code ? `${baseUrl}?code=${code}` : baseUrl;
-        const msg = code ? `✅ 已複製「${currentClass.name}」家長端專屬連結 (附帶班級代碼)！` : "✅ 已複製家長端通用連結！";
+        const msg = code ? `已複製「${currentClass.name}」家長端專屬連結 (附帶班級代碼)！` : "已複製家長端通用連結！";
         await safeCopyToClipboard(url, msg);
     });
 
@@ -3139,18 +3155,18 @@ export function setupButtonEvents() {
                 deferredInstallPrompt.prompt();
                 const { outcome } = await deferredInstallPrompt.userChoice;
                 if (outcome === 'accepted') {
-                    showToast("✅ 已成功安裝作業點收系統 App！", "success");
+                    showToast("已成功安裝作業點收系統 App！", "success");
                 }
                 deferredInstallPrompt = null;
             } else {
-                showToast("💡 提示：請點擊瀏覽器網址列右側的「安裝」圖示，或選單中的「加到主畫面」進行安裝。", "info");
+                showToast("提示：請點擊瀏覽器網址列右側的「安裝」圖示，或選單中的「加到主畫面」進行安裝。", "info");
             }
         });
     }
 
     window.addEventListener('appinstalled', () => {
         deferredInstallPrompt = null;
-        showToast("🎉 作業點收系統 App 安裝完成！", "success");
+        showToast("作業點收系統 App 安裝完成！", "success");
     });
 
     // 畫面尺寸調整
@@ -3206,7 +3222,7 @@ export function setupButtonEvents() {
     }, true);
 
     // ==========================================
-    // 📋 LINE 班級家長群通報文案綁定
+    // LINE 班級家長群通報文案綁定
     // ==========================================
     document.getElementById('copy-line-report-btn')?.addEventListener('click', openLineReportModal);
     document.getElementById('mobile-sheet-line-report-btn')?.addEventListener('click', () => {
@@ -3217,7 +3233,7 @@ export function setupButtonEvents() {
         const text = document.getElementById('line-report-textarea')?.value;
         if (text) {
             safeCopyToClipboard(text);
-            showToast("🎉 已複製到剪貼簿！", "success");
+            showToast("已複製到剪貼簿！", "success");
         }
     });
     document.getElementById('close-line-report-modal-btn')?.addEventListener('click', () => {
@@ -3228,23 +3244,23 @@ export function setupButtonEvents() {
     });
 
     // ==========================================
-    // 🖥️ 雙螢幕模式 (Beta版) 綁定
+    // 雙螢幕模式 (Beta版) 綁定
     // ==========================================
     document.getElementById('toggle-dual-screen-mode')?.addEventListener('change', (e) => {
         localStorage.setItem('feature_dual_screen_enabled', e.target.checked ? 'true' : 'false');
         updateDualScreenSidebar();
-        showToast(e.target.checked ? "🖥️ 已開啟雙螢幕模式 (Beta版)" : "🖥️ 已關閉雙螢幕模式", "info");
+        showToast(e.target.checked ? "已開啟雙螢幕模式 (Beta版)" : "已關閉雙螢幕模式", "info");
     });
     document.getElementById('dual-screen-toggle-btn')?.addEventListener('click', toggleDualScreenCollapse);
     document.getElementById('dual-screen-refresh-btn')?.addEventListener('click', () => {
         renderDualScreenContactBook();
-        showToast("🔄 當日聯絡簿已重新整理", "info");
+        showToast("當日聯絡簿已重新整理", "info");
     });
     // 初始化雙螢幕側邊欄狀態
     updateDualScreenSidebar();
 
     // ==========================================
-    // 📱 手機端原生 App 底部導航欄與 FAB 綁定
+    // 手機端原生 App 底部導航欄與 FAB 綁定
     // ==========================================
     document.getElementById('mobile-nav-homework')?.addEventListener('click', () => {
         showMainPage();
@@ -3300,13 +3316,13 @@ export function setupButtonEvents() {
     });
 
     // ==========================================
-    // 📴 離線優先 (Offline-First) 狀態監聽
+    // 離線優先 (Offline-First) 狀態監聽
     // ==========================================
     window.addEventListener('offline', () => {
-        showToast("📴 目前處於離線模式，所有作業與聯絡簿將極速儲存於本地！", "warning");
+        showToast("目前處於離線模式，所有作業與聯絡簿將極速儲存於本地！", "warning");
     });
     window.addEventListener('online', () => {
-        showToast("🌐 已恢復網路連線，正在自動同步雲端資料...", "success");
+        showToast("已恢復網路連線，正在自動同步雲端資料...", "success");
         try { syncDataToCloud(true); } catch(e) {}
     });
 }
@@ -3352,7 +3368,7 @@ export function enterDeveloperMode() {
         if (window.updateChatUnreadBadge) window.updateChatUnreadBadge();
     } catch(e) {}
 
-    showToast("🛠️ 已進入開發者模式（具備完整管理員與維護權限）", "success");
+    showToast("已進入開發者模式（具備完整管理員與維護權限）", "success");
 }
 window.enterDeveloperMode = enterDeveloperMode;
 
@@ -3403,7 +3419,7 @@ window.setScanActionMode = setScanActionMode;
 
 
 // ==========================================
-// 📋 1. 一鍵生成 LINE 班級家長群每日通報文案
+// 1. 一鍵生成 LINE 班級家長群每日通報文案
 // ==========================================
 export function generateLineReportText() {
     const curClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId) || state.appData?.classes?.[0];
@@ -3413,12 +3429,12 @@ export function generateLineReportText() {
     const days = ['日', '一', '二', '三', '四', '五', '六'];
     const dateStr = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} (${days[now.getDay()]})`;
 
-    let text = `📅 【${className} 今日聯絡簿與作業點收】${dateStr}\n`;
+    let text = `【${className} 今日聯絡簿與作業點收】${dateStr}\n`;
     text += `━━━━━━━━━━━━━━━━━━━━━━\n`;
 
     // 今日作業點收狀況
     const curHws = (state.appData?.homeworks || []).filter(h => h.classId === (curClass?.id || state.currentClassId));
-    text += `📖 今日作業點收狀況：\n`;
+    text += `[今日作業點收狀況]\n`;
     if (curHws.length === 0) {
         text += `（今日尚無登記作業）\n`;
     } else {
@@ -3437,14 +3453,14 @@ export function generateLineReportText() {
                 }
             }
             if (missingSeats.length === 0) {
-                text += `${idx + 1}. ${hw.name}（🎉 全班已交齊）\n`;
+                text += `${idx + 1}. ${hw.name}（全班已交齊）\n`;
             } else {
                 text += `${idx + 1}. ${hw.name}（缺交：${missingSeats.join('、')}）\n`;
             }
         });
     }
 
-    text += `\n📝 今日黑板聯絡事項：\n`;
+    text += `\n[今日黑板聯絡事項]\n`;
     const todayYMD = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
     const cbItems = curClass?.contactBook?.[todayYMD] || state.appData?.contactBooks?.[curClass?.id || state.currentClassId]?.[todayYMD] || [];
     if (cbItems.length === 0) {
@@ -3455,7 +3471,7 @@ export function generateLineReportText() {
         });
     }
 
-    text += `\n🔗 家長專屬即時查核連結（免密碼直達）：\n`;
+    text += `\n[家長專屬即時查核連結（免密碼直達）]\n`;
     const baseUrl = 'https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/';
     text += classCode ? `${baseUrl}?code=${classCode}\n` : `${baseUrl}\n`;
     text += `━━━━━━━━━━━━━━━━━━━━━━\n`;
@@ -3471,14 +3487,14 @@ export function openLineReportModal() {
     
     // 自動複製進剪貼簿
     safeCopyToClipboard(reportText);
-    showToast("🎉 已自動複製 LINE 家長群通報文案！", "success");
+    showToast("已自動複製 LINE 家長群通報文案！", "success");
 
     const modal = document.getElementById('line-report-modal');
     if (modal) openModal(modal);
 }
 
 // ==========================================
-// 🖥️ 2. 雙螢幕模式 (Beta版) 當日聯絡簿側邊欄
+// 2. 雙螢幕模式 (Beta版) 當日聯絡簿側邊欄
 // ==========================================
 let isDualScreenExpanded = true;
 

@@ -38,3 +38,4 @@ export const state = {
 
 // Also expose on window for legacy / event handler fallback if needed
 window.appState = state;
+window.state = state;

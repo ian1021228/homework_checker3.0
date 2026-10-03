@@ -124,7 +124,7 @@ export function saveData() {
     }
     state.isLocalEmptyOnBoot = false; 
 
-    // ⚡ 1. 立即同步寫入該帳號專屬之 localStorage 與全域快取，各帳號完全隔離
+    // 1. 立即同步寫入該帳號專屬之 localStorage 與全域快取，各帳號完全隔離
     try {
         const userKey = getUserStorageKey(state.currentUser);
         const dataStr = safeStringify(state.appData);
@@ -141,7 +141,7 @@ export function saveData() {
         console.error("Local storage save error:", err);
     }
 
-    // ⚡ 2. 背景非同步防抖處理磁碟寫入與雲端備份，完全不卡死 UI 執行緒
+    // 2. 背景非同步防抖處理磁碟寫入與雲端備份，完全不卡死 UI 執行緒
     if (state.saveTimeout) clearTimeout(state.saveTimeout);
     state.isSaving = true;
     state.saveTimeout = setTimeout(async () => {
@@ -213,7 +213,7 @@ export function checkAndCleanupStorage() {
         const fullBytes = new Blob([safeStringify(state.appData)]).size;
         const sizeKB = (fullBytes / 1024).toFixed(1);
         if (fullBytes > 4 * 1024 * 1024) { // 超過 4MB 警告
-            showToast(`⚠️ 本地資料量較大 (${sizeKB} KB)，建議使用匯出備份。`, 'warning');
+            showToast(`本地資料量較大 (${sizeKB} KB)，建議使用匯出備份。`, 'warning');
         }
     } catch(e) {}
 }
@@ -391,7 +391,7 @@ export async function executeCopyClassData(sourceClass, targetClass, { syncHw, s
     if (onDoneCallback) onDoneCallback();
     closeModal(document.getElementById('copy-class-modal'));
     closeModal(document.getElementById('settings-modal'));
-    showToast(`✅ 資料同步完成！${syncHw ? ` (新增 ${hwAddedCount} 項作業)` : ''}`, 'success');
+    showToast(`資料同步完成！${syncHw ? ` (新增 ${hwAddedCount} 項作業)` : ''}`, 'success');
 }
 
 export { updateDataManagementUI } from './render.js';

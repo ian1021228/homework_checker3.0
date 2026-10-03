@@ -88,7 +88,7 @@ if (fbAuth) {
 
             if (user) {
                 if (syncStatus) {
-                    syncStatus.innerHTML = `狀態：跨裝置即時同步中 <br><span class="text-sky-900 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-sky-100 text-[11px] tracking-wide">👤 ${user.displayName || user.email}</span>`;
+                    syncStatus.innerHTML = `狀態：跨裝置即時同步中 <br><span class="text-sky-900 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-sky-100 text-[11px] tracking-wide"><i class="fa-solid fa-user mr-1 text-sky-600"></i> ${user.displayName || user.email}</span>`;
                 }
                 if (loginBtn) loginBtn.classList.add('hidden');
                 if (cloudActions) cloudActions.classList.remove('hidden');
@@ -103,7 +103,7 @@ if (fbAuth) {
                     const isGoogle = isGoogleAuthUser(state.currentUser) || sessionStorage.getItem('auth_provider') === 'google';
                     const badgeText = isGoogle ? 'Google 帳號掃碼授權同步中' : '跨裝置掃碼授權同步中';
                     if (syncStatus) {
-                        syncStatus.innerHTML = `狀態：${badgeText} <br><span class="text-sky-900 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-sky-100 text-[11px] tracking-wide">👤 ${state.currentUser.displayName || state.currentUser.email}</span>`;
+                        syncStatus.innerHTML = `狀態：${badgeText} <br><span class="text-sky-900 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-sky-100 text-[11px] tracking-wide"><i class="fa-solid fa-user mr-1 text-sky-600"></i> ${state.currentUser.displayName || state.currentUser.email}</span>`;
                     }
                     if (loginBtn) loginBtn.classList.add('hidden');
                     if (cloudActions) cloudActions.classList.remove('hidden');
@@ -115,7 +115,7 @@ if (fbAuth) {
                     stopRealtimeCloudSync();
                     if (syncStatus) {
                         if (state.currentUser) {
-                            syncStatus.innerHTML = `狀態：本地離線模式 <br><span class="text-slate-700 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-slate-200 text-[11px] tracking-wide">👤 ${state.currentUser.displayName || state.currentUser.email}</span><br><span class="text-[11px] text-sky-600 mt-1 inline-block">點擊下方按鈕登入 Google 帳號以啟用雲端同步</span>`;
+                            syncStatus.innerHTML = `狀態：本地離線模式 <br><span class="text-slate-700 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-slate-200 text-[11px] tracking-wide"><i class="fa-solid fa-user mr-1 text-sky-600"></i> ${state.currentUser.displayName || state.currentUser.email}</span><br><span class="text-[11px] text-sky-600 mt-1 inline-block">點擊下方按鈕登入 Google 帳號以啟用雲端同步</span>`;
                         } else {
                             syncStatus.innerHTML = "狀態：未登入，點擊下方按鈕登入以啟用雲端同步。";
                         }
@@ -215,7 +215,7 @@ export function listenToProfile() {
                 if (!dismissed) {
                     const banner = document.getElementById('system-banner');
                     const bannerMsgSpan = document.querySelector('#system-banner-msg span');
-                    if (bannerMsgSpan) bannerMsgSpan.textContent = "📢 系統公告：" + data.bannerMessage;
+                    if (bannerMsgSpan) bannerMsgSpan.textContent = "系統公告：" + data.bannerMessage;
                     banner?.classList.remove('hidden');
                     banner?.classList.add('flex');
                     const bannerClose = document.getElementById('system-banner-close');
@@ -289,7 +289,7 @@ export async function performRemoteReset() {
     
     const lockScreen = document.getElementById('system-lock-screen');
     if (lockScreen) {
-        lockScreen.innerHTML = `<div class="text-6xl mb-6 shadow-2xl">⚠️</div><h1 class="text-3xl font-black text-white mb-4">資料已重置</h1><p class="text-slate-300 font-medium">系統已完成資料強制重置作業。</p>`;
+        lockScreen.innerHTML = `<div class="text-6xl mb-6 text-rose-500"><i class="fa-solid fa-triangle-exclamation"></i></div><h1 class="text-3xl font-black text-white mb-4">資料已重置</h1><p class="text-slate-300 font-medium">系統已完成資料強制重置作業。</p>`;
         lockScreen.classList.remove('hidden');
     }
     setTimeout(() => window.location.reload(), 2000);
@@ -376,7 +376,7 @@ export function renderAdminUsersList() {
     usersList.innerHTML = '';
 
     if (filtered.length === 0) {
-        usersList.innerHTML = '<tr><td colspan="5" class="text-center p-8 text-slate-400 font-bold">🔍 查無符合條件的用戶資料。</td></tr>';
+        usersList.innerHTML = '<tr><td colspan="5" class="text-center p-8 text-slate-400 font-bold"><i class="fa-solid fa-magnifying-glass mr-1"></i> 查無符合條件的用戶資料。</td></tr>';
         return;
     }
 
@@ -386,8 +386,8 @@ export function renderAdminUsersList() {
         const isAdminUser = u.isAdmin;
         const isLocked = u.isLocked;
         const statusHtml = isLocked 
-            ? '<span class="bg-rose-100 text-rose-600 px-2 py-1 rounded-lg text-xs font-black shadow-sm">🔴 已凍結</span>'
-            : '<span class="bg-emerald-100 text-emerald-600 px-2 py-1 rounded-lg text-xs font-black shadow-sm">🟢 正常</span>';
+            ? '<span class="bg-rose-100 text-rose-600 px-2 py-1 rounded-lg text-xs font-black shadow-sm flex items-center gap-1"><i class="fa-solid fa-ban"></i> 已凍結</span>'
+            : '<span class="bg-emerald-100 text-emerald-600 px-2 py-1 rounded-lg text-xs font-black shadow-sm flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> 正常</span>';
             
         const lastActive = data.lastActive ? new Date(data.lastActive).toLocaleString('zh-TW', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'}) : '未知';
         const size = data.dataSizeKB ? `${data.dataSizeKB} KB` : '未知';
@@ -411,22 +411,22 @@ export function renderAdminUsersList() {
             <td class="p-3 border-b border-slate-100">${statusHtml}</td>
             <td class="p-3 border-b border-slate-100 text-right space-x-1 whitespace-nowrap">
                 ${isAdminUser ? 
-                    '<span class="text-xs font-bold text-slate-400 px-2 py-1 mr-2">🛡️ 最高權限</span>' : 
+                    '<span class="text-xs font-bold text-slate-400 px-2 py-1 mr-2 flex items-center gap-1"><i class="fa-solid fa-shield-halved text-indigo-500"></i> 最高權限</span>' : 
                     `<button class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-colors toggle-lock-btn shadow-sm cursor-pointer" data-id="${id}" data-locked="${isLocked}">
-                        ${isLocked ? '🔓 解鎖' : '🔒 鎖定'}
+                        ${isLocked ? '<i class="fa-solid fa-lock-open mr-1"></i> 解鎖' : '<i class="fa-solid fa-lock mr-1"></i> 鎖定'}
                     </button>`
                 }
                 <button class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-colors view-data-btn shadow-sm cursor-pointer" data-id="${id}" data-email="${u.email || u.displayName}">
-                    👁️ 查看資料
+                    <i class="fa-solid fa-eye mr-1"></i> 查看資料
                 </button>
                 <button class="bg-amber-100 hover:bg-amber-200 text-amber-700 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-colors send-banner-btn shadow-sm cursor-pointer" data-id="${id}">
-                    📢 廣播
+                    <i class="fa-solid fa-bullhorn mr-1"></i> 廣播
                 </button>
                 <button class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-colors force-reset-btn shadow-sm cursor-pointer" data-id="${id}">
-                    ⚠️ 重置
+                    <i class="fa-solid fa-rotate-left mr-1"></i> 重置
                 </button>
                 <button class="bg-red-600 hover:bg-red-700 text-white border border-red-800 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-colors delete-user-btn shadow-sm cursor-pointer" data-id="${id}" data-name="${u.displayName || u.email || id}">
-                    🗑️ 刪除
+                    <i class="fa-solid fa-trash mr-1"></i> 刪除
                 </button>
             </td>
         `;
@@ -539,7 +539,7 @@ export async function loadAllUsersForAdmin(onViewDataCallback) {
     const countBadge = document.getElementById('admin-user-count-badge');
     if (!usersList) return;
     if (countBadge) countBadge.textContent = '載入中...';
-    usersList.innerHTML = '<tr><td colspan="5" class="text-center p-6 text-slate-500 font-bold">📡 正在載入全球伺服器資料...</td></tr>';
+    usersList.innerHTML = '<tr><td colspan="5" class="text-center p-6 text-slate-500 font-bold"><i class="fa-solid fa-tower-broadcast mr-1"></i> 正在載入全球伺服器資料...</td></tr>';
     
     try {
         const usersRef = collection(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles');
@@ -672,7 +672,7 @@ export function startRealtimeCloudSync() {
             if (syncStatus && (fbAuth?.currentUser || state.currentUser)) {
                 const u = fbAuth?.currentUser || state.currentUser;
                 const timeStr = new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                syncStatus.innerHTML = `狀態：跨裝置即時同步中 <br><span class="text-sky-900 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-sky-100 text-[11px] tracking-wide">👤 ${u.displayName || u.email}</span><br><span class="text-[10px] text-emerald-600 font-bold mt-1 inline-block">● 於 ${timeStr} 接收跨裝置即時更新</span>`;
+                syncStatus.innerHTML = `狀態：跨裝置即時同步中 <br><span class="text-sky-900 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-sky-100 text-[11px] tracking-wide"><i class="fa-solid fa-user mr-1 text-sky-600"></i> ${u.displayName || u.email}</span><br><span class="text-[10px] text-emerald-600 font-bold mt-1 inline-block">● 於 ${timeStr} 接收跨裝置即時更新</span>`;
             }
         } catch (err) {
             console.warn("Realtime cloud sync parse notice:", err);
@@ -895,7 +895,7 @@ export async function loadDataFromCloud(silent = false, onLoadedCallback) {
                 fixDates(state.appData);
                 state.currentClassId = state.appData.classes?.[0]?.id || null;
                 if (onLoadedCallback) onLoadedCallback();
-                showToast(`✅ 已成功載入「${state.adminViewModeUserEmail || targetUid}」之點收資料（唯讀）`, 'success');
+                showToast(`已成功載入「${state.adminViewModeUserEmail || targetUid}」之點收資料（唯讀）`, 'success');
                 return true;
             } else if (silent) { 
                 state.appData = cloudData; 
@@ -910,7 +910,7 @@ export async function loadDataFromCloud(silent = false, onLoadedCallback) {
                 }
                 if (onLoadedCallback) onLoadedCallback();
                 startRealtimeCloudSync();
-                showToast('✅ 已從雲端自動還原您的資料！', 'success');
+                showToast('已從雲端自動還原您的資料！', 'success');
                 return true;
             } 
             else {
@@ -988,7 +988,7 @@ export async function deleteMyAccount() {
     const uid = fbAuth?.currentUser?.uid || state.currentUser?.uid;
     const email = user.email || user.displayName || "目前登入的帳號";
 
-    const confirmed = confirm(`⚠️【確定註銷並刪除帳號？】\n\n您即將刪除帳號【${email}】。\n\n此操作將會：\n1. 永久刪除您在雲端保存的所有班級、學生與作業紀錄\n2. 刪除所有雲端備份與設定檔\n3. 清空本機暫存並登出系統\n\n此操作無法復原！是否確定要繼續刪除？`);
+    const confirmed = confirm(`【確定註銷並刪除帳號？】\n\n您即將刪除帳號【${email}】。\n\n此操作將會：\n1. 永久刪除您在雲端保存的所有班級、學生與作業紀錄\n2. 刪除所有雲端備份與設定檔\n3. 清空本機暫存並登出系統\n\n此操作無法復原！是否確定要繼續刪除？`);
     if (!confirmed) return;
 
     try {
@@ -1038,7 +1038,7 @@ export async function deleteMyAccount() {
             await signOut(fbAuth);
         } catch(e) {}
 
-        showToast(authDeleted ? "✅ 帳號與雲端資料已永久註銷並刪除！" : "✅ 雲端資料與帳戶紀錄已全數清空！", "success");
+        showToast(authDeleted ? "帳號與雲端資料已永久註銷並刪除！" : "雲端資料與帳戶紀錄已全數清空！", "success");
 
         // 5. 關閉彈窗並返回入口頁
         const settingsModal = document.getElementById('settings-modal');

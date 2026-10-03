@@ -31,7 +31,6 @@ let currentSelectedExamId = null;
 let currentExportFormat = 'xlsx';
 let currentExportDateRange = 'all';
 let hideScoresPrivacy = false; // 勾選隱藏成績（防偷窺/大螢幕隱私模式）
-let hideCompletedStudents = false; // 填寫完分數要隱藏（避免重複填寫）
 let currentSyncClassCode = null;
 let unsubscribeStudentScores = null;
 
@@ -71,7 +70,40 @@ export function getCurrentClass() {
 }
 
 /**
- * 檢查是否需要彈出初次設定班級最後座號彈窗
+ * 解析缺號字串（例如 "5, 12" 或 "5-7, 10"）為去重遞增數字陣列
+ */
+export function parseSeatsInput(inputStr, maxSeat = 100) {
+  if (!inputStr) return [];
+  if (Array.isArray(inputStr)) {
+    return Array.from(new Set(inputStr.map(Number).filter(n => !isNaN(n) && n >= 1 && n <= maxSeat))).sort((a, b) => a - b);
+  }
+  const str = String(inputStr).replace(/，/g, ',').trim();
+  const parts = str.split(/[\s,]+/);
+  const seats = [];
+  for (let part of parts) {
+    part = part.trim();
+    if (!part) continue;
+    if (part.includes('-')) {
+      const [startStr, endStr] = part.split('-');
+      const start = parseInt(startStr, 10);
+      const end = parseInt(endStr, 10);
+      if (!isNaN(start) && !isNaN(end) && start <= end) {
+        for (let i = start; i <= end; i++) {
+          if (i >= 1 && i <= maxSeat) seats.push(i);
+        }
+      }
+    } else {
+      const num = parseInt(part, 10);
+      if (!isNaN(num) && num >= 1 && num <= maxSeat) {
+        seats.push(num);
+      }
+    }
+  }
+  return Array.from(new Set(seats)).sort((a, b) => a - b);
+}
+
+/**
+ * 檢查是否需要彈出初次設定班級最後座號與缺號彈窗
  */
 export function checkInitialMaxSeatSetup() {
   const curClass = getCurrentClass();
@@ -80,17 +112,21 @@ export function checkInitialMaxSeatSetup() {
   if (!curClass.hasConfiguredMaxSeat) {
     const modal = document.getElementById('initial-max-seat-modal');
     const input = document.getElementById('initial-max-seat-input');
+    const skippedInput = document.getElementById('initial-skipped-seats-input');
     if (modal && input) {
       input.value = curClass.lastMaxSeat || 30;
+      if (skippedInput) {
+        skippedInput.value = Array.isArray(curClass.skippedSeats) ? curClass.skippedSeats.join(', ') : (curClass.lastMissingSeats || '');
+      }
       openModal(modal);
     }
   }
 }
 
 /**
- * 更新班級最後座號並套用至全班作業
+ * 更新班級最後座號與缺號並套用至全班作業
  */
-export async function updateClassMaxSeat(classId, newMaxSeat) {
+export async function updateClassMaxSeat(classId, newMaxSeat, newSkippedSeats = null) {
   const targetClass = (state.appData?.classes || []).find(c => c.id === classId);
   if (!targetClass) return false;
 
@@ -98,7 +134,16 @@ export async function updateClassMaxSeat(classId, newMaxSeat) {
   targetClass.lastMaxSeat = validMax;
   targetClass.hasConfiguredMaxSeat = true;
 
-  // 全班所有作業同步套用座號變更
+  if (newSkippedSeats !== null) {
+    targetClass.skippedSeats = parseSeatsInput(newSkippedSeats, validMax);
+    targetClass.lastMissingSeats = targetClass.skippedSeats.join(', ');
+  } else if (!targetClass.skippedSeats && targetClass.lastMissingSeats) {
+    targetClass.skippedSeats = parseSeatsInput(targetClass.lastMissingSeats, validMax);
+  }
+
+  const skipped = targetClass.skippedSeats || [];
+
+  // 全班所有作業同步套用座號變更（排除缺號）
   (state.appData.homeworks || []).forEach(hw => {
     if (hw.classId === classId) {
       const existingStudents = hw.students || [];
@@ -109,6 +154,10 @@ export async function updateClassMaxSeat(classId, newMaxSeat) {
       const defaultStatus = (hw.typeId && state.appData.homeworkTypes?.find(t => t.id === hw.typeId)?.statuses?.[0]?.key) || 'not_submitted';
 
       for (let seat = 1; seat <= validMax; seat++) {
+        if (skipped.includes(seat)) {
+          // 缺號學生不列入日常作業點收
+          continue;
+        }
         if (studentMap.has(seat)) {
           updatedStudents.push(studentMap.get(seat));
         } else {
@@ -116,6 +165,7 @@ export async function updateClassMaxSeat(classId, newMaxSeat) {
         }
       }
       hw.students = updatedStudents;
+      hw.studentCount = updatedStudents.length;
     }
   });
 
@@ -301,7 +351,7 @@ export function renderExamScoresView() {
             <span class="px-2 py-0.5 rounded-md text-[10px] font-black ${domain.lightBg} ${domain.textColor} border ${domain.borderColor}">
               ${exam.subject}
             </span>
-            <span class="text-[11px] font-bold text-slate-400">📅 ${exam.date || '未定'}</span>
+            <span class="text-[11px] font-bold text-slate-400"><i class="fa-regular fa-calendar mr-1"></i> ${exam.date || '未定'}</span>
           </div>
           <h4 class="font-extrabold text-sm text-slate-900 leading-snug line-clamp-1 mb-2">${exam.name}</h4>
           <div class="flex items-center justify-between text-xs pt-2 border-t border-slate-100">
@@ -379,6 +429,8 @@ function renderSelectedExamDetails() {
   const domain = getDomainBySubject(curExam.subject);
   const submissions = curExam.submissions || {};
   const maxSeat = curClass.lastMaxSeat || 30;
+  const skippedSeats = Array.isArray(curClass.skippedSeats) ? curClass.skippedSeats : [];
+  const activeSeatsCount = Math.max(1, maxSeat - skippedSeats.filter(s => s >= 1 && s <= maxSeat).length);
   const missingSeatsArr = Array.isArray(curExam.missingSeats)
     ? curExam.missingSeats.map(String)
     : (curExam.missingSeats ? String(curExam.missingSeats).split(/[,，\s]+/).filter(Boolean) : []);
@@ -389,9 +441,9 @@ function renderSelectedExamDetails() {
   const maxScore = filledCount > 0 ? Math.max(...scoresList) : '--';
   const minScore = filledCount > 0 ? Math.min(...scoresList) : '--';
 
-  const displayAvg = hideScoresPrivacy ? (filledCount > 0 ? '🔒 ***' : '--') : (avgScore !== '--' ? `${avgScore} 分` : '--');
-  const displayMax = hideScoresPrivacy ? (filledCount > 0 ? '🔒 ***' : '--') : (maxScore !== '--' ? `${maxScore} 分` : '--');
-  const displayMin = hideScoresPrivacy ? (filledCount > 0 ? '🔒 ***' : '--') : (minScore !== '--' ? `${minScore} 分` : '--');
+  const displayAvg = hideScoresPrivacy ? (filledCount > 0 ? '***' : '--') : (avgScore !== '--' ? `${avgScore} 分` : '--');
+  const displayMax = hideScoresPrivacy ? (filledCount > 0 ? '***' : '--') : (maxScore !== '--' ? `${maxScore} 分` : '--');
+  const displayMin = hideScoresPrivacy ? (filledCount > 0 ? '***' : '--') : (minScore !== '--' ? `${minScore} 分` : '--');
 
   // 計算 6 大分數區段
   const segments = calculateScoreSegments(scoresList);
@@ -404,17 +456,29 @@ function renderSelectedExamDetails() {
           <span class="px-2.5 py-0.5 rounded-lg text-xs font-black ${domain.lightBg} ${domain.textColor} border ${domain.borderColor}">
             ${curExam.subject}
           </span>
-          <span class="text-xs font-bold text-slate-500">📅 測驗日期：${curExam.date || '未定'}</span>
+          <span class="text-xs font-bold text-slate-500 inline-flex items-center gap-1"><i class="fa-regular fa-calendar"></i> 測驗日期：${curExam.date || '未定'}</span>
           ${missingSeatsArr.length > 0 ? `<span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">缺考座號：${missingSeatsArr.join(', ')} 號（填寫後將自動標註「補考」）</span>` : ''}
         </div>
-        <h3 class="text-lg font-black text-slate-900">${curExam.name}</h3>
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <h3 class="text-lg font-black text-slate-900">${curExam.name}</h3>
+          <div class="flex items-center gap-1.5">
+            <button type="button" id="btn-header-edit-exam" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-teal-700 bg-slate-100 hover:bg-teal-50 border border-slate-200 transition-colors flex items-center gap-1 cursor-pointer" title="編輯此考試設定">
+              <i class="fa-solid fa-pen-to-square"></i>
+              <span>編輯</span>
+            </button>
+            <button type="button" id="btn-header-delete-exam" class="px-2.5 py-1 rounded-lg text-xs font-bold text-rose-600 hover:text-white bg-rose-50 hover:bg-rose-600 border border-rose-200 hover:border-transparent transition-colors flex items-center gap-1 cursor-pointer" title="刪除此考試與全班成績">
+              <i class="fa-solid fa-trash"></i>
+              <span>刪除考試</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- 快捷數據看板 -->
       <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
         <div class="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-center">
           <span class="text-[10px] font-bold text-slate-400 block">填寫進度</span>
-          <span class="text-sm font-black text-slate-800">${filledCount} / ${maxSeat} 人</span>
+          <span class="text-sm font-black text-slate-800">${filledCount} / ${activeSeatsCount} 人</span>
         </div>
         <div class="px-3 py-1.5 rounded-xl bg-teal-50 border border-teal-200 text-center">
           <span class="text-[10px] font-bold text-teal-600 block">班級平均分</span>
@@ -462,6 +526,16 @@ function renderSelectedExamDetails() {
     </div>
   `;
 
+  // 綁定頂部測驗操作按鈕
+  document.getElementById('btn-header-edit-exam')?.addEventListener('click', () => {
+    openExamEditorModal(curExam.id);
+  });
+  document.getElementById('btn-header-delete-exam')?.addEventListener('click', () => {
+    showConfirmModal('刪除考試確認', `確定要刪除「${curExam.name}」嗎？此測驗的所有全班學生成績與紀錄將一併移除且無法復原！`, async () => {
+      await deleteExam(curExam.id);
+    });
+  });
+
   // 渲染學生座號表 (1 ~ maxSeat)
   tbody.innerHTML = '';
   let visibleCount = 0;
@@ -470,19 +544,17 @@ function renderSelectedExamDetails() {
     const sub = submissions[seatStr] || null;
     const isFilled = sub && sub.score !== undefined && sub.score !== null && sub.score !== '';
     const isMissingOriginally = missingSeatsArr.includes(seatStr);
-
-    // 填寫完分數要隱藏（避免重複填寫）
-    if (hideCompletedStudents && isFilled) {
-      continue;
-    }
+    const isSkipped = skippedSeats.includes(seat);
     visibleCount++;
 
     const tr = document.createElement('tr');
-    tr.className = 'hover:bg-slate-50/80 transition-colors';
+    tr.className = isSkipped ? 'bg-slate-50/50 opacity-60 transition-colors' : 'hover:bg-slate-50/80 transition-colors';
 
     // 1. 填寫狀態徽章
     let statusBadge = '';
-    if (sub) {
+    if (isSkipped) {
+      statusBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-400 border border-slate-200">缺號</span>';
+    } else if (sub) {
       if (isMissingOriginally || sub.isMakeup) {
         statusBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-800 border border-amber-300">補考</span>';
       } else {
@@ -496,14 +568,16 @@ function renderSelectedExamDetails() {
 
     // 2. 分數欄 (若勾選隱藏成績，顯示防偷窺 ***)
     let scoreDisplay = '';
-    if (isFilled) {
+    if (isSkipped) {
+      scoreDisplay = '<span class="text-slate-300 font-bold block text-center">—</span>';
+    } else if (isFilled) {
       const scoreNum = Number(sub.score);
       const scoreColor = scoreNum >= 90 ? 'text-indigo-600' : scoreNum >= 60 ? 'text-slate-800' : 'text-rose-600';
       if (hideScoresPrivacy) {
         scoreDisplay = `
           <div class="text-center">
             <span class="text-base font-black text-slate-400 select-none tracking-widest font-mono">*** 分</span>
-            <div class="text-[10px] text-teal-600 font-bold mt-0.5">🔒 已隱藏 (隱私保護)</div>
+            <div class="text-[10px] text-teal-600 font-bold mt-0.5 inline-flex items-center gap-1"><i class="fa-solid fa-lock"></i> 已隱藏 (隱私保護)</div>
           </div>
         `;
       } else {
@@ -524,7 +598,9 @@ function renderSelectedExamDetails() {
 
     // 3. 訂正情形欄
     let correctionDisplay = '';
-    if (sub && sub.correction) {
+    if (isSkipped) {
+      correctionDisplay = '<span class="text-slate-300 text-xs block text-center">—</span>';
+    } else if (sub && sub.correction) {
       let badgeClass = 'bg-slate-100 text-slate-700';
       if (sub.correction.includes('全對') || sub.correction.includes('免訂正')) {
         badgeClass = 'bg-purple-50 text-purple-700 border border-purple-200';
@@ -539,7 +615,13 @@ function renderSelectedExamDetails() {
     }
 
     // 4. 備註欄
-    const remarkDisplay = sub && sub.remark ? `<span class="text-xs text-slate-700 font-medium">${sub.remark}</span>` : '<span class="text-slate-300 text-xs">無備註</span>';
+    const remarkDisplay = isSkipped
+      ? '<span class="text-slate-300 text-xs">缺號不計</span>'
+      : (sub && sub.remark ? `<span class="text-xs text-slate-700 font-medium">${sub.remark}</span>` : '<span class="text-slate-300 text-xs">無備註</span>');
+
+    const editBtnHtml = isSkipped
+      ? `<button type="button" disabled class="px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-100 text-slate-400 text-xs font-bold cursor-not-allowed opacity-60"><i class="fa-solid fa-ban mr-1"></i>缺號</button>`
+      : `<button type="button" class="btn-open-teacher-edit px-3 py-1.5 rounded-xl border border-teal-200 bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-black transition-colors cursor-pointer shadow-2xs" data-seat="${seat}"><i class="fa-solid fa-pen-to-square mr-1"></i>修改</button>`;
 
     tr.innerHTML = `
       <td class="py-3 px-4 text-center font-black text-slate-800 text-sm">
@@ -549,16 +631,14 @@ function renderSelectedExamDetails() {
       <td class="py-3 px-4 text-center">${scoreDisplay}</td>
       <td class="py-3 px-4 text-center">${correctionDisplay}</td>
       <td class="py-3 px-4">${remarkDisplay}</td>
-      <td class="py-3 px-4 text-center">
-        <button type="button" class="btn-open-teacher-edit px-3 py-1.5 rounded-xl border border-teal-200 bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-black transition-colors cursor-pointer shadow-2xs" data-seat="${seat}">
-          <i class="fa-solid fa-pen-to-square mr-1"></i>修改
-        </button>
-      </td>
+      <td class="py-3 px-4 text-center">${editBtnHtml}</td>
     `;
 
-    tr.querySelector('.btn-open-teacher-edit')?.addEventListener('click', () => {
-      openTeacherEditScoreModal(curExam.id, seat);
-    });
+    if (!isSkipped) {
+      tr.querySelector('.btn-open-teacher-edit')?.addEventListener('click', () => {
+        openTeacherEditScoreModal(curExam.id, seat);
+      });
+    }
 
     tbody.appendChild(tr);
   }
@@ -576,11 +656,7 @@ function renderSelectedExamDetails() {
 
   const filterStatsEl = document.getElementById('scores-table-filter-stats');
   if (filterStatsEl) {
-    if (hideCompletedStudents) {
-      filterStatsEl.textContent = `(已隱藏 ${filledCount} 位已填寫，目前顯示 ${visibleCount} 位待填寫/缺考)`;
-    } else {
-      filterStatsEl.textContent = `(全班共 ${maxSeat} 位學生，已填寫 ${filledCount} 位)`;
-    }
+    filterStatsEl.textContent = `(全班共 ${activeSeatsCount} 位學生，已填寫 ${filledCount} 位${skippedSeats.length > 0 ? `，缺號 ${skippedSeats.length} 位` : ''})`;
   }
 }
 
@@ -640,9 +716,11 @@ export function openExamEditorModal(examId = null) {
 
   // 2. 渲染缺考座號快速點選按鈕 (1 ~ maxSeat)
   const maxSeat = curClass.lastMaxSeat || 30;
+  const skippedSeats = Array.isArray(curClass.skippedSeats) ? curClass.skippedSeats : [];
   if (chipsContainer) {
     chipsContainer.innerHTML = '';
     for (let i = 1; i <= maxSeat; i++) {
+      if (skippedSeats.includes(i)) continue;
       const chip = document.createElement('button');
       chip.type = 'button';
       chip.className = 'chip-seat-btn px-2 py-0.5 rounded-lg border border-slate-200 bg-white text-slate-700 text-[11px] font-bold hover:bg-slate-200 transition-colors cursor-pointer';
@@ -672,6 +750,7 @@ export function openExamEditorModal(examId = null) {
     const exam = exams.find(e => e.id === examId);
     if (!exam) return;
     if (title) title.textContent = '編輯考試內容';
+    document.getElementById('btn-delete-from-exam-editor')?.classList.remove('hidden');
     if (editIdInput) editIdInput.value = exam.id;
     if (subjectInput) subjectInput.value = exam.subject;
     if (subjectBadge) subjectBadge.textContent = exam.subject;
@@ -691,6 +770,7 @@ export function openExamEditorModal(examId = null) {
     });
   } else {
     if (title) title.textContent = '新增考試';
+    document.getElementById('btn-delete-from-exam-editor')?.classList.add('hidden');
     if (editIdInput) editIdInput.value = '';
     const defaultSub = '國語文';
     if (subjectInput) subjectInput.value = defaultSub;
@@ -814,7 +894,7 @@ export function openTeacherEditScoreModal(examId, seat) {
     remarkInput.value = sub.remark || '';
     if (sub.originalScore !== undefined && sub.originalScore !== null && Number(sub.originalScore) !== Number(sub.score)) {
       originalScoreBox.classList.remove('hidden');
-      originalScoreBox.innerHTML = `⚠️ 原登記分數為：<b>${sub.originalScore} 分</b>（最後修改時間：${sub.lastModified || '未知'}）`;
+      originalScoreBox.innerHTML = `<i class="fa-solid fa-clock-rotate-left text-amber-600 mr-1"></i> 原登記分數為：<b>${sub.originalScore} 分</b>（最後修改時間：${sub.lastModified || '未知'}）`;
     } else {
       originalScoreBox.classList.add('hidden');
     }
@@ -1154,7 +1234,7 @@ function exportToHtml(rows, className, fileName) {
 </head>
 <body>
   <div class="card">
-    <h1>📊 ${className} 班級成績匯出報表</h1>
+    <h1>${className} 班級成績匯出報表</h1>
     <p>匯出時間：${new Date().toLocaleString('zh-TW')} ｜ 資料來源：親師作業點收X聯絡簿系統</p>
     <table>
       <thead>
@@ -1191,7 +1271,7 @@ function exportToDocx(rows, className, fileName) {
   </style>
 </head>
 <body>
-  <h2>📊 ${className} 班級學生成績分析報表</h2>
+  <h2>${className} 班級學生成績分析報表</h2>
   <p style="text-align:center;font-size:9pt;color:#666;">匯出日期：${new Date().toLocaleDateString('zh-TW')}</p>
   <table>
     <thead>
@@ -1230,7 +1310,7 @@ function exportToPdf(rows, className) {
   </style>
 </head>
 <body>
-  <h2>📊 ${className} 班級成績報表</h2>
+  <h2>${className} 班級成績報表</h2>
   <p>匯出時間：${new Date().toLocaleString('zh-TW')} ｜ 親師作業點收系統</p>
   <table>
     <thead>
@@ -1309,12 +1389,6 @@ export function setupExamScoresEvents() {
     renderSelectedExamDetails();
   });
 
-  // 填寫完分數要隱藏（避免重複填寫）
-  document.getElementById('toggle-hide-completed-students')?.addEventListener('change', (e) => {
-    hideCompletedStudents = e.target.checked;
-    renderSelectedExamDetails();
-  });
-
   // 學生端直達連結按鈕
   document.getElementById('btn-copy-student-link-from-scores')?.addEventListener('click', () => {
     const curClass = getCurrentClass();
@@ -1354,6 +1428,19 @@ export function setupExamScoresEvents() {
   document.getElementById('form-exam-editor')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     await saveExamFromForm();
+  });
+
+  // 考試編輯彈窗內刪除按鈕
+  document.getElementById('btn-delete-from-exam-editor')?.addEventListener('click', () => {
+    const editId = document.getElementById('exam-edit-id')?.value.trim();
+    if (!editId) return;
+    const curClass = getCurrentClass();
+    const exam = (curClass?.exams || []).find(e => e.id === editId);
+    const examName = exam ? exam.name : '此考試';
+    closeModal(document.getElementById('modal-exam-editor'));
+    showConfirmModal('刪除考試確認', `確定要刪除「${examName}」嗎？此測驗的所有全班學生成績與紀錄將一併移除且無法復原！`, async () => {
+      await deleteExam(editId);
+    });
   });
 
   // 篩選學科變更
@@ -1420,16 +1507,18 @@ export function setupExamScoresEvents() {
     const curClass = getCurrentClass();
     if (!curClass) return;
     const input = document.getElementById('initial-max-seat-input');
+    const skippedInput = document.getElementById('initial-skipped-seats-input');
     const val = parseInt(input?.value, 10);
     if (!val || val < 1 || val > 100) {
       showToast('請輸入 1 至 100 之間的有效座號！', 'warning');
       return;
     }
-    await updateClassMaxSeat(curClass.id, val);
+    const skippedVal = skippedInput ? skippedInput.value.trim() : '';
+    await updateClassMaxSeat(curClass.id, val, skippedVal);
     const countInput = document.getElementById('student-count');
     if (countInput) countInput.value = val;
     closeModal(document.getElementById('initial-max-seat-modal'));
-    showToast(`已成功設定班級最後座號為 ${val} 號，並同步套用至全班作業！`, 'success');
+    showToast(`已成功設定班級最後座號為 ${val} 號與缺號設定，並同步套用至全班作業！`, 'success');
   });
 
   // 關閉最後座號設定彈窗
@@ -1448,11 +1537,15 @@ export function setupExamScoresEvents() {
     const titleEl = document.getElementById('max-seat-modal-title');
     const descEl = document.getElementById('max-seat-modal-desc');
     const inputEl = document.getElementById('initial-max-seat-input');
+    const skippedInputEl = document.getElementById('initial-skipped-seats-input');
     const closeBtn = document.getElementById('btn-close-initial-max-seat');
 
-    if (titleEl) titleEl.textContent = `修改【${curClass.name}】最後座號`;
-    if (descEl) descEl.textContent = '請輸入最新的最後座號（學生總人數）。修改後，全班現有作業與預設座號將同步套用！';
+    if (titleEl) titleEl.textContent = `修改【${curClass.name}】最後座號與缺號`;
+    if (descEl) descEl.textContent = '請輸入最新的最後座號與缺號座號。修改後，全班現有作業與預設座號將同步套用！';
     if (inputEl) inputEl.value = currentMax;
+    if (skippedInputEl) {
+      skippedInputEl.value = Array.isArray(curClass.skippedSeats) ? curClass.skippedSeats.join(', ') : (curClass.lastMissingSeats || '');
+    }
     if (closeBtn) closeBtn.classList.remove('hidden');
 
     openModal(modal);
