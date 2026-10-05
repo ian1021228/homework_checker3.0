@@ -401,6 +401,21 @@
                         </div>
                     </div>
 
+                    <!-- 測試版注意事項警示條 (顯著醒目大字體) -->
+                    <div class="p-4 sm:p-5 bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-red-500/20 border-2 border-amber-500/80 rounded-2xl flex items-start gap-3 relative z-10 shadow-sm">
+                        <span class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 text-lg shadow-sm">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </span>
+                        <div class="text-xs sm:text-sm leading-relaxed text-amber-950">
+                            <p class="font-black text-amber-950 text-sm sm:text-base tracking-tight mb-1 flex items-center gap-1.5">
+                                <span>重要提醒：此版本為測試版，不會影響原資料，且在正式版上線前建議不要取代目前版本！</span>
+                            </p>
+                            <p class="text-amber-900/90 font-medium">
+                                測試版（DEV）旨在搶先驗證前瞻功能，環境與正式版資料庫 100% 獨立隔離。為確保資料純淨與測試安全，測試版一律僅提供本機瀏覽器快取獨立體驗，無需帳號密碼，請安心試用。
+                            </p>
+                        </div>
+                    </div>
+
                     <!-- 更新內容簡述卡片 -->
                     <div class="p-4 sm:p-5 bg-white/90 rounded-2xl border border-amber-200/70 shadow-2xs space-y-2.5 relative z-10">
                         <div class="font-bold text-stone-900 flex items-center gap-2 text-xs sm:text-sm">
@@ -486,13 +501,13 @@
                     </div>
                 </div>
 
-                <!-- 測試小提示 -->
-                <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs text-stone-500 font-medium relative z-10 border-t border-amber-200/60">
-                    <span class="flex items-center gap-1.5">
-                        <i class="fa-solid fa-key text-amber-600"></i>
-                        <span>測試登入帳號：<code class="px-1.5 py-0.5 bg-white rounded border border-stone-200 font-bold text-stone-800">antigravity</code> ／ 密碼：<code class="px-1.5 py-0.5 bg-white rounded border border-stone-200 font-bold text-stone-800">123456</code></span>
+                <!-- 測試小提示 (移除帳號密碼) -->
+                <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs text-stone-600 font-medium relative z-10 border-t border-amber-200/60">
+                    <span class="flex items-center gap-1.5 font-bold text-amber-800">
+                        <i class="fa-solid fa-shield-halved text-amber-600"></i>
+                        <span>資料安全隔離保障：免帳密・本機瀏覽器獨立快取體驗</span>
                     </span>
-                    <span class="text-stone-400">（亦可點擊「訪客模式」直接免登入暢玩體驗）</span>
+                    <span class="text-stone-500 font-normal">（測試版僅提供瀏覽器快取，其他登入方式皆已鎖定）</span>
                 </div>
             </div>
 
@@ -1183,7 +1198,6 @@
                 <!-- 底部「我知道了！」按鈕 -->
                 <button id="btn-know-letter" type="button" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-black text-base shadow-lg shadow-orange-500/25 hover:shadow-orange-500/35 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2 text-center">
                     <span>我知道了！</span>
-                    <i class="fa-solid fa-check text-sm ml-1"></i>
                 </button>
             </div>
         </div>
@@ -3007,6 +3021,39 @@
 
                 <!-- 版本歷程時間軸 -->
                 <div class="space-y-6">
+                    <!-- v3.6 測試版前瞻預覽 -->
+                    <div class="p-5 rounded-2xl bg-gradient-to-br from-amber-50/90 via-orange-50/60 to-purple-50/40 border-2 border-amber-400 shadow-md relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-amber-500 text-white text-xs font-black uppercase tracking-wider shadow-xs animate-pulse">DEV v3.6 搶先體驗</span>
+                                <span class="text-xs font-bold text-amber-950">出缺席 24H 時間滾輪、出席狀況統計看板、班級事務座號簽名情形、三端測試版連動</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-400">2026-10-05</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-amber-600 shrink-0 mt-0.5"></i>
+                                <span><b>班級事務全班座號簽名情形與狀態標註</b>：班級事務卡片與詳情彈窗新增各座號簽名情形速覽，逐一標記「已簽名」或「未簽名」，支援各座號填答選項、手寫簽章預覽與一鍵篩選。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-amber-600 shrink-0 mt-0.5"></i>
+                                <span><b>測試環境全站常駐警示條與一鍵返回</b>：測試版全站左下角常駐最高圖層警示橫幅，明確標註環境隔離狀態，並隨時提供【返回正式版】一鍵直達按鈕。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-amber-600 shrink-0 mt-0.5"></i>
+                                <span><b>測試版僅開放瀏覽器快取獨立體驗</b>：測試版一律只開放本機瀏覽器快取模式，雲端帳密、Google 登入與硬碟直寫全面置灰鎖定，零資料風險、免帳密暢玩。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-amber-600 shrink-0 mt-0.5"></i>
+                                <span><b>首頁體驗測試版區塊安全警告註明</b>：搶先體驗專區以顯著字體標示「此版本為測試版，不會影響原資料，且在正式版上線前建議不要取代目前版本」，並全面移除公開測試帳密。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-amber-600 shrink-0 mt-0.5"></i>
+                                <span><b>首頁「我知道了！」按鈕純文字極簡化</b>：移除「我知道了！」按鈕後方打勾圖標，版面更加乾淨沉穩。</span>
+                            </li>
+                        </ul>
+                    </div>
+
                     <!-- v3.5.2 最新優化 -->
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/90 via-purple-50/60 to-pink-50/40 border-2 border-indigo-500 shadow-md relative">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
