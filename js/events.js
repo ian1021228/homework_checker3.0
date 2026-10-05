@@ -1,5 +1,5 @@
 /**
- * 親師作業點收X聯絡簿系統 3.0 - DOM 事件監聽與交互管理
+ * 班級經營系統 3.0 - DOM 事件監聽與交互管理
  */
 
 import { state } from './state.js';
@@ -3290,7 +3290,7 @@ export function setupButtonEvents() {
                 deferredInstallPrompt.prompt();
                 const { outcome } = await deferredInstallPrompt.userChoice;
                 if (outcome === 'accepted') {
-                    showToast("已成功安裝作業點收系統 App！", "success");
+                    showToast("已成功安裝班級經營系統 App！", "success");
                 }
                 deferredInstallPrompt = null;
             } else {
@@ -3301,7 +3301,7 @@ export function setupButtonEvents() {
 
     window.addEventListener('appinstalled', () => {
         deferredInstallPrompt = null;
-        showToast("作業點收系統 App 安裝完成！", "success");
+        showToast("班級經營系統 App 安裝完成！", "success");
     });
 
     // 畫面尺寸調整
@@ -3610,7 +3610,7 @@ export function generateLineReportText() {
     const baseUrl = 'https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/';
     text += classCode ? `${baseUrl}?code=${classCode}\n` : `${baseUrl}\n`;
     text += `━━━━━━━━━━━━━━━━━━━━━━\n`;
-    text += `七賢國中107 王禹硯 開發 • 親師作業點收系統`;
+    text += `七賢國中107 王禹硯 開發 • 班級經營系統`;
 
     return text;
 }

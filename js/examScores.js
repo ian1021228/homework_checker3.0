@@ -1,5 +1,5 @@
 /**
- * 親師作業點收X聯絡簿系統 3.0 - 全螢幕班級成績與測驗管理系統 (Exam Scores Management System)
+ * 班級經營系統 3.0 - 全螢幕班級成績與測驗管理系統 (Exam Scores Management System)
  */
 
 import { state } from './state.js';
@@ -1241,7 +1241,7 @@ function exportToHtml(rows, className, fileName) {
 <body>
   <div class="card">
     <h1>${className} 班級成績匯出報表</h1>
-    <p>匯出時間：${new Date().toLocaleString('zh-TW')} ｜ 資料來源：親師作業點收X聯絡簿系統</p>
+    <p>匯出時間：${new Date().toLocaleString('zh-TW')} ｜ 資料來源：班級經營系統</p>
     <table>
       <thead>
         <tr>${rows[0].map(h => `<th>${h}</th>`).join('')}</tr>
@@ -1250,7 +1250,7 @@ function exportToHtml(rows, className, fileName) {
         ${rows.slice(1).map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}
       </tbody>
     </table>
-    <div class="footer">由 親師作業點收X聯絡簿系統 自動生成</div>
+    <div class="footer">由 班級經營系統 自動生成</div>
   </div>
 </body>
 </html>`;
@@ -1287,7 +1287,7 @@ function exportToDocx(rows, className, fileName) {
       ${rows.slice(1).map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}
     </tbody>
   </table>
-  <p class="footer">親師作業點收系統 3.0</p>
+  <p class="footer">班級經營系統 3.0</p>
 </body>
 </html>`;
 
@@ -1317,7 +1317,7 @@ function exportToPdf(rows, className) {
 </head>
 <body>
   <h2>${className} 班級成績報表</h2>
-  <p>匯出時間：${new Date().toLocaleString('zh-TW')} ｜ 親師作業點收系統</p>
+  <p>匯出時間：${new Date().toLocaleString('zh-TW')} ｜ 班級經營系統</p>
   <table>
     <thead>
       <tr>${rows[0].map(h => `<th>${h}</th>`).join('')}</tr>

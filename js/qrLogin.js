@@ -386,7 +386,7 @@ export async function openPhoneQrScannerModal() {
                 if (challengeId) {
                     await promptAuthorizeChallenge(challengeId);
                 } else {
-                    showAlertModal("無法辨識的 QR Code", "此 QR Code 並非作業點收系統的登入碼，請對準電腦螢幕上的登入 QR Code 再次掃描。");
+                    showAlertModal("無法辨識的 QR Code", "此 QR Code 並非班級經營系統的登入碼，請對準電腦螢幕上的登入 QR Code 再次掃描。");
                 }
             },
             (errorMessage) => {

@@ -763,7 +763,7 @@ export function updatePortalUI() {
         if (guestActions) guestActions.classList.add('hidden');
         if (userBadge) userBadge.classList.remove('hidden');
         if (userNameSpan) userNameSpan.textContent = displayName;
-        if (heroStartBtn) heroStartBtn.innerHTML = `<span>進入作業點收系統</span><i class="fa-solid fa-arrow-right text-sm"></i>`;
+        if (heroStartBtn) heroStartBtn.innerHTML = `<span>進入班級經營系統</span><i class="fa-solid fa-arrow-right text-sm"></i>`;
         if (ctaStartBtn) ctaStartBtn.innerHTML = `<span class="pointer-events-none select-none inline-block">立即進入系統</span><i class="fa-solid fa-chevron-right text-xs pointer-events-none select-none"></i>`;
     } else {
         if (loggedinView) loggedinView.classList.add('hidden');
