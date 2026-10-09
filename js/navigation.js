@@ -311,13 +311,17 @@ export function proceedIntoSystem() {
     const portalEl = document.getElementById('portal-page');
     if (portalEl) portalEl.classList.add('hidden');
     
-    // 進入系統時確保能選擇點收方式 (手動點收 / 條碼掃描)
+    // 預設手動點收，不彈窗打擾
+    if (!localStorage.getItem('checkMode')) {
+        localStorage.setItem('checkMode', 'manual');
+        state.currentCheckMode = 'manual';
+    }
     const welcomeModal = document.getElementById('welcome-modal');
     if (welcomeModal) {
-        openModal(welcomeModal);
-        showWelcomeStep2();
-    } else {
-        if (state.appData.classes.length === 0) openModal(document.getElementById('manage-classes-modal'));
+        closeModal(welcomeModal);
+    }
+    if (state.appData?.classes?.length === 0) {
+        openModal(document.getElementById('manage-classes-modal'));
     }
     updateGuestHomeBtnVisibility();
 }

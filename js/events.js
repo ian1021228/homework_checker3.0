@@ -937,19 +937,21 @@ export function setupButtonEvents() {
                             showAlertModal("登入失敗", "密碼錯誤，請確認後重試。若忘記密碼請點選下方「忘記密碼？」");
                             return;
                         }
-                        if (signInErr.code === 'auth/invalid-credential' || signInErr.code === 'auth/wrong-password' || signInErr.code === 'auth/user-not-found') {
-                            if ((cand.email || '').toLowerCase() === 'ianw.solar@gmail.com' || (cand.email || '').toLowerCase().includes('@gmail.com')) {
-                                showAlertModal("登入提示", "帳號或密碼不相符。\n\n提示：若此帳號平時是使用 Google 授權登入，請直接點選下方「使用 Google 帳號快速登入」按鈕！");
-                            } else {
-                                showAlertModal("登入失敗", "密碼錯誤或憑證無效，請確認後重試。若忘記密碼請點選下方「忘記密碼？」");
+                        if (!isPasswordMatch) {
+                            if (signInErr.code === 'auth/invalid-credential' || signInErr.code === 'auth/wrong-password' || signInErr.code === 'auth/user-not-found') {
+                                if ((cand.email || '').toLowerCase() === 'ianw.solar@gmail.com' || (cand.email || '').toLowerCase().includes('@gmail.com')) {
+                                    showAlertModal("登入提示", "帳號或密碼不相符。\n\n提示：若此帳號平時是使用 Google 授權登入，請直接點選下方「使用 Google 帳號快速登入」按鈕！");
+                                } else {
+                                    showAlertModal("登入失敗", "密碼錯誤或憑證無效，請確認後重試。若忘記密碼請點選下方「忘記密碼？」");
+                                }
+                                return;
                             }
-                            return;
+                            throw signInErr;
                         }
-                        throw signInErr;
                     }
                 }
 
-                const isUserAdmin = (cand.email || cred.user.email).toLowerCase() === 'ianw.solar@gmail.com';
+                const isUserAdmin = ((cand.email || (cred ? cred.user.email : '')).toLowerCase() === 'ianw.solar@gmail.com') || !!cand.isAdmin || cand.role === 'admin';
                 const userObj = {
                     uid: cred ? cred.user.uid : (cand.uid || cand.id),
                     email: cand.email || (cred ? cred.user.email : ''),
