@@ -356,11 +356,77 @@ export function showConfirmModal(title, message, onConfirm, onCancel, options = 
     confirmCancel.addEventListener('click', cancelHandler);
 }
 
+export function showConfirmDialog(title, message, options = {}) {
+    return new Promise((resolve) => {
+        showConfirmModal(
+            title,
+            message,
+            () => resolve(true),
+            () => resolve(false),
+            options
+        );
+    });
+}
+
+export function showPromptDialog(title, message, defaultValue = '', placeholder = '') {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('custom-prompt-modal');
+        if (!modal) {
+            resolve(defaultValue || null);
+            return;
+        }
+        const titleEl = document.getElementById('custom-prompt-title');
+        const msgEl = document.getElementById('custom-prompt-message');
+        const inputEl = document.getElementById('custom-prompt-input');
+        const okBtn = document.getElementById('custom-prompt-ok-btn');
+        const cancelBtn = document.getElementById('custom-prompt-cancel-btn');
+
+        if (titleEl) titleEl.textContent = title;
+        if (msgEl) msgEl.textContent = message;
+        if (inputEl) {
+            inputEl.value = defaultValue;
+            inputEl.placeholder = placeholder;
+        }
+
+        openModal(modal);
+        if (inputEl) {
+            setTimeout(() => {
+                inputEl.focus();
+                inputEl.select();
+            }, 100);
+        }
+
+        const handleOk = () => {
+            cleanup();
+            closeModal(modal);
+            resolve(inputEl ? inputEl.value : '');
+        };
+        const handleCancel = () => {
+            cleanup();
+            closeModal(modal);
+            resolve(null);
+        };
+        const handleKeyDown = (e) => {
+            if (e.key === 'Enter') handleOk();
+            if (e.key === 'Escape') handleCancel();
+        };
+
+        const cleanup = () => {
+            okBtn?.removeEventListener('click', handleOk);
+            cancelBtn?.removeEventListener('click', handleCancel);
+            inputEl?.removeEventListener('keydown', handleKeyDown);
+        };
+
+        okBtn?.addEventListener('click', handleOk);
+        cancelBtn?.addEventListener('click', handleCancel);
+        inputEl?.addEventListener('keydown', handleKeyDown);
+    });
+}
+
 export function showNamePromptModal(callback) {
     const modal = document.getElementById('name-prompt-modal');
     if (!modal) {
-        const name = prompt("請輸入您的尊姓大名或暱稱：", localStorage.getItem('visitor_name') || '親愛的老師');
-        if (callback) callback(name);
+        if (callback) callback(localStorage.getItem('visitor_name') || '親愛的老師');
         return;
     }
     const input = document.getElementById('name-prompt-input') || document.getElementById('visitor-name-input');
@@ -409,11 +475,38 @@ export const bindChange = (id, handler) => {
     if (el) el.addEventListener('change', handler);
 };
 
-// Attach globally for window convenience
-window.showToast = showToast;
-window.showAlertModal = showAlertModal;
-window.showConfirmModal = showConfirmModal;
-window.showNamePromptModal = showNamePromptModal;
-window.safeCopyToClipboard = safeCopyToClipboard;
+export function triggerHaptic(type = 'light') {
+    if (typeof navigator === 'undefined' || !navigator.vibrate) return;
+    try {
+        if (type === 'light') navigator.vibrate(10);
+        else if (type === 'medium') navigator.vibrate(20);
+        else if (type === 'heavy') navigator.vibrate([30, 20, 30]);
+        else if (type === 'success') navigator.vibrate([15, 30, 15]);
+    } catch (e) {}
+}
+
+// 嚴格攔截瀏覽器原生彈窗，絕不彈出系統原生提示或詢問框
+if (typeof window !== 'undefined') {
+    window.alert = function(msg) {
+        showToast(String(msg), 'info');
+    };
+    window.confirm = function(msg) {
+        console.warn('Native confirm was blocked by app design standard:', msg);
+        return false;
+    };
+    window.prompt = function(msg, def) {
+        console.warn('Native prompt was blocked by app design standard:', msg);
+        return def || null;
+    };
+
+    window.triggerHaptic = triggerHaptic;
+    window.showToast = showToast;
+    window.showAlertModal = showAlertModal;
+    window.showConfirmModal = showConfirmModal;
+    window.showConfirmDialog = showConfirmDialog;
+    window.showPromptDialog = showPromptDialog;
+    window.showNamePromptModal = showNamePromptModal;
+    window.safeCopyToClipboard = safeCopyToClipboard;
+}
 
 

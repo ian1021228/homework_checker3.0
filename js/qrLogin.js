@@ -394,9 +394,10 @@ export async function openPhoneQrScannerModal() {
             }
         );
     } catch (err) {
-        console.error("Camera start error:", err);
-        showAlertModal("無法啟用相機", "系統無法存取您的手機鏡頭。請確認已允許瀏覽器使用相機權限，或使用手機內建的相機 App 掃描電腦螢幕上的 QR Code。");
-        closePhoneQrScannerModal();
+        console.warn("Camera start error (fallback to OTP mode):", err);
+        showToast("相機未就緒，已切換至認證碼模式", "info");
+        const otpTab = document.getElementById('qr-auth-tab-otp');
+        if (otpTab) otpTab.click();
     }
 }
 
@@ -937,6 +938,9 @@ export function setupQrLoginEvents() {
         startDeviceQrLoginSession();
     });
     document.getElementById('portal-modal-qr-login-btn')?.addEventListener('click', () => {
+        startDeviceQrLoginSession();
+    });
+    document.getElementById('portal-signup-qr-login-btn')?.addEventListener('click', () => {
         startDeviceQrLoginSession();
     });
     document.getElementById('settings-show-qr-btn')?.addEventListener('click', () => {

@@ -12,7 +12,7 @@ import { saveData } from './storage.js';
 // 【模組功能開關】成績系統是否啟用
 // 若日後需復原成績系統，只需將此開關改為 true，並移除 index.html 中 #exam-scores-system-btn 的 hidden class 即可 100% 完整還原！
 // ==========================================
-export const ENABLE_EXAM_SCORES_SYSTEM = false;
+export const ENABLE_EXAM_SCORES_SYSTEM = true;
 
 // ==========================================
 // 1. 課綱六大領域與 21 門學科配置
@@ -232,6 +232,27 @@ export function startRealtimeStudentScoresSync(curClass) {
             }
           }
         });
+
+        // 實時合併家長端電子簽章與問卷回條
+        if (data.contactSignatures && typeof data.contactSignatures === 'object') {
+          curClass.contactSignatures = curClass.contactSignatures || {};
+          Object.keys(data.contactSignatures).forEach(dateKey => {
+            curClass.contactSignatures[dateKey] = curClass.contactSignatures[dateKey] || {};
+            curClass.contactSignatures[dateKey][seatStr] = data.contactSignatures[dateKey];
+          });
+        }
+        if (data.affairResponses && typeof data.affairResponses === 'object') {
+          curClass.affairResponses = curClass.affairResponses || {};
+          Object.keys(data.affairResponses).forEach(affairId => {
+            curClass.affairResponses[affairId] = curClass.affairResponses[affairId] || {};
+            curClass.affairResponses[affairId][seatStr] = data.affairResponses[affairId];
+          });
+          if (state.currentPage === 'affairs-page') {
+            try {
+              import('./affairs.js').then(m => m.renderAffairsPage());
+            } catch (e) {}
+          }
+        }
       });
 
       if (changed) {
@@ -262,6 +283,32 @@ export function startRealtimeStudentScoresSync(curClass) {
 // ==========================================
 // 4. 全螢幕成績系統渲染 (Fullscreen View Render)
 // ==========================================
+export function openExamScoresSystem(fromHistory = false) {
+  if (window.showExamScoresPage) {
+    window.showExamScoresPage(fromHistory);
+  } else {
+    const fullscreenView = document.getElementById('exam-scores-fullscreen-view');
+    if (fullscreenView) {
+      fullscreenView.classList.remove('hidden');
+      fullscreenView.classList.add('flex');
+      renderExamScoresView();
+    }
+  }
+}
+
+export function closeExamScoresSystem() {
+  const fullscreenView = document.getElementById('exam-scores-fullscreen-view');
+  if (fullscreenView) {
+    fullscreenView.classList.add('hidden');
+    fullscreenView.classList.remove('flex');
+  }
+  if (unsubscribeStudentScores) {
+    try { unsubscribeStudentScores(); } catch (e) {}
+    unsubscribeStudentScores = null;
+    currentSyncClassCode = null;
+  }
+}
+
 export function renderExamScoresView() {
   const curClass = getCurrentClass();
   const fullscreenView = document.getElementById('exam-scores-fullscreen-view');
@@ -1369,12 +1416,7 @@ export function setupExamScoresEvents() {
       showToast('請先建立或選擇班級後再使用成績系統！', 'warning');
       return;
     }
-    const fullscreenView = document.getElementById('exam-scores-fullscreen-view');
-    if (fullscreenView) {
-      fullscreenView.classList.remove('hidden');
-      fullscreenView.classList.add('flex');
-      renderExamScoresView();
-    }
+    openExamScoresSystem();
   };
 
   document.getElementById('exam-scores-system-btn')?.addEventListener('click', openScoresSystem);
@@ -1382,16 +1424,8 @@ export function setupExamScoresEvents() {
 
   // 關閉全螢幕成績系統
   document.getElementById('btn-close-exam-scores-view')?.addEventListener('click', () => {
-    const fullscreenView = document.getElementById('exam-scores-fullscreen-view');
-    if (fullscreenView) {
-      fullscreenView.classList.add('hidden');
-      fullscreenView.classList.remove('flex');
-    }
-    if (unsubscribeStudentScores) {
-      try { unsubscribeStudentScores(); } catch (e) {}
-      unsubscribeStudentScores = null;
-      currentSyncClassCode = null;
-    }
+    closeExamScoresSystem();
+    if (window.showMainPage) window.showMainPage();
   });
 
   // 勾選隱藏成績（防偷窺/大螢幕隱私）

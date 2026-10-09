@@ -707,6 +707,14 @@ export function updateGuestHomeBtnVisibility() {
             btn.classList.add('hidden');
         }
     }
+    const globalHamburger = document.getElementById('global-sidebar-toggle-btn');
+    if (globalHamburger) {
+        if (!isPortalVisible) {
+            globalHamburger.classList.remove('hidden');
+        } else {
+            globalHamburger.classList.add('hidden');
+        }
+    }
     if (window.updateChatVisibility) {
         window.updateChatVisibility();
     }

@@ -15,7 +15,13 @@ import {
     updateGuestHomeBtnVisibility,
     isStudentCompleted 
 } from './render.js';
-import { checkInitialMaxSeatSetup } from './examScores.js';
+import { checkInitialMaxSeatSetup, renderExamScoresView } from './examScores.js';
+import { renderOverviewPage } from './overview.js';
+import { renderOfficersPage } from './officers.js';
+import { renderAttendancePage } from './attendance.js';
+import { renderAffairsPage } from './affairs.js';
+import { updateSidebarActiveState } from './sidebar.js';
+import { renderAdminAuditsInContactBook, renderSchoolBroadcastsInContactBook } from './adminDashboard.js';
 
 export function applyCheckMode(mode) {
     state.currentCheckMode = mode;
@@ -97,10 +103,20 @@ export function hideAllPages() {
     if (state.currentPage) {
         state.scrollPositions[state.currentPage] = window.scrollY || document.documentElement.scrollTop;
     }
-    ['portal-page', 'main-page', 'detail-page', 'student-details-page', 'contact-book-page', 'homework-types-page'].forEach(id => { 
+    ['portal-page', 'main-page', 'detail-page', 'student-details-page', 'contact-book-page', 'homework-types-page', 'overview-page', 'officers-page', 'attendance-page', 'affairs-page'].forEach(id => { 
         const el = document.getElementById(id); 
         if (el) el.classList.add('hidden'); 
     });
+    const fullscreenScores = document.getElementById('exam-scores-fullscreen-view');
+    if (fullscreenScores) {
+        fullscreenScores.classList.add('hidden');
+        fullscreenScores.classList.remove('flex');
+    }
+    const qrScannerModal = document.getElementById('qr-scanner-modal');
+    if (qrScannerModal) {
+        qrScannerModal.classList.add('hidden');
+        qrScannerModal.classList.remove('flex', 'opacity-100');
+    }
     updateGuestHomeBtnVisibility();
 }
 
@@ -191,6 +207,7 @@ export function showMainPage(fromHistory = false) {
     if (detailPage) detailPage.dataset.from = ''; 
     restoreScroll('main-page');
     updateMobileNavVisibility('main');
+    updateSidebarActiveState('main-page');
     checkInitialMaxSeatSetup();
 }
 
@@ -209,6 +226,7 @@ export function showDetailPage(homeworkId, fromHistory = false) {
     renderStudentGrid(homeworkId); 
     restoreScroll('detail-page');
     updateMobileNavVisibility('detail');
+    updateSidebarActiveState('detail-page');
     requestAnimationFrame(() => { renderStudentGrid(homeworkId); });
 }
 
@@ -220,6 +238,7 @@ export function showStudentDetailsPage(fromHistory = false) {
     renderStudentDetailsPage(); 
     restoreScroll('student-details-page');
     updateMobileNavVisibility('student-details');
+    updateSidebarActiveState('student-details-page');
 
     if (state.lastActiveStudentSeat) {
         const targetSeat = state.lastActiveStudentSeat;
@@ -249,8 +268,11 @@ export function showContactBookPage(fromHistory = false) {
     const titleEl = document.getElementById('contact-book-title'); 
     if (titleEl) titleEl.textContent = `${currentClass?.name || ''} 聯絡簿`;
     renderContactBookItems(); 
+    renderAdminAuditsInContactBook();
+    renderSchoolBroadcastsInContactBook();
     restoreScroll('contact-book-page');
     updateMobileNavVisibility('contact-book');
+    updateSidebarActiveState('contact-book-page');
 }
 
 export function showHomeworkTypesPage(fromHistory = false) {
@@ -261,6 +283,65 @@ export function showHomeworkTypesPage(fromHistory = false) {
     renderHomeworkTypesPage(); 
     restoreScroll('homework-types-page');
     updateMobileNavVisibility('homework-types');
+}
+
+export function showOverviewPage(fromHistory = false) {
+    hideAllPages();
+    const el = document.getElementById('overview-page');
+    if (el) el.classList.remove('hidden');
+    if (!fromHistory) pushPageState({ page: 'overview' }, '#overview');
+    renderOverviewPage();
+    restoreScroll('overview-page');
+    updateSidebarActiveState('overview-page');
+}
+
+export function showOfficersPage(fromHistory = false) {
+    hideAllPages();
+    const el = document.getElementById('officers-page');
+    if (el) el.classList.remove('hidden');
+    if (!fromHistory) pushPageState({ page: 'officers' }, '#officers');
+    renderOfficersPage();
+    restoreScroll('officers-page');
+    updateSidebarActiveState('officers-page');
+}
+
+export function showAttendancePage(fromHistory = false) {
+    hideAllPages();
+    const el = document.getElementById('attendance-page');
+    if (el) el.classList.remove('hidden');
+    if (!fromHistory) pushPageState({ page: 'attendance' }, '#attendance');
+    renderAttendancePage();
+    restoreScroll('attendance-page');
+    updateSidebarActiveState('attendance-page');
+}
+
+export function showAffairsPage(fromHistory = false) {
+    hideAllPages();
+    const el = document.getElementById('affairs-page');
+    if (el) el.classList.remove('hidden');
+    if (!fromHistory) pushPageState({ page: 'affairs' }, '#affairs');
+    renderAffairsPage();
+    restoreScroll('affairs-page');
+    updateSidebarActiveState('affairs-page');
+}
+
+export function showExamScoresPage(fromHistory = false) {
+    const curClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId);
+    if (!curClass) {
+        showToast('請先建立或選擇班級後再使用成績系統！', 'warning');
+        return;
+    }
+    hideAllPages();
+    const fullscreenView = document.getElementById('exam-scores-fullscreen-view');
+    if (fullscreenView) {
+        fullscreenView.classList.remove('hidden');
+        fullscreenView.classList.add('flex');
+    }
+    if (!fromHistory) pushPageState({ page: 'scores' }, '#scores');
+    state.currentPage = 'scores-page';
+    renderExamScoresView();
+    restoreScroll('scores-page');
+    updateSidebarActiveState('scores-page');
 }
 
 export function promptSystemUsageAndNavigate() {
@@ -311,7 +392,7 @@ export function proceedIntoSystem() {
     const portalEl = document.getElementById('portal-page');
     if (portalEl) portalEl.classList.add('hidden');
     
-    // 預設手動點收，不彈窗打擾
+    // 預設手動點收，略過彈窗詢問
     if (!localStorage.getItem('checkMode')) {
         localStorage.setItem('checkMode', 'manual');
         state.currentCheckMode = 'manual';
@@ -398,4 +479,13 @@ export function showWelcomeStep2() {
     document.getElementById('welcome-step-1')?.classList.add('hidden');
     document.getElementById('welcome-step-2')?.classList.remove('hidden');
     window.dispatchEvent(new CustomEvent('welcome-step-2-opened'));
+}
+
+if (typeof window !== 'undefined') {
+    window.showAttendancePage = showAttendancePage;
+    window.showMainPage = showMainPage;
+    window.showOverviewPage = showOverviewPage;
+    window.showOfficersPage = showOfficersPage;
+    window.showAffairsPage = showAffairsPage;
+    window.showExamScoresPage = showExamScoresPage;
 }

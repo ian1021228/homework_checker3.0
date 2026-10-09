@@ -28,7 +28,8 @@ import {
     closeModal,
     bindClick,
     bindSubmit,
-    bindChange
+    bindChange,
+    triggerHaptic
 } from './utils.js';
 
 import {
@@ -105,8 +106,19 @@ import {
     closePortalAuthModal,
     proceedIntoSystem,
     openCopyClassModal,
-    showWelcomeStep2
-, fullRender } from './navigation.js';
+    showWelcomeStep2,
+    showOverviewPage,
+    showOfficersPage,
+    showAttendancePage,
+    showAffairsPage,
+    showExamScoresPage,
+    fullRender
+} from './navigation.js';
+import { renderOverviewPage } from './overview.js';
+import { renderOfficersPage } from './officers.js';
+import { renderAttendancePage } from './attendance.js';
+import { renderAffairsPage } from './affairs.js';
+import { showAdminDashboardPage } from './adminDashboard.js';
 
 import {
     setupExamScoresEvents,
@@ -1592,6 +1604,7 @@ export function setupButtonEvents() {
     };
 
     bindClick('portal-google-btn', handleGoogleLogin);
+    bindClick('portal-signup-google-btn', handleGoogleLogin);
     bindClick('google-login-btn', handleGoogleLogin);
     bindClick('welcome-google-btn', handleGoogleLogin);
 
@@ -1851,12 +1864,9 @@ export function setupButtonEvents() {
     bindClick('admin-modal-exit-view-btn', exitAdminViewMode);
 
     // 本地硬碟連結
-    bindClick('portal-link-file-btn', async () => {
+    const handleLinkFileAction = async () => {
         if (!window.showSaveFilePicker) {
-            showConfirmModal("硬碟直寫限制", "您的瀏覽器環境不支援直接存取本機硬碟（推薦使用 Chrome 或 Edge 桌面版）。\n\n是否以「瀏覽器暫存」模式進入系統？", () => {
-                localStorage.setItem('storageSelected', 'true');
-                proceedIntoSystem();
-            });
+            showAlertModal("硬碟直寫限制", "您的瀏覽器環境不支援直接存取本機硬碟（推薦使用 Chrome 或 Edge 桌面版）。");
             return;
         }
         try {
@@ -1878,25 +1888,9 @@ export function setupButtonEvents() {
         } catch (e) {
             if (e.name !== 'AbortError') showAlertModal("無法連結檔案", e.message);
         }
-    });
-
-    bindClick('portal-browser-only-btn', () => {
-        showNamePromptModal((name) => {
-            if (name) {
-                sessionStorage.setItem('app_is_guest_mode', 'true');
-                state.currentUser = null;
-                localStorage.removeItem('app_user_session');
-                state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
-                state.currentClassId = null;
-                localStorage.removeItem('homeworkAppData');
-                localStorage.removeItem('currentClassId');
-                localStorage.setItem('visitor_name', name.trim());
-                localStorage.setItem('storageSelected', 'true');
-                showToast("已選擇瀏覽器暫存模式 (免帳號體驗，不寫入雲端)", "info");
-                proceedIntoSystem();
-            }
-        });
-    });
+    };
+    bindClick('portal-link-file-btn', handleLinkFileAction);
+    bindClick('portal-signup-link-file-btn', handleLinkFileAction);
 
     bindClick('google-logout-btn', performFullLogout);
     bindClick('delete-my-account-btn', deleteMyAccount);
@@ -2238,8 +2232,8 @@ export function setupButtonEvents() {
     bindChange('filter-date-start', renderHomeworkList);
     bindChange('filter-date-end', renderHomeworkList);
 
-    // 班級管理與權限碼
-    const PARENT_DASHBOARD_URL = 'https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/';
+    // 班級管理與權限碼 (測試版指針)
+    const PARENT_DASHBOARD_URL = 'https://ian1021228.github.io/parent_dashboard_dev/';
 
     bindClick('gen-code-btn', () => {
         const input = document.getElementById('class-access-code');
@@ -2484,24 +2478,24 @@ export function setupButtonEvents() {
                 return;
             }
 
-            // 複製該班級專屬家長端連結（包含代碼參數）
+            // 複製該班級專屬家長端連結（包含代碼參數，測試版）
             const copyParentBtn = e.target.closest('.copy-parent-link-btn');
             if (copyParentBtn) {
                 e.stopPropagation();
                 const code = copyParentBtn.dataset.code;
                 const name = copyParentBtn.dataset.name;
-                const parentUrl = `https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/?code=${encodeURIComponent(code)}`;
+                const parentUrl = `https://ian1021228.github.io/parent_dashboard_dev/?code=${encodeURIComponent(code)}`;
                 await safeCopyToClipboard(parentUrl, `已複製「${name}」專屬家長端連結（包含代碼）！`);
                 return;
             }
 
-            // 複製該班級專屬學生端連結（包含代碼參數）
+            // 複製該班級專屬學生端連結（包含代碼參數，測試版）
             const copyStudentBtn = e.target.closest('.copy-student-link-btn');
             if (copyStudentBtn) {
                 e.stopPropagation();
                 const code = copyStudentBtn.dataset.code;
                 const name = copyStudentBtn.dataset.name;
-                const studentUrl = `https://ian1021228.github.io/ian_homework_checker2.0_online_student_dashboard/?code=${encodeURIComponent(code)}`;
+                const studentUrl = `https://ian1021228.github.io/student_dashboard_dev/?code=${encodeURIComponent(code)}`;
                 await safeCopyToClipboard(studentUrl, `已複製「${name}」專屬學生端聯絡簿連結（包含代碼）！`);
                 return;
             }
@@ -2864,7 +2858,7 @@ export function setupButtonEvents() {
     }
 
     bindClick('copy-parent-link-btn', async () => {
-        const baseUrl = 'https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/';
+        const baseUrl = 'https://ian1021228.github.io/parent_dashboard_dev/';
         const currentClass = state.appData.classes.find(c => c.id === state.currentClassId);
         const code = (currentClass && currentClass.accessCode) ? encodeURIComponent(currentClass.accessCode) : '';
         const url = code ? `${baseUrl}?code=${code}` : baseUrl;
@@ -2901,6 +2895,10 @@ export function setupButtonEvents() {
         const userKey = getUserStorageKey(state.currentUser);
         localStorage.setItem('currentClassId_' + userKey, state.currentClassId);
         renderHomeworkList(); 
+        if (state.currentPage === 'overview-page') renderOverviewPage();
+        if (state.currentPage === 'officers-page') renderOfficersPage();
+        if (state.currentPage === 'attendance-page') renderAttendancePage();
+        if (state.currentPage === 'affairs-page') renderAffairsPage();
     });
 
     // 學生網格點擊
@@ -2909,6 +2907,7 @@ export function setupButtonEvents() {
         studentGrid.addEventListener('click', async (e) => {
             const studentBtn = e.target.closest('.student-btn');
             if (studentBtn) {
+                triggerHaptic('light');
                 const seat = parseInt(studentBtn.dataset.seat); 
                 const hw = state.appData.homeworks.find(h => h.id === state.currentHomeworkId); 
                 if (!hw || !hw.students) return;
@@ -3427,27 +3426,58 @@ export function setupButtonEvents() {
     });
 
     // 手機抽屜內部快捷按鈕
+    document.getElementById('mobile-sheet-overview-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
+        closeModal(document.getElementById('mobile-more-sheet'));
+        showOverviewPage();
+    });
+    document.getElementById('mobile-sheet-attendance-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
+        closeModal(document.getElementById('mobile-more-sheet'));
+        showAttendancePage();
+    });
+    document.getElementById('mobile-sheet-officers-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
+        closeModal(document.getElementById('mobile-more-sheet'));
+        showOfficersPage();
+    });
+    document.getElementById('mobile-sheet-affairs-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
+        closeModal(document.getElementById('mobile-more-sheet'));
+        showAffairsPage();
+    });
+    document.getElementById('mobile-sheet-scores-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
+        closeModal(document.getElementById('mobile-more-sheet'));
+        showExamScoresPage();
+    });
+    document.getElementById('mobile-sheet-admin-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
+        closeModal(document.getElementById('mobile-more-sheet'));
+        showAdminDashboardPage();
+    });
     document.getElementById('mobile-sheet-manage-classes-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
         closeModal(document.getElementById('mobile-more-sheet'));
         document.getElementById('manage-classes-btn')?.click();
     });
-    document.getElementById('mobile-sheet-set-barcodes-btn')?.addEventListener('click', () => {
-        closeModal(document.getElementById('mobile-more-sheet'));
-        document.getElementById('set-barcodes-btn')?.click();
-    });
     document.getElementById('mobile-sheet-student-details-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
         closeModal(document.getElementById('mobile-more-sheet'));
         document.getElementById('student-details-btn')?.click();
     });
     document.getElementById('mobile-sheet-types-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
         closeModal(document.getElementById('mobile-more-sheet'));
         document.getElementById('show-types-modal-btn')?.click();
     });
-    document.getElementById('mobile-sheet-quick-auth-btn')?.addEventListener('click', () => {
+    document.getElementById('mobile-sheet-set-barcodes-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
         closeModal(document.getElementById('mobile-more-sheet'));
-        document.getElementById('main-qr-scan-btn')?.click();
+        document.getElementById('set-barcodes-btn')?.click();
     });
     document.getElementById('mobile-sheet-settings-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
         closeModal(document.getElementById('mobile-more-sheet'));
         document.getElementById('settings-btn')?.click();
     });
@@ -3461,6 +3491,29 @@ export function setupButtonEvents() {
     window.addEventListener('online', () => {
         showToast("已恢復網路連線，正在自動同步雲端資料...", "success");
         try { syncDataToCloud(true); } catch(e) {}
+    });
+
+    // ==========================================
+    // 瀏覽器上一頁/下一頁 (Popstate) 導覽監聽
+    // ==========================================
+    window.addEventListener('popstate', (e) => {
+        const hash = window.location.hash;
+        if (sessionStorage.getItem('has_passed_portal_in_session') !== 'true') return;
+        if (hash === '#scores') {
+            showExamScoresPage(true);
+        } else if (hash === '#contact-book') {
+            showContactBookPage(true);
+        } else if (hash === '#overview') {
+            showOverviewPage(true);
+        } else if (hash === '#officers') {
+            showOfficersPage(true);
+        } else if (hash === '#attendance') {
+            showAttendancePage(true);
+        } else if (hash === '#affairs') {
+            showAffairsPage(true);
+        } else if (hash === '#main') {
+            showMainPage(true);
+        }
     });
 }
 
@@ -3608,8 +3661,8 @@ export function generateLineReportText() {
         });
     }
 
-    text += `\n[家長專屬即時查核連結（免密碼直達）]\n`;
-    const baseUrl = 'https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/';
+    text += `\n[家長專屬即時查核連結（免密碼直達，測試版）]\n`;
+    const baseUrl = 'https://ian1021228.github.io/parent_dashboard_dev/';
     text += classCode ? `${baseUrl}?code=${classCode}\n` : `${baseUrl}\n`;
     text += `━━━━━━━━━━━━━━━━━━━━━━\n`;
     text += `七賢國中107 王禹硯 開發 • 班級經營系統`;
