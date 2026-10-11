@@ -28,7 +28,6 @@ export const STATUS_COLORS = [
     { class: 'bg-purple-500', textClass: 'text-white', name: '紫' } 
 ];
 
-// 正式版獨立 Firebase Firestore 命名空間
 export const globalAppId = typeof window.__app_id !== 'undefined' ? window.__app_id : 'homework-checker-pro';
 
 export const PARENT_DASHBOARD_URL = `${window.location.origin}/parent.html`;

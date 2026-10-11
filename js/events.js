@@ -28,8 +28,7 @@ import {
     closeModal,
     bindClick,
     bindSubmit,
-    bindChange,
-    triggerHaptic
+    bindChange
 } from './utils.js';
 
 import {
@@ -106,19 +105,8 @@ import {
     closePortalAuthModal,
     proceedIntoSystem,
     openCopyClassModal,
-    showWelcomeStep2,
-    showOverviewPage,
-    showOfficersPage,
-    showAttendancePage,
-    showAffairsPage,
-    showExamScoresPage,
-    fullRender
-} from './navigation.js';
-import { renderOverviewPage } from './overview.js';
-import { renderOfficersPage } from './officers.js';
-import { renderAttendancePage } from './attendance.js';
-import { renderAffairsPage } from './affairs.js';
-import { showAdminDashboardPage } from './adminDashboard.js';
+    showWelcomeStep2
+, fullRender } from './navigation.js';
 
 import {
     setupExamScoresEvents,
@@ -1604,7 +1592,6 @@ export function setupButtonEvents() {
     };
 
     bindClick('portal-google-btn', handleGoogleLogin);
-    bindClick('portal-signup-google-btn', handleGoogleLogin);
     bindClick('google-login-btn', handleGoogleLogin);
     bindClick('welcome-google-btn', handleGoogleLogin);
 
@@ -1864,9 +1851,12 @@ export function setupButtonEvents() {
     bindClick('admin-modal-exit-view-btn', exitAdminViewMode);
 
     // 本地硬碟連結
-    const handleLinkFileAction = async () => {
+    bindClick('portal-link-file-btn', async () => {
         if (!window.showSaveFilePicker) {
-            showAlertModal("硬碟直寫限制", "您的瀏覽器環境不支援直接存取本機硬碟（推薦使用 Chrome 或 Edge 桌面版）。");
+            showConfirmModal("硬碟直寫限制", "您的瀏覽器環境不支援直接存取本機硬碟（推薦使用 Chrome 或 Edge 桌面版）。\n\n是否以「瀏覽器暫存」模式進入系統？", () => {
+                localStorage.setItem('storageSelected', 'true');
+                proceedIntoSystem();
+            });
             return;
         }
         try {
@@ -1888,9 +1878,25 @@ export function setupButtonEvents() {
         } catch (e) {
             if (e.name !== 'AbortError') showAlertModal("無法連結檔案", e.message);
         }
-    };
-    bindClick('portal-link-file-btn', handleLinkFileAction);
-    bindClick('portal-signup-link-file-btn', handleLinkFileAction);
+    });
+
+    bindClick('portal-browser-only-btn', () => {
+        showNamePromptModal((name) => {
+            if (name) {
+                sessionStorage.setItem('app_is_guest_mode', 'true');
+                state.currentUser = null;
+                localStorage.removeItem('app_user_session');
+                state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
+                state.currentClassId = null;
+                localStorage.removeItem('homeworkAppData');
+                localStorage.removeItem('currentClassId');
+                localStorage.setItem('visitor_name', name.trim());
+                localStorage.setItem('storageSelected', 'true');
+                showToast("已選擇瀏覽器暫存模式 (免帳號體驗，不寫入雲端)", "info");
+                proceedIntoSystem();
+            }
+        });
+    });
 
     bindClick('google-logout-btn', performFullLogout);
     bindClick('delete-my-account-btn', deleteMyAccount);
@@ -2895,10 +2901,6 @@ export function setupButtonEvents() {
         const userKey = getUserStorageKey(state.currentUser);
         localStorage.setItem('currentClassId_' + userKey, state.currentClassId);
         renderHomeworkList(); 
-        if (state.currentPage === 'overview-page') renderOverviewPage();
-        if (state.currentPage === 'officers-page') renderOfficersPage();
-        if (state.currentPage === 'attendance-page') renderAttendancePage();
-        if (state.currentPage === 'affairs-page') renderAffairsPage();
     });
 
     // 學生網格點擊
@@ -2907,7 +2909,6 @@ export function setupButtonEvents() {
         studentGrid.addEventListener('click', async (e) => {
             const studentBtn = e.target.closest('.student-btn');
             if (studentBtn) {
-                triggerHaptic('light');
                 const seat = parseInt(studentBtn.dataset.seat); 
                 const hw = state.appData.homeworks.find(h => h.id === state.currentHomeworkId); 
                 if (!hw || !hw.students) return;
@@ -3426,58 +3427,27 @@ export function setupButtonEvents() {
     });
 
     // 手機抽屜內部快捷按鈕
-    document.getElementById('mobile-sheet-overview-btn')?.addEventListener('click', () => {
-        triggerHaptic('light');
-        closeModal(document.getElementById('mobile-more-sheet'));
-        showOverviewPage();
-    });
-    document.getElementById('mobile-sheet-attendance-btn')?.addEventListener('click', () => {
-        triggerHaptic('light');
-        closeModal(document.getElementById('mobile-more-sheet'));
-        showAttendancePage();
-    });
-    document.getElementById('mobile-sheet-officers-btn')?.addEventListener('click', () => {
-        triggerHaptic('light');
-        closeModal(document.getElementById('mobile-more-sheet'));
-        showOfficersPage();
-    });
-    document.getElementById('mobile-sheet-affairs-btn')?.addEventListener('click', () => {
-        triggerHaptic('light');
-        closeModal(document.getElementById('mobile-more-sheet'));
-        showAffairsPage();
-    });
-    document.getElementById('mobile-sheet-scores-btn')?.addEventListener('click', () => {
-        triggerHaptic('light');
-        closeModal(document.getElementById('mobile-more-sheet'));
-        showExamScoresPage();
-    });
-    document.getElementById('mobile-sheet-admin-btn')?.addEventListener('click', () => {
-        triggerHaptic('light');
-        closeModal(document.getElementById('mobile-more-sheet'));
-        showAdminDashboardPage();
-    });
     document.getElementById('mobile-sheet-manage-classes-btn')?.addEventListener('click', () => {
-        triggerHaptic('light');
         closeModal(document.getElementById('mobile-more-sheet'));
         document.getElementById('manage-classes-btn')?.click();
     });
+    document.getElementById('mobile-sheet-set-barcodes-btn')?.addEventListener('click', () => {
+        closeModal(document.getElementById('mobile-more-sheet'));
+        document.getElementById('set-barcodes-btn')?.click();
+    });
     document.getElementById('mobile-sheet-student-details-btn')?.addEventListener('click', () => {
-        triggerHaptic('light');
         closeModal(document.getElementById('mobile-more-sheet'));
         document.getElementById('student-details-btn')?.click();
     });
     document.getElementById('mobile-sheet-types-btn')?.addEventListener('click', () => {
-        triggerHaptic('light');
         closeModal(document.getElementById('mobile-more-sheet'));
         document.getElementById('show-types-modal-btn')?.click();
     });
-    document.getElementById('mobile-sheet-set-barcodes-btn')?.addEventListener('click', () => {
-        triggerHaptic('light');
+    document.getElementById('mobile-sheet-quick-auth-btn')?.addEventListener('click', () => {
         closeModal(document.getElementById('mobile-more-sheet'));
-        document.getElementById('set-barcodes-btn')?.click();
+        document.getElementById('main-qr-scan-btn')?.click();
     });
     document.getElementById('mobile-sheet-settings-btn')?.addEventListener('click', () => {
-        triggerHaptic('light');
         closeModal(document.getElementById('mobile-more-sheet'));
         document.getElementById('settings-btn')?.click();
     });
@@ -3491,29 +3461,6 @@ export function setupButtonEvents() {
     window.addEventListener('online', () => {
         showToast("已恢復網路連線，正在自動同步雲端資料...", "success");
         try { syncDataToCloud(true); } catch(e) {}
-    });
-
-    // ==========================================
-    // 瀏覽器上一頁/下一頁 (Popstate) 導覽監聽
-    // ==========================================
-    window.addEventListener('popstate', (e) => {
-        const hash = window.location.hash;
-        if (sessionStorage.getItem('has_passed_portal_in_session') !== 'true') return;
-        if (hash === '#scores') {
-            showExamScoresPage(true);
-        } else if (hash === '#contact-book') {
-            showContactBookPage(true);
-        } else if (hash === '#overview') {
-            showOverviewPage(true);
-        } else if (hash === '#officers') {
-            showOfficersPage(true);
-        } else if (hash === '#attendance') {
-            showAttendancePage(true);
-        } else if (hash === '#affairs') {
-            showAffairsPage(true);
-        } else if (hash === '#main') {
-            showMainPage(true);
-        }
     });
 }
 

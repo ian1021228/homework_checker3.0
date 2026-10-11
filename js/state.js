@@ -33,11 +33,8 @@ export const state = {
     unsubReplies: null,
     isBellOpen: false,
     activeBellTab: 'notices',
-    isDevMode: sessionStorage.getItem('app_dev_mode') === 'true',
-    currentUserRole: 'teacher', // 'admin' | 'teacher' | 'viewer'
-    adminAudits: JSON.parse(localStorage.getItem('admin_audit_records') || '{}'),
-    schoolBroadcasts: JSON.parse(localStorage.getItem('admin_school_broadcasts') || '[]'),
-    batchCreatedAccounts: JSON.parse(localStorage.getItem('admin_batch_accounts') || '[]')
+    unreadRepliesCount: 0,
+    isDevMode: sessionStorage.getItem('app_dev_mode') === 'true'
 };
 
 // Also expose on window for legacy / event handler fallback if needed

@@ -1,7 +1,7 @@
 import { fbDb, fbAuth, doc, setDoc, getDoc, updateDoc, onSnapshot, isGoogleAdmin } from './firebase.js';
 import { globalAppId } from './constants.js';
 import { state } from './state.js';
-import { safeCopyToClipboard, showToast, formatDate, showConfirmDialog } from './utils.js';
+import { safeCopyToClipboard, showToast, formatDate } from './utils.js';
 
 // HTML 安全轉義工具
 function escapeHtml(str) {
@@ -703,11 +703,8 @@ function renderRepliesView(container, user) {
     container.querySelectorAll('.reply-delete-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
             const id = btn.getAttribute('data-id');
-            if (id) {
-                const ok = await showConfirmDialog("刪除回覆", "確定要刪除這筆回覆紀錄嗎？", { okText: "確定刪除" });
-                if (ok) {
-                    await deleteReplyRecord(id);
-                }
+            if (id && confirm("確定要刪除這筆回覆紀錄嗎？")) {
+                await deleteReplyRecord(id);
             }
         });
     });
@@ -772,8 +769,7 @@ function renderPublishView(container, user) {
 
     if (clearBtn) {
         clearBtn.addEventListener('click', async () => {
-            const ok = await showConfirmDialog("撤除全體廣播", "確定要撤除目前的全體廣播公告嗎？", { okText: "確定撤除" });
-            if (!ok) return;
+            if (!confirm("確定要撤除目前的全體廣播公告嗎？")) return;
             try {
                 await clearSystemBroadcast();
                 showToast("已撤除全體廣播公告", "info");

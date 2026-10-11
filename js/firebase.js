@@ -810,8 +810,7 @@ export async function syncDataToCloud() {
                     try {
                         const existingSnap = await getDoc(parentDocRef);
                         if (existingSnap.exists()) {
-                            const cloudData = existingSnap.data() || {};
-                            const cloudExams = cloudData.exams || [];
+                            const cloudExams = existingSnap.data()?.exams || [];
                             (c.exams || []).forEach(localExam => {
                                 const cloudExam = cloudExams.find(ce => ce.id === localExam.id);
                                 if (cloudExam && cloudExam.submissions) {
@@ -821,18 +820,6 @@ export async function syncDataToCloud() {
                                     };
                                 }
                             });
-                            if (cloudData.contactSignatures) {
-                                c.contactSignatures = {
-                                    ...cloudData.contactSignatures,
-                                    ...(c.contactSignatures || {})
-                                };
-                            }
-                            if (cloudData.affairResponses) {
-                                c.affairResponses = {
-                                    ...cloudData.affairResponses,
-                                    ...(c.affairResponses || {})
-                                };
-                            }
                         }
                     } catch (e) {}
 
@@ -850,14 +837,7 @@ export async function syncDataToCloud() {
                         contactBook: c.contactBook || {},
                         homeworkTypes: safeClone(state.appData.homeworkTypes || DEFAULT_TYPES),
                         studentPins: c.studentPins || {},
-                        exams: c.exams || [],
-                        officers: c.officers || {},
-                        dutySettings: c.dutySettings || {},
-                        attendance: c.attendance || {},
-                        affairs: c.affairs || [],
-                        affairResponses: c.affairResponses || {},
-                        contactSignatures: c.contactSignatures || {},
-                        bulletinNotice: c.bulletinNotice || ''
+                        exams: c.exams || []
                     };
                     await setDoc(parentDocRef, {
                         ...parentPayload,
