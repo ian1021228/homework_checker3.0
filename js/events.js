@@ -2232,8 +2232,8 @@ export function setupButtonEvents() {
     bindChange('filter-date-start', renderHomeworkList);
     bindChange('filter-date-end', renderHomeworkList);
 
-    // 班級管理與權限碼 (測試版指針)
-    const PARENT_DASHBOARD_URL = 'https://ian1021228.github.io/parent_dashboard_dev/';
+    // 班級管理與權限碼
+    const PARENT_DASHBOARD_URL = 'https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/';
 
     bindClick('gen-code-btn', () => {
         const input = document.getElementById('class-access-code');
@@ -2478,24 +2478,24 @@ export function setupButtonEvents() {
                 return;
             }
 
-            // 複製該班級專屬家長端連結（包含代碼參數，測試版）
+            // 複製該班級專屬家長端連結（包含代碼參數）
             const copyParentBtn = e.target.closest('.copy-parent-link-btn');
             if (copyParentBtn) {
                 e.stopPropagation();
                 const code = copyParentBtn.dataset.code;
                 const name = copyParentBtn.dataset.name;
-                const parentUrl = `https://ian1021228.github.io/parent_dashboard_dev/?code=${encodeURIComponent(code)}`;
+                const parentUrl = `https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/?code=${encodeURIComponent(code)}`;
                 await safeCopyToClipboard(parentUrl, `已複製「${name}」專屬家長端連結（包含代碼）！`);
                 return;
             }
 
-            // 複製該班級專屬學生端連結（包含代碼參數，測試版）
+            // 複製該班級專屬學生端連結（包含代碼參數）
             const copyStudentBtn = e.target.closest('.copy-student-link-btn');
             if (copyStudentBtn) {
                 e.stopPropagation();
                 const code = copyStudentBtn.dataset.code;
                 const name = copyStudentBtn.dataset.name;
-                const studentUrl = `https://ian1021228.github.io/student_dashboard_dev/?code=${encodeURIComponent(code)}`;
+                const studentUrl = `https://ian1021228.github.io/ian_homework_checker2.0_online_student_dashboard/?code=${encodeURIComponent(code)}`;
                 await safeCopyToClipboard(studentUrl, `已複製「${name}」專屬學生端聯絡簿連結（包含代碼）！`);
                 return;
             }
@@ -2858,7 +2858,7 @@ export function setupButtonEvents() {
     }
 
     bindClick('copy-parent-link-btn', async () => {
-        const baseUrl = 'https://ian1021228.github.io/parent_dashboard_dev/';
+        const baseUrl = 'https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/';
         const currentClass = state.appData.classes.find(c => c.id === state.currentClassId);
         const code = (currentClass && currentClass.accessCode) ? encodeURIComponent(currentClass.accessCode) : '';
         const url = code ? `${baseUrl}?code=${code}` : baseUrl;
@@ -3661,8 +3661,8 @@ export function generateLineReportText() {
         });
     }
 
-    text += `\n[家長專屬即時查核連結（免密碼直達，測試版）]\n`;
-    const baseUrl = 'https://ian1021228.github.io/parent_dashboard_dev/';
+    text += `\n[家長專屬即時查核連結（免密碼直達）]\n`;
+    const baseUrl = 'https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/';
     text += classCode ? `${baseUrl}?code=${classCode}\n` : `${baseUrl}\n`;
     text += `━━━━━━━━━━━━━━━━━━━━━━\n`;
     text += `七賢國中107 王禹硯 開發 • 班級經營系統`;

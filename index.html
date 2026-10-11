@@ -5,7 +5,7 @@
     <meta name="google" content="notranslate">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>班級經營系統 3.0</title>
-    <meta name="description" content="班級經營系統 3.0 - 開發測試環境，獨立資料庫">
+    <meta name="description" content="班級經營系統 3.0 - 支援實體條碼掃描槍、雲端備份、親師聯絡簿與成績登記的全方位班級經營系統">
     <meta property="og:title" content="班級經營系統 3.0">
     <meta property="og:description" content="班級經營系統 3.0 - 支援實體條碼掃描槍、雲端備份、親師聯絡簿與成績登記的全方位班級經營系統">
     
@@ -144,16 +144,16 @@
 
                 <!-- 右側：提供意見 + 登入 / 註冊 / 進入系統按鈕列 -->
                 <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-                    <!-- 家長端直達按鈕 (測試版) -->
-                    <a href="https://ian1021228.github.io/parent_dashboard_dev/" target="_blank" rel="noopener noreferrer" class="text-xs sm:text-sm font-bold text-indigo-700 bg-indigo-50/90 hover:bg-indigo-100 border border-indigo-200/80 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full transition-all flex items-center gap-1 shadow-2xs cursor-pointer" title="前往家長端即時查核看板 (測試版)">
+                    <!-- 家長端直達按鈕 -->
+                    <a href="https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/" target="_blank" rel="noopener noreferrer" class="text-xs sm:text-sm font-bold text-indigo-700 bg-indigo-50/90 hover:bg-indigo-100 border border-indigo-200/80 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full transition-all flex items-center gap-1 shadow-2xs cursor-pointer" title="前往家長端即時查核看板">
                         <i class="fa-solid fa-house-chimney-user text-indigo-600"></i>
-                        <span class="hidden sm:inline">家長端(DEV)</span>
+                        <span class="hidden sm:inline">家長端</span>
                     </a>
 
-                    <!-- 學生端直達按鈕 (測試版) -->
-                    <a href="https://ian1021228.github.io/student_dashboard_dev/" target="_blank" rel="noopener noreferrer" class="text-xs sm:text-sm font-bold text-emerald-800 bg-emerald-50/90 hover:bg-emerald-100 border border-emerald-300/80 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full transition-all flex items-center gap-1 shadow-2xs cursor-pointer" title="前往學生端數位聯絡簿與成績登記 (測試版)">
+                    <!-- 學生端直達按鈕 -->
+                    <a href="https://ian1021228.github.io/ian_homework_checker2.0_online_student_dashboard/" target="_blank" rel="noopener noreferrer" class="text-xs sm:text-sm font-bold text-emerald-800 bg-emerald-50/90 hover:bg-emerald-100 border border-emerald-300/80 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full transition-all flex items-center gap-1 shadow-2xs cursor-pointer" title="前往學生端數位聯絡簿與成績登記">
                         <i class="fa-solid fa-graduation-cap text-emerald-600"></i>
-                        <span class="hidden sm:inline">學生端(DEV)</span>
+                        <span class="hidden sm:inline">學生端</span>
                     </a>
 
                     <!-- 給老師的話 按鈕 -->
@@ -1420,7 +1420,6 @@
                 <div>
                     <div class="flex items-center gap-1.5">
                         <span class="font-black text-slate-900 text-lg tracking-tight">班級經營系統</span>
-                        <span class="text-[10px] font-black px-1.5 py-0.5 rounded-md bg-amber-500 text-white">DEV</span>
                     </div>
                     <p id="sidebar-current-class-name" class="text-xs font-bold text-indigo-600 truncate max-w-[170px] mt-0.5">未選擇班級</p>
                 </div>
@@ -1560,11 +1559,11 @@
         <!-- 底部：快捷連結與帳號資訊 -->
         <div class="p-4 border-t border-slate-100 bg-slate-50/60 space-y-2">
             <div class="grid grid-cols-2 gap-2 text-xs">
-                <a href="https://ian1021228.github.io/parent_dashboard_dev/" target="_blank" class="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-indigo-600 font-bold transition-all shadow-xs">
-                    <i class="fa-solid fa-house-chimney-user text-indigo-500"></i> 家長端 (DEV)
+                <a href="https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/" target="_blank" class="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-indigo-600 font-bold transition-all shadow-xs">
+                    <i class="fa-solid fa-house-chimney-user text-indigo-500"></i> 家長端
                 </a>
-                <a href="https://ian1021228.github.io/student_dashboard_dev/" target="_blank" class="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-indigo-600 font-bold transition-all shadow-xs">
-                    <i class="fa-solid fa-graduation-cap text-emerald-500"></i> 學生端 (DEV)
+                <a href="https://ian1021228.github.io/ian_homework_checker2.0_online_student_dashboard/" target="_blank" class="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-indigo-600 font-bold transition-all shadow-xs">
+                    <i class="fa-solid fa-graduation-cap text-emerald-500"></i> 學生端
                 </a>
             </div>
             <div class="flex items-center justify-between pt-2 text-xs text-slate-500">
@@ -1589,10 +1588,9 @@
             <div class="flex flex-col 2xl:flex-row justify-between items-start 2xl:items-center gap-5 2xl:gap-8 w-full">
                 <!-- 左側：標題與班級選單 -->
                 <div class="flex items-center gap-3 sm:gap-4 flex-shrink-0">
-                     <button id="main-logo-btn" class="cursor-pointer group flex items-center gap-2.5 sm:gap-3 select-none text-left shrink-0" title="班級經營系統 (測試版)">
+                     <button id="main-logo-btn" class="cursor-pointer group flex items-center gap-2.5 sm:gap-3 select-none text-left shrink-0" title="班級經營系統">
                          <img src="icon.svg" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl drop-shadow-sm inline-block group-hover:scale-105 transition-transform" alt="班級經營系統">
                          <span class="text-xl sm:text-2xl xl:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-500 to-indigo-600 animated-gradient-text tracking-tight drop-shadow-sm group-hover:opacity-90 transition-opacity whitespace-nowrap">班級經營系統</span>
-                         <span class="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-black bg-amber-500 text-white shadow-xs uppercase tracking-wider">測試版 DEV</span>
                      </button>
                      <select id="class-selector" class="rounded-xl border-slate-200/80 shadow-sm shadow-slate-100/50 focus:border-indigo-500 focus:ring-indigo-500 py-2.5 px-4 text-base sm:text-lg bg-white font-extrabold text-indigo-600 cursor-pointer transition-all"></select>
                 </div>
@@ -3086,14 +3084,14 @@
                     家長與學生輸入班級權限碼即可直達專屬系統。家長端具備學生端專屬 PIN 密碼隱私保護；學生端支援作業自主檢核與數位聯絡簿札記。
                 </p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <a id="goto-parent-dashboard-btn" href="https://ian1021228.github.io/parent_dashboard_dev/" target="_blank" rel="noopener noreferrer" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-3 text-xs rounded-xl shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer">
+                    <a id="goto-parent-dashboard-btn" href="https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/" target="_blank" rel="noopener noreferrer" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-3 text-xs rounded-xl shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer">
                         <i class="fa-solid fa-house-chimney-user"></i>
-                        <span>前往家長端 (DEV)</span>
+                        <span>前往家長端</span>
                         <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
                     </a>
-                    <a id="goto-student-dashboard-btn" href="https://ian1021228.github.io/student_dashboard_dev/" target="_blank" rel="noopener noreferrer" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-3 text-xs rounded-xl shadow-md shadow-emerald-500/20 transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer">
+                    <a id="goto-student-dashboard-btn" href="https://ian1021228.github.io/ian_homework_checker2.0_online_student_dashboard/" target="_blank" rel="noopener noreferrer" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-3 text-xs rounded-xl shadow-md shadow-emerald-500/20 transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer">
                         <i class="fa-solid fa-graduation-cap"></i>
-                        <span>前往學生端 (DEV)</span>
+                        <span>前往學生端</span>
                         <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
                     </a>
                 </div>
@@ -3867,6 +3865,31 @@
 
                 <!-- 版本歷程時間軸 -->
                 <div class="space-y-6">
+                    <!-- v4.1.1 正式版環境校準與連線安全性架構維護 -->
+                    <div class="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/90 via-sky-50/60 to-purple-50/40 border-2 border-indigo-500 shadow-md relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs animate-pulse">v4.1.1 正式版架構校準</span>
+                                <span class="text-xs font-bold text-indigo-950">正式版獨立資料庫命名空間確認、三端正式版直達連結校準與離線快取同步</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-400">2026-10-11</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>正式版資料庫實體隔離維護</b>：全面確保連線至 <code>homework-checker-pro</code> 專屬正式雲端資料庫，保障線上使用者班級、作業、聯絡簿與點名歷史資料 100% 獨立安全零受損。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>三端正式版直達連結與標籤全面對齊</b>：全域介面標題、側邊選單、班級管理彈窗與家長端頁尾移除 DEV 測試標籤，直達連結全面對齊正式版家長端與學生端。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>Service Worker 離線快取同步升級 (v4.1.1)</b>：自動推進 PWA 快取快照版本，確保各端終端載具與瀏覽器即刻無縫獲取正式版最新架構與即時連線。</span>
+                            </li>
+                        </ul>
+                    </div>
+
                     <!-- v4.1.0 原生 App 行動端極致體驗重大升級 -->
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-emerald-50/90 via-teal-50/60 to-indigo-50/40 border-2 border-emerald-500 shadow-md relative">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">

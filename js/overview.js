@@ -292,8 +292,8 @@ export function copyOverviewDailyReport() {
     const todayStr = getTodayDateStr();
     const summary = getTodayAttendanceSummary(currentClass, todayStr);
     const classHomeworks = (state.appData?.homeworks || []).filter(h => h.classId === currentClass.id);
-    const accessCode = currentClass.accessCode || 'DEMO';
-    const parentUrl = `${window.location.origin}${window.location.pathname.replace('homework_checker3.0_dev', 'parent_dashboard_dev')}?code=${accessCode}`;
+    const accessCode = currentClass.accessCode || '';
+    const parentUrl = accessCode ? `https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/?code=${encodeURIComponent(accessCode)}` : 'https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/';
 
     let report = `📢 【${currentClass.name} 今日班級聯絡簿與出缺席總通報】\n`;
     report += `📅 日期：${formatChineseDateWithWeekday()}\n\n`;
