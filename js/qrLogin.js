@@ -499,7 +499,7 @@ export async function promptAuthorizeChallenge(challengeId) {
             confirmBtn.onclick = async () => {
                 confirmBtn.disabled = true;
                 const origText = confirmBtn.innerHTML;
-                confirmBtn.innerHTML = `<span>⏳ 正在授權登入...</span>`;
+                confirmBtn.innerHTML = `<span><i class="fa-solid fa-spinner fa-spin mr-1.5"></i>正在授權登入...</span>`;
 
                 try {
                     // 取得可能存在的密碼 (從 boundAccounts 記錄)
@@ -625,7 +625,7 @@ export async function verifyAndLoginWithOtp(inputCode) {
     if (errorEl) errorEl.classList.add('hidden');
     if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = `<span>⏳ 驗證中...</span>`;
+        submitBtn.innerHTML = `<span><i class="fa-solid fa-spinner fa-spin mr-1.5"></i>驗證中...</span>`;
     }
 
     try {

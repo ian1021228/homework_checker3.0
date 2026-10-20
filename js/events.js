@@ -749,7 +749,7 @@ export function setupButtonEvents() {
             `恭喜您！您的電子信箱已通過驗證，帳號【${userObj.displayName}】已正式啟用！\n\n日後登入時，您只需輸入使用者名稱【${userObj.displayName}】與密碼即可快速進入系統。`
         );
 
-        showToast("⏳ 正在同步雲端資料...", "info");
+        showToast("正在同步雲端資料...", "info");
         await syncUserProfile();
         await loadDataFromCloud(true);
         await syncDataToCloud();
@@ -997,7 +997,7 @@ export function setupButtonEvents() {
                 localStorage.setItem('homeworkAppData', safeStringify(state.appData));
                 if (state.currentClassId) localStorage.setItem('currentClassId', state.currentClassId);
 
-                showToast("⏳ 正在同步雲端資料...", "info");
+                showToast("正在同步雲端資料...", "info");
                 await loadDataFromCloud(true);
                 proceedIntoSystem();
             };
@@ -1077,7 +1077,7 @@ export function setupButtonEvents() {
                     if (state.currentClassId) localStorage.setItem('currentClassId', state.currentClassId);
 
                     showToast(`登入成功！歡迎 ${userObj.displayName}`, "success");
-                    showToast("⏳ 正在同步雲端資料...", "info");
+                    showToast("正在同步雲端資料...", "info");
                     await loadDataFromCloud(true);
                     proceedIntoSystem();
                     return;
@@ -1576,7 +1576,7 @@ export function setupButtonEvents() {
             localStorage.setItem('homeworkAppData', safeStringify(state.appData));
             if (state.currentClassId) localStorage.setItem('currentClassId', state.currentClassId);
 
-            showToast("⏳ 登入成功！正在檢查雲端資料...", "info");
+            showToast("登入成功！正在檢查雲端資料...", "info");
             await loadDataFromCloud(true);
             proceedIntoSystem();
         }).catch((error) => {
@@ -1794,7 +1794,7 @@ export function setupButtonEvents() {
     // 管理員退出檢視模式，回到管理員自己的資料
     async function exitAdminViewMode() {
         if (!state.adminViewModeUserId && !sessionStorage.getItem('admin_backup_appData')) return;
-        showToast("⏳ 正在退出檢視模式並還原您的資料...", "info");
+        showToast("正在退出檢視模式並還原您的資料...", "info");
         state.adminViewModeUserId = null;
         state.adminViewModeUserEmail = null;
         updateAdminInspectionUI();

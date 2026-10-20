@@ -26,11 +26,7 @@ export function applyCheckMode(mode) {
     const checkModeSection = document.getElementById('check-mode-section');
     
     if (barcodeBtn) {
-        if (mode === 'manual') {
-            barcodeBtn.classList.add('hidden');
-        } else {
-            barcodeBtn.classList.remove('hidden');
-        }
+        barcodeBtn.classList.remove('hidden');
     }
     
     if (checkModeSection) {
