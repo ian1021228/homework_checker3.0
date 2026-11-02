@@ -567,7 +567,7 @@ function renderSelectedExamDetails() {
         statusBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300">已填寫</span>';
       }
     } else if (isMissingOriginally) {
-      statusBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-black bg-rose-100 text-rose-700 border border-rose-300">缺考 (待補)</span>';
+      statusBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-black bg-rose-100 text-rose-700 border border-rose-300">缺考</span>';
     } else {
       statusBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500">未填寫</span>';
     }
