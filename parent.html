@@ -795,30 +795,68 @@
     // STATUS RESOLVER HELPERS
     // ==========================================
 
+    const DEFAULT_STATUS_MAP = {
+      'submitted': { text: '已繳交', color: 'bg-blue-500', textColor: 'text-white', isCompleted: true, isCorrection: false },
+      'not-submitted': { text: '未繳交', color: 'bg-slate-200', textColor: 'text-slate-500', isCompleted: false, isCorrection: false },
+      'needs-correction': { text: '待訂正', color: 'bg-amber-400', textColor: 'text-amber-950', isCompleted: false, isCorrection: true },
+      'completed': { text: '已完成', color: 'bg-emerald-500', textColor: 'text-white', isCompleted: true, isCorrection: false },
+      'read': { text: '已閱讀', color: 'bg-emerald-500', textColor: 'text-white', isCompleted: true, isCorrection: false },
+      'unread': { text: '未閱讀', color: 'bg-slate-200', textColor: 'text-slate-500', isCompleted: false, isCorrection: false }
+    };
+
+    function normalizeStatusText(rawText, key) {
+      const t = String(rawText || '').trim().toLowerCase();
+      const k = String(key || '').trim().toLowerCase();
+      if (t === 'submitted' || k === 'submitted' || t === '已繳交') return '已繳交';
+      if (t === 'not-submitted' || t === 'not_submitted' || k === 'not-submitted' || k === 'not_submitted' || t === '未繳交') return '未繳交';
+      if (t === 'needs-correction' || k === 'needs-correction' || t.includes('訂正')) return '待訂正';
+      if (t === 'completed' || k === 'completed' || t === '已完成') return '已完成';
+      if (t === 'read' || k === 'read' || t === '已閱讀') return '已閱讀';
+      if (t === 'unread' || k === 'unread' || t === '未閱讀') return '未閱讀';
+      return rawText || '未繳交';
+    }
+
     function getStatusMeta(homeworkTypeId, statusKey, classData) {
-      // Default fallback
+      const defaultMeta = DEFAULT_STATUS_MAP[statusKey] || {
+        text: statusKey === 'submitted' ? '已繳交' : (statusKey === 'needs-correction' ? '待訂正' : (statusKey === 'completed' ? '已完成' : (statusKey || '未繳交'))),
+        color: statusKey === 'submitted' ? 'bg-blue-500' : (statusKey === 'completed' ? 'bg-emerald-500' : (statusKey === 'needs-correction' ? 'bg-amber-400' : 'bg-slate-200')),
+        textColor: (statusKey === 'submitted' || statusKey === 'completed') ? 'text-white' : (statusKey === 'needs-correction' ? 'text-amber-950' : 'text-slate-500'),
+        isCompleted: statusKey === 'submitted' || statusKey === 'completed' || statusKey === 'read',
+        isCorrection: statusKey === 'needs-correction'
+      };
+
       const fallback = {
         key: statusKey,
-        text: statusKey || '未繳交',
-        color: 'bg-slate-200',
-        textColor: 'text-slate-700',
-        isCompleted: false,
-        isCorrection: false
+        ...defaultMeta,
+        text: normalizeStatusText(defaultMeta.text, statusKey)
       };
 
-      if (!classData || !classData.homeworkTypes) return fallback;
-      const type = classData.homeworkTypes.find(t => t.id === homeworkTypeId);
-      if (!type || !type.statuses) return fallback;
+      const hwTypes = (classData && Array.isArray(classData.homeworkTypes) && classData.homeworkTypes.length > 0)
+        ? classData.homeworkTypes
+        : DEFAULT_TYPES;
 
-      const found = type.statuses.find(s => s.key === statusKey);
-      if (!found) return fallback;
+      const type = (hwTypes || []).find(t => t.id === homeworkTypeId) || (hwTypes || [])[0] || DEFAULT_TYPES[0];
+      if (type && type.statuses) {
+        const found = type.statuses.find(s => s.key === statusKey);
+        if (found) {
+          const isCorrection = (found.key === 'needs-correction' || (found.text && found.text.includes('訂正')) || (found.color && (found.color.includes('amber') || found.color.includes('yellow'))));
+          const resolvedText = normalizeStatusText(found.text, found.key);
+          const isCompleted = typeof found.isCompleted === 'boolean'
+            ? found.isCompleted
+            : (found.key === 'submitted' || found.key === 'completed' || found.key === 'read' || resolvedText === '已繳交' || resolvedText === '已完成' || resolvedText === '已閱讀');
 
-      const isCorrection = (found.key === 'needs-correction' || found.text.includes('訂正') || found.color.includes('amber') || found.color.includes('yellow'));
-      
-      return {
-        ...found,
-        isCorrection: isCorrection
-      };
+          return {
+            ...found,
+            text: resolvedText,
+            color: (found.color && found.color.startsWith('bg-')) ? found.color : defaultMeta.color,
+            textColor: found.textColor || defaultMeta.textColor,
+            isCompleted: isCompleted,
+            isCorrection: isCorrection
+          };
+        }
+      }
+
+      return fallback;
     }
 
     // ==========================================
@@ -1480,8 +1518,8 @@
       const hw = (state.classData.homeworks || []).find(h => h.id === hwId);
       if (!hw) return;
 
-      const typeObj = (state.classData.homeworkTypes || []).find(t => t.id === hw.typeId);
-      const statuses = typeObj ? typeObj.statuses : [];
+      const typeObj = (state.classData.homeworkTypes || []).find(t => t.id === hw.typeId) || DEFAULT_TYPES.find(t => t.id === hw.typeId) || DEFAULT_TYPES[0];
+      const statuses = (typeObj && Array.isArray(typeObj.statuses) && typeObj.statuses.length > 0) ? typeObj.statuses : DEFAULT_TYPES[0].statuses;
       const missingSeats = parseMissingSeats(state.classData.lastMissingSeats);
       const maxSeat = state.classData.lastMaxSeat || 30;
 
@@ -1502,12 +1540,16 @@
       elements.matrixHwStats.textContent = `全班完成度：${completedCount} / ${effectiveTotal} 人 (${Math.round((completedCount / effectiveTotal) * 100 || 0)}%)`;
 
       // Legend
-      elements.matrixLegendContainer.innerHTML = statuses.map(s => `
+      elements.matrixLegendContainer.innerHTML = statuses.map(s => {
+        const text = normalizeStatusText(s.text, s.key);
+        const color = (s.color && s.color.startsWith('bg-')) ? s.color : (DEFAULT_STATUS_MAP[s.key]?.color || 'bg-slate-300');
+        return `
         <div class="flex items-center gap-1.5">
-          <span class="w-3 h-3 rounded-full ${s.color || 'bg-slate-300'} border border-slate-300/40"></span>
-          <span class="font-medium text-slate-700">${escapeHtml(s.text)}</span>
+          <span class="w-3 h-3 rounded-full ${color} border border-slate-300/40"></span>
+          <span class="font-medium text-slate-700">${escapeHtml(text)}</span>
         </div>
-      `).join('') + `
+      `;
+      }).join('') + `
         <div class="flex items-center gap-1.5 text-slate-400">
           <span class="w-3 h-3 rounded-full bg-slate-100 border border-slate-200"></span>
           <span>缺號</span>
