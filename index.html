@@ -396,6 +396,7 @@
                                 <span>v4.2.4 個人經典版核心特色：</span>
                             </div>
                             <ul class="space-y-1.5 text-xs text-stone-600 pl-2">
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-expand text-emerald-600 mt-0.5"></i> <span><b>新版本通知預設展開與記憶設定</b>：每次進站新版本通知卡片自動預設展開展示，並提供「不再顯示（記憶預設收合）」選項，勾選後自動記憶收合狀態。</span></li>
                                 <li class="flex items-start gap-1.5"><i class="fa-solid fa-bell text-amber-600 mt-0.5"></i> <span><b>常態新版本通知鈴鐺加回</b>：右下角常態顯示全新 PalClass 旗艦版通知鈴鐺，一鍵展開全系列新功能清單，直達正式版網站。</span></li>
                                 <li class="flex items-start gap-1.5"><i class="fa-solid fa-sparkles text-amber-500 mt-0.5"></i> <span><b>同步 PalClass v6.3.8 旗艦版亮點</b>：全面列載課堂活動計時雙滾輪即時同步、學生與家長端姓名連動動態呈現、座位表隨機排位 Undo 快照等最新功能。</span></li>
                                 <li class="flex items-start gap-1.5"><i class="fa-solid fa-language text-indigo-600 mt-0.5"></i> <span><b>家長端作業點收狀態繁體化加固</b>：健全點收狀態雙重解析防護網，保證圖例與學生卡片 100% 以繁體中文呈現並正確計算全班完成進度。</span></li>
@@ -2887,6 +2888,10 @@
                         </div>
                         <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
                             <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-expand text-emerald-600 shrink-0 mt-0.5"></i>
+                                <span><b>新版本通知預設展開與記憶設定</b>：每次進站新版本通知卡片自動預設展開展示，並提供「不再顯示（記憶預設收合）」選項，勾選後自動記憶收合狀態，兼顧宣傳與自訂靈活性。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
                                 <i class="fa-solid fa-bell text-amber-600 shrink-0 mt-0.5"></i>
                                 <span><b>常態新版本直達通知鈴鐺加回</b>：於系統右下角常態提供可收合之全新世代 PalClass 旗艦版通知鈴鐺（附帶 NEW 脈衝提示），點擊可一秒展開旗艦版全功能介紹與直達按鈕。</span>
                             </li>
@@ -4221,7 +4226,7 @@
                 </div>
             </div>
 
-            <!-- 直達按鈕 -->
+            <!-- 直達按鈕與不再顯示選項 -->
             <div class="space-y-2 pt-0.5">
                 <a href="https://ian-class-management.vercel.app/" target="_blank" rel="noopener noreferrer" class="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-black text-xs sm:text-sm text-center flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer">
                     <span>立即體驗全新旗艦版 (v6.3.8)</span>
@@ -4233,6 +4238,16 @@
                         <i class="fa-brands fa-github text-xs"></i>
                         <span>查看 GitHub</span>
                     </a>
+                </div>
+
+                <div class="flex items-center justify-between text-[11px] pt-1.5 border-t border-amber-100/80 dark:border-amber-900/40 px-1">
+                    <label class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer select-none">
+                        <input type="checkbox" id="chk-never-show-new-version" class="w-3.5 h-3.5 rounded text-amber-600 focus:ring-amber-500 border-slate-300 dark:border-slate-600 cursor-pointer">
+                        <span>不再顯示（記憶預設收合）</span>
+                    </label>
+                    <button type="button" id="btn-collapse-new-version-text" class="text-amber-700 hover:text-amber-800 dark:text-amber-400 font-bold hover:underline cursor-pointer">
+                        收合通知
+                    </button>
                 </div>
             </div>
         </div>
@@ -4261,19 +4276,40 @@
         (function() {
             const toggleBtn = document.getElementById('btn-toggle-new-version');
             const closeBtn = document.getElementById('btn-close-new-version-card');
+            const collapseTextBtn = document.getElementById('btn-collapse-new-version-text');
             const card = document.getElementById('new-version-card');
             const bellIcon = document.getElementById('new-version-bell-icon');
+            const neverShowChk = document.getElementById('chk-never-show-new-version');
             if (!toggleBtn || !card) return;
+
+            const STORAGE_KEY = 'palclass_never_auto_expand_new_version';
+            const isNeverShow = localStorage.getItem(STORAGE_KEY) === 'true';
 
             let isExpanded = false;
 
-            function openCard() {
+            if (neverShowChk) {
+                neverShowChk.checked = isNeverShow;
+                neverShowChk.addEventListener('change', () => {
+                    if (neverShowChk.checked) {
+                        localStorage.setItem(STORAGE_KEY, 'true');
+                    } else {
+                        localStorage.removeItem(STORAGE_KEY);
+                    }
+                });
+            }
+
+            function openCard(immediate = false) {
                 isExpanded = true;
                 card.classList.remove('hidden');
-                requestAnimationFrame(() => {
+                if (immediate) {
                     card.classList.remove('scale-95', 'opacity-0');
                     card.classList.add('scale-100', 'opacity-100');
-                });
+                } else {
+                    requestAnimationFrame(() => {
+                        card.classList.remove('scale-95', 'opacity-0');
+                        card.classList.add('scale-100', 'opacity-100');
+                    });
+                }
                 if (bellIcon) {
                     bellIcon.classList.remove('fa-bell');
                     bellIcon.classList.add('fa-chevron-down');
@@ -4282,6 +4318,9 @@
 
             function closeCard() {
                 isExpanded = false;
+                if (neverShowChk && neverShowChk.checked) {
+                    localStorage.setItem(STORAGE_KEY, 'true');
+                }
                 card.classList.remove('scale-100', 'opacity-100');
                 card.classList.add('scale-95', 'opacity-0');
                 setTimeout(() => {
@@ -4291,6 +4330,11 @@
                     bellIcon.classList.remove('fa-chevron-down');
                     bellIcon.classList.add('fa-bell');
                 }
+            }
+
+            // 預設展開：若使用者未勾選「不再顯示」，每次進站皆自動預設展開
+            if (!isNeverShow) {
+                openCard(true);
             }
 
             toggleBtn.addEventListener('click', (e) => {
@@ -4309,8 +4353,16 @@
                 });
             }
 
+            if (collapseTextBtn) {
+                collapseTextBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    closeCard();
+                });
+            }
+
             document.addEventListener('click', (e) => {
                 if (isExpanded && !card.contains(e.target) && !toggleBtn.contains(e.target)) {
+                    if (e.target.closest('.modal')) return;
                     closeCard();
                 }
             });
