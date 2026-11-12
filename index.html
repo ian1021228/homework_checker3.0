@@ -385,7 +385,7 @@
                                 </span>
                                 <div>
                                     <h3 class="font-black text-stone-900 text-lg">系統更新紀錄 (Changelog)</h3>
-                                    <span class="text-xs text-stone-400 font-bold">最新版本 v4.2.4 • 2026/11/08</span>
+                                    <span class="text-xs text-stone-400 font-bold">最新版本 v4.2.5 • 2026/11/12</span>
                                 </div>
                             </div>
                             <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-200">最新版本</span>
@@ -394,21 +394,18 @@
                         <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100/80 space-y-2 text-xs sm:text-sm text-stone-700 font-medium">
                             <div class="font-bold text-emerald-950 flex items-center gap-1.5">
                                 <i class="fa-solid fa-bullhorn text-emerald-600"></i>
-                                <span>v4.2.4 個人經典版核心特色：</span>
+                                <span>v4.2.5 個人經典版介面調整：</span>
                             </div>
                             <ul class="space-y-1.5 text-xs text-stone-600 pl-2">
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-expand text-emerald-600 mt-0.5"></i> <span><b>新版本通知預設展開與記憶設定</b>：每次進站新版本通知卡片自動預設展開展示，並提供「不再顯示（記憶預設收合）」選項，勾選後自動記憶收合狀態。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-bell text-amber-600 mt-0.5"></i> <span><b>常態新版本通知鈴鐺加回</b>：右下角常態顯示全新 PalClass 旗艦版通知鈴鐺，一鍵展開全系列新功能清單，直達正式版網站。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-sparkles text-amber-500 mt-0.5"></i> <span><b>同步 PalClass v6.3.8 旗艦版亮點</b>：全面列載課堂活動計時雙滾輪即時同步、學生與家長端姓名連動動態呈現、座位表隨機排位 Undo 快照等最新功能。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-language text-indigo-600 mt-0.5"></i> <span><b>家長端作業點收狀態繁體化加固</b>：健全點收狀態雙重解析防護網，保證圖例與學生卡片 100% 以繁體中文呈現並正確計算全班完成進度。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-icons text-emerald-600 mt-0.5"></i> <span><b>全站圖標規範嚴格達標</b>：全系統介面全面採用 FontAwesome 向量圖標，徹底排除 Emoji，風格純淨沉穩一致。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-eye-slash text-emerald-600 mt-0.5"></i> <span><b>暫時隱藏新版本通知組件</b>：依需求暫時隱藏右下角常態新版本浮動通知鈴鐺與自動展開卡片，維持清爽無遮擋之點收工作區（保留模組結構以備後續一鍵恢復）。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-clock-rotate-left text-amber-600 mt-0.5"></i> <span><b>延續 v4.2.4 核心體驗</b>：完整保留 PalClass 旗艦版功能索引參考、家長端點收狀態繁體化防護與全站 FontAwesome 向量圖標一致化設計。</span></li>
                             </ul>
                         </div>
 
                         <div class="flex items-center justify-between pt-1">
                             <button type="button" id="portal-card-changelog-btn" class="w-full py-2.5 px-4 bg-emerald-100/80 hover:bg-emerald-200/80 text-emerald-950 font-bold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-clock-rotate-left text-emerald-700"></i>
-                                <span>查看完整版本演進日誌 (v1.0 ~ v4.2.4)</span>
+                                <span>查看完整版本演進日誌 (v1.0 ~ v4.2.5)</span>
                             </button>
                         </div>
                     </div>
@@ -2878,12 +2875,29 @@
 
                 <!-- 版本歷程時間軸 -->
                 <div class="space-y-6">
-                    <!-- v4.2.4 加回全新旗艦版常態浮動通知鈴鐺並同步 v6.3.8 亮點 -->
-                    <div class="p-5 rounded-2xl bg-gradient-to-br from-amber-50/90 via-orange-50/60 to-emerald-50/40 border-2 border-amber-500 shadow-md relative">
+                    <!-- v4.2.5 暫時隱藏新版本通知組件 -->
+                    <div class="p-5 rounded-2xl bg-gradient-to-br from-emerald-50/90 via-teal-50/50 to-slate-50/40 border-2 border-emerald-500 shadow-md relative">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                             <div class="flex items-center gap-2">
-                                <span class="px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-black uppercase tracking-wider shadow-xs animate-pulse">v4.2.4 全新升級</span>
-                                <span class="text-xs font-bold text-amber-950">加回常態新版本通知鈴鐺・同步 PalClass v6.3.8 旗艦版最新特色亮點</span>
+                                <span class="px-3 py-1 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v4.2.5 最新版本</span>
+                                <span class="text-xs font-bold text-emerald-950">暫時隱藏新版本通知組件・保持清爽無遮擋工作區</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-400">2026-11-12</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-eye-slash text-emerald-600 shrink-0 mt-0.5"></i>
+                                <span><b>暫時隱藏新版本通知組件</b>：依需求暫時隱藏右下角常態新版本浮動通知鈴鐺與自動展開卡片，維持清爽無遮擋之點收工作區（保留模組結構以備後續一鍵恢復）。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- v4.2.4 加回全新旗艦版常態浮動通知鈴鐺並同步 v6.3.8 亮點 -->
+                    <div class="p-5 rounded-2xl bg-white/80 border border-slate-200 shadow-xs relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-slate-200 text-slate-700 text-xs font-black uppercase tracking-wider shadow-xs">v4.2.4 歷史版本</span>
+                                <span class="text-xs font-bold text-slate-700">加回常態新版本通知鈴鐺・同步 PalClass v6.3.8 旗艦版最新特色亮點</span>
                             </div>
                             <span class="text-xs font-mono font-bold text-slate-400">2026-11-08</span>
                         </div>
@@ -4151,9 +4165,9 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- 全新旗艦版常態浮動通知組件 (New Version Floating Bell & Card) -->
+    <!-- 全新旗艦版常態浮動通知組件 (New Version Floating Bell & Card) - 依指示暫時隱藏 -->
     <!-- ============================================================== -->
-    <aside id="new-version-widget" class="fixed bottom-16 sm:bottom-6 right-4 sm:right-6 z-[80] select-none flex flex-col items-end pointer-events-none" aria-label="新版本發布通知">
+    <aside id="new-version-widget" class="hidden fixed bottom-16 sm:bottom-6 right-4 sm:right-6 z-[80] select-none flex flex-col items-end pointer-events-none" style="display: none !important;" aria-label="新版本發布通知" aria-hidden="true">
         <!-- 展開卡片 (Expanded Card) -->
         <div id="new-version-card" class="hidden pointer-events-auto w-[calc(100vw-2rem)] sm:w-96 max-w-[380px] mb-3 p-5 rounded-3xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-amber-300/80 dark:border-amber-500/40 shadow-2xl shadow-amber-500/10 space-y-3.5 transition-all duration-300 transform scale-95 opacity-0 origin-bottom-right">
             <!-- 頂部標題列 -->
