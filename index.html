@@ -385,7 +385,7 @@
                                 </span>
                                 <div>
                                     <h3 class="font-black text-stone-900 text-lg">系統更新紀錄 (Changelog)</h3>
-                                    <span class="text-xs text-stone-400 font-bold">最新版本 v4.2.5 • 2026/11/12</span>
+                                    <span class="text-xs text-stone-400 font-bold">最新版本 v4.2.6 • 2026/11/14</span>
                                 </div>
                             </div>
                             <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-200">最新版本</span>
@@ -394,18 +394,18 @@
                         <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100/80 space-y-2 text-xs sm:text-sm text-stone-700 font-medium">
                             <div class="font-bold text-emerald-950 flex items-center gap-1.5">
                                 <i class="fa-solid fa-bullhorn text-emerald-600"></i>
-                                <span>v4.2.5 個人經典版介面調整：</span>
+                                <span>v4.2.6 資料備份匯出與匯入修復：</span>
                             </div>
                             <ul class="space-y-1.5 text-xs text-stone-600 pl-2">
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-eye-slash text-emerald-600 mt-0.5"></i> <span><b>暫時隱藏新版本通知組件</b>：依需求暫時隱藏右下角常態新版本浮動通知鈴鐺與自動展開卡片，維持清爽無遮擋之點收工作區（保留模組結構以備後續一鍵恢復）。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-clock-rotate-left text-amber-600 mt-0.5"></i> <span><b>延續 v4.2.4 核心體驗</b>：完整保留 PalClass 旗艦版功能索引參考、家長端點收狀態繁體化防護與全站 FontAwesome 向量圖標一致化設計。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-file-export text-emerald-600 mt-0.5"></i> <span><b>修復本機 JSON 備份匯出失敗</b>：修正舊版資料狀態參照錯誤與大型備份下載限制，點擊「下載為 JSON 檔」即可穩定產出完整備份，可無縫匯入 PalClass 新版系統。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-file-import text-amber-600 mt-0.5"></i> <span><b>升級跨版 JSON 匯入相容與同步</b>：支援新版 PalClass 封裝備份格式還原，匯入後同步持久化至本機帳戶快取與雲端資料庫。</span></li>
                             </ul>
                         </div>
 
                         <div class="flex items-center justify-between pt-1">
                             <button type="button" id="portal-card-changelog-btn" class="w-full py-2.5 px-4 bg-emerald-100/80 hover:bg-emerald-200/80 text-emerald-950 font-bold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-clock-rotate-left text-emerald-700"></i>
-                                <span>查看完整版本演進日誌 (v1.0 ~ v4.2.5)</span>
+                                <span>查看完整版本演進日誌 (v1.0 ~ v4.2.6)</span>
                             </button>
                         </div>
                     </div>
@@ -2875,12 +2875,33 @@
 
                 <!-- 版本歷程時間軸 -->
                 <div class="space-y-6">
-                    <!-- v4.2.5 暫時隱藏新版本通知組件 -->
+                    <!-- v4.2.6 資料備份匯出與匯入修復 -->
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-emerald-50/90 via-teal-50/50 to-slate-50/40 border-2 border-emerald-500 shadow-md relative">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                             <div class="flex items-center gap-2">
-                                <span class="px-3 py-1 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v4.2.5 最新版本</span>
-                                <span class="text-xs font-bold text-emerald-950">暫時隱藏新版本通知組件・保持清爽無遮擋工作區</span>
+                                <span class="px-3 py-1 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v4.2.6 最新版本</span>
+                                <span class="text-xs font-bold text-emerald-950">本機 JSON 備份匯出與跨版匯入還原全面修復</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-400">2026-11-14</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-file-export text-emerald-600 shrink-0 mt-0.5"></i>
+                                <span><b>修復本機 JSON 備份匯出失敗</b>：修正狀態變數參照並改用標準 Blob 下載通道，解決大量作業與聯絡簿資料無法匯出問題，且可無縫轉移匯入 PalClass。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-file-import text-amber-600 shrink-0 mt-0.5"></i>
+                                <span><b>修復 JSON 匯入還原流程</b>：兼容新舊版備份格式，匯入覆蓋後確保帳戶快取與雲端資料完整寫入再重新載入。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- v4.2.5 暫時隱藏新版本通知組件 -->
+                    <div class="p-5 rounded-2xl bg-white/80 border border-slate-200 shadow-xs relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-slate-200 text-slate-700 text-xs font-black uppercase tracking-wider shadow-xs">v4.2.5 歷史版本</span>
+                                <span class="text-xs font-bold text-slate-700">暫時隱藏新版本通知組件・保持清爽無遮擋工作區</span>
                             </div>
                             <span class="text-xs font-mono font-bold text-slate-400">2026-11-12</span>
                         </div>

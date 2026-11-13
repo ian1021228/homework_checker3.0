@@ -1982,34 +1982,50 @@ export function setupButtonEvents() {
 
     // 匯出 / 匯入
     bindClick('export-data-btn', () => {
-        const exportHw = document.getElementById('export-hw-chk').checked, exportTypes = document.getElementById('export-types-chk').checked, exportContact = document.getElementById('export-contact-chk').checked;
-        let exportData = JSON.parse(safeStringify(appData));
-        if (!exportHw) exportData.homeworks = []; 
-        if (!exportTypes) exportData.homeworkTypes = DEFAULT_TYPES; 
-        if (!exportContact) exportData.classes.forEach(c => c.contactBook = {}); 
-        else { 
-            const thirtyDaysAgo = new Date(); 
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30); 
-            const limitDateStr = formatDate(thirtyDaysAgo, 'YYYY-MM-DD'); 
-            exportData.classes.forEach(c => { 
-                if (c.contactBook) { 
-                    const filteredBook = {}; 
-                    for (const [date, items] of Object.entries(c.contactBook)) { 
-                        if (date >= limitDateStr) filteredBook[date] = items; 
+        try {
+            const exportHw = document.getElementById('export-hw-chk')?.checked ?? true;
+            const exportTypes = document.getElementById('export-types-chk')?.checked ?? true;
+            const exportContact = document.getElementById('export-contact-chk')?.checked ?? true;
+            const sourceData = state.appData || { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
+            let exportData = JSON.parse(safeStringify(sourceData));
+            if (!exportData || typeof exportData !== 'object') exportData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
+            if (!Array.isArray(exportData.classes)) exportData.classes = [];
+            if (!Array.isArray(exportData.homeworks)) exportData.homeworks = [];
+            if (!exportHw) exportData.homeworks = []; 
+            if (!exportTypes) exportData.homeworkTypes = safeClone(DEFAULT_TYPES); 
+            if (!exportContact) {
+                exportData.classes.forEach(c => { if (c) c.contactBook = {}; }); 
+            } else { 
+                const thirtyDaysAgo = new Date(); 
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30); 
+                const limitDateStr = formatDate(thirtyDaysAgo, 'YYYY-MM-DD'); 
+                exportData.classes.forEach(c => { 
+                    if (c && c.contactBook && typeof c.contactBook === 'object') { 
+                        const filteredBook = {}; 
+                        for (const [date, items] of Object.entries(c.contactBook)) { 
+                            if (date >= limitDateStr) filteredBook[date] = items; 
+                        } 
+                        c.contactBook = filteredBook; 
                     } 
-                    c.contactBook = filteredBook; 
-                } 
-            }); 
+                }); 
+            }
+            const jsonText = safeStringify(exportData);
+            const filename = `作業點收備份_${formatDate(new Date(), 'YYYY-MM-DD')}.json`;
+            const blob = new Blob([jsonText], { type: 'application/json;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const downloadAnchorNode = document.createElement('a'); 
+            downloadAnchorNode.setAttribute("href", url); 
+            downloadAnchorNode.setAttribute("download", filename); 
+            document.body.appendChild(downloadAnchorNode); 
+            downloadAnchorNode.click(); 
+            downloadAnchorNode.remove(); 
+            setTimeout(() => URL.revokeObjectURL(url), 1500);
+            closeModal(document.getElementById('settings-modal')); 
+            showToast("下載 JSON 備份檔成功！", "success");
+        } catch (err) {
+            console.error('Export data error:', err);
+            showAlertModal("匯出失敗", err?.message || "無法建立備份檔案，請稍後再試。");
         }
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(safeStringify(exportData)); 
-        const downloadAnchorNode = document.createElement('a'); 
-        downloadAnchorNode.setAttribute("href", dataStr); 
-        downloadAnchorNode.setAttribute("download", `作業點收備份_${formatDate(new Date(), 'YYYY-MM-DD')}.json`); 
-        document.body.appendChild(downloadAnchorNode); 
-        downloadAnchorNode.click(); 
-        downloadAnchorNode.remove(); 
-        closeModal(document.getElementById('settings-modal')); 
-        showToast("下載 JSON 備份檔成功！", "success");
     });
 
     bindClick('trigger-import-btn', () => document.getElementById('import-file-input').click());
@@ -2017,21 +2033,50 @@ export function setupButtonEvents() {
         const file = e.target.files[0]; 
         if (!file) return; 
         const reader = new FileReader();
-        reader.onload = async (e) => { 
+        reader.onload = async (ev) => { 
             try { 
-                const data = sanitizeAppData(JSON.parse(e.target.result)); 
+                const parsedRaw = JSON.parse(ev.target.result);
+                if (!parsedRaw || typeof parsedRaw !== 'object') throw new Error("無效備份格式");
+                const rawTarget = parsedRaw.appData || parsedRaw.data || parsedRaw;
+                if (!Array.isArray(rawTarget?.classes) && !Array.isArray(rawTarget?.homeworks)) {
+                    throw new Error("無效備份格式（找不到班級或作業資料）");
+                }
+                const data = sanitizeAppData(rawTarget); 
                 if(!data.classes || !data.homeworks || !data.homeworkTypes) throw new Error("無效備份格式"); 
                 showConfirmModal('覆蓋資料', '確定將 JSON 完整覆蓋目前資料嗎？', async () => { 
                     closeModal(document.getElementById('settings-modal')); 
+                    if (state.saveTimeout) {
+                        clearTimeout(state.saveTimeout);
+                        state.saveTimeout = null;
+                    }
                     state.appData = data; 
-                    fixDates(appData); 
-                    localStorage.setItem('homeworkAppData', safeStringify(appData)); 
-                    try { await saveData(); } catch(saveErr) {} 
+                    fixDates(state.appData); 
+                    const validClass = state.appData.classes.find(c => c.id === state.currentClassId) || state.appData.classes[0];
+                    state.currentClassId = validClass ? validClass.id : null;
+                    const userKey = getUserStorageKey(state.currentUser);
+                    const serialized = safeStringify(state.appData);
+                    localStorage.setItem('homeworkAppData', serialized); 
+                    localStorage.setItem('homeworkAppData_' + userKey, serialized);
+                    if (state.appData.classes.length > 0) {
+                        localStorage.setItem('homeworkAppData_last', serialized);
+                    }
+                    if (state.currentClassId) {
+                        localStorage.setItem('currentClassId', state.currentClassId);
+                        localStorage.setItem('currentClassId_' + userKey, state.currentClassId);
+                    }
+                    try {
+                        if (sessionStorage.getItem('app_is_guest_mode') !== 'true' && state.currentUser && !state.currentUser.isGuest) {
+                            await Promise.race([
+                                syncDataToCloud(),
+                                new Promise(resolve => setTimeout(resolve, 4000))
+                            ]);
+                        }
+                    } catch(saveErr) {} 
                     showToast("資料匯入成功！", "success"); 
-                    setTimeout(() => window.location.reload(), 500); 
+                    setTimeout(() => window.location.reload(), 300); 
                 }); 
             } catch(err) { 
-                showAlertModal("匯入失敗", err.message); 
+                showAlertModal("匯入失敗", err.message || "請確認檔案為合法的 JSON 備份檔"); 
             } 
         }; 
         reader.readAsText(file); 
