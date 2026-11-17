@@ -126,6 +126,11 @@ export function saveData() {
 
     // 1. 立即同步寫入該帳號專屬之 localStorage 與全域快取，各帳號完全隔離
     try {
+        const nowTs = Date.now();
+        const prevMemTs = Number(state.appData?._lastModifiedAt || 0);
+        if (state.appData && typeof state.appData === 'object') {
+            state.appData._lastModifiedAt = Math.max(nowTs, prevMemTs + 1);
+        }
         const userKey = getUserStorageKey(state.currentUser);
         const dataStr = safeStringify(state.appData);
         localStorage.setItem('homeworkAppData_' + userKey, dataStr);

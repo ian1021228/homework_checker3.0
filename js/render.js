@@ -779,6 +779,7 @@ export function updatePortalUI() {
         if (heroStartBtn) heroStartBtn.innerHTML = `<span>立即開始使用</span><i class="fa-solid fa-arrow-right text-sm"></i>`;
         if (ctaStartBtn) ctaStartBtn.innerHTML = `<span class="pointer-events-none select-none inline-block">免費建立帳號 / 立即開始使用</span><i class="fa-solid fa-chevron-right text-xs pointer-events-none select-none"></i>`;
     }
+    try { window.__refreshV3NewVersionNotice?.(); } catch (e) {}
 }
 
 export function reRenderCurrentPage(showMainPageFn, showDetailPageFn) {

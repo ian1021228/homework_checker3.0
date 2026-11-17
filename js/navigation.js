@@ -306,6 +306,7 @@ export function proceedIntoSystem() {
     showMainPage();
     const portalEl = document.getElementById('portal-page');
     if (portalEl) portalEl.classList.add('hidden');
+    try { window.__refreshV3NewVersionNotice?.(); } catch (e) {}
     
     // 預設手動點收，不彈窗打擾
     if (!localStorage.getItem('checkMode')) {

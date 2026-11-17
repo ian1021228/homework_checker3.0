@@ -653,6 +653,7 @@ export function setupButtonEvents() {
         updateDataManagementUI(handleRestoreBackup);
         updatePortalUI();
         showPortalPage(true);
+        window.__refreshV3NewVersionNotice?.();
         showToast("已成功登出並返回網站首頁", "info");
     };
     bindClick('portal-logout-btn', performFullLogout);

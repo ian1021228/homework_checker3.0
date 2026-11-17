@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hw-checker-v4.2.6-classic';
+const CACHE_NAME = 'hw-checker-v4.2.7-sync';
 const urlsToCache = [
   './index.html',
   './parent.html',
@@ -10,6 +10,7 @@ const urlsToCache = [
   './js/firebase.js',
   './js/icons.js',
   './js/navigation.js',
+  './js/newVersionNotice.js',
   './js/qrLogin.js',
   './js/render.js',
   './js/state.js',

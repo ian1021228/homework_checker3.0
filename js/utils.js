@@ -95,6 +95,7 @@ export function sanitizeAppData(data) {
             }
         }
         return {
+            ...c,
             id: String(c.id || generateId()),
             name: String(c.name || '未命名班級'),
             accessCode: typeof c.accessCode === 'string' ? c.accessCode.trim() : (typeof c.accessCode === 'number' ? String(c.accessCode) : ''),
@@ -113,11 +114,13 @@ export function sanitizeAppData(data) {
         const cleanStudents = Array.isArray(h.students) ? h.students.map(s => {
             if (!s || typeof s !== 'object') return null;
             return {
+                ...s,
                 seat: typeof s.seat === 'number' ? s.seat : (parseInt(s.seat, 10) || 1),
                 status: String(s.status || 'not-submitted')
             };
         }).filter(Boolean) : [];
         return {
+            ...h,
             id: String(h.id || generateId()),
             classId: String(h.classId || ''),
             name: String(h.name || '未命名作業'),
@@ -133,6 +136,7 @@ export function sanitizeAppData(data) {
         const cleanStatuses = Array.isArray(t.statuses) ? t.statuses.map(s => {
             if (!s || typeof s !== 'object') return null;
             return {
+                ...s,
                 key: String(s.key || 's1'),
                 text: String(s.text || '狀態'),
                 color: String(s.color || 'bg-slate-200'),
@@ -141,6 +145,7 @@ export function sanitizeAppData(data) {
             };
         }).filter(Boolean) : [];
         return {
+            ...t,
             id: String(t.id || generateId()),
             name: String(t.name || '種類'),
             statuses: cleanStatuses.length > 0 ? cleanStatuses : [
@@ -151,6 +156,7 @@ export function sanitizeAppData(data) {
     }).filter(Boolean) : safeClone(DEFAULT_TYPES);
 
     return {
+        ...data,
         classes: cleanClasses,
         homeworks: cleanHomeworks,
         homeworkTypes: cleanTypes

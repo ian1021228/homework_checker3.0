@@ -75,6 +75,7 @@ import {
 import { setupButtonEvents } from './events.js';
 import { ICONS, getSvgIcon } from './icons.js';
 import { startRealtimeCloudSync, stopRealtimeCloudSync } from './firebase.js';
+import { initNewVersionNotice } from './newVersionNotice.js';
 import {
     setupQrLoginEvents,
     checkUrlForQrLogin,
@@ -246,7 +247,8 @@ async function init() {
     }
 
     initPortalScrollIndicator();
-    if (fbAuth?.currentUser && fbDb && sessionStorage.getItem('app_is_guest_mode') !== 'true' && !state.currentUser?.isDevMode) {
+    initNewVersionNotice();
+    if ((fbAuth?.currentUser || state.currentUser) && fbDb && sessionStorage.getItem('app_is_guest_mode') !== 'true' && !state.currentUser?.isGuest && !state.currentUser?.isDevMode) {
         startRealtimeCloudSync();
     }
 

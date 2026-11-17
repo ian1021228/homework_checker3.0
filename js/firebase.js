@@ -125,6 +125,7 @@ if (fbAuth) {
                     if (storageContainer) storageContainer.classList.add('hidden');
                 }
             }
+            try { window.__refreshV3NewVersionNotice?.(); } catch (e) {}
         } catch(e) {}
     });
 }
@@ -608,22 +609,26 @@ export async function deleteCloudParentClass(code) {
 }
 
 let unsubAppData = null;
+let unsubMainDoc = null;
+let unsubSyncChannel = null;
 let lastSyncedDataStr = null;
+
+function resolveTargetUid(authUser) {
+    return authUser?.uid
+        || state.currentUser?.uid
+        || state.currentUser?.id
+        || (state.currentUser?.username ? 'user_' + String(state.currentUser.username).trim().toLowerCase() : null);
+}
 
 export function startRealtimeCloudSync() {
     if (state.adminViewModeUserId || sessionStorage.getItem('app_is_guest_mode') === 'true' || !fbDb) return;
-    if (state.currentUser?.isDevMode) return;
-    
-    // 必須在 Firebase Auth 驗證完成後或存在 QR 授權 Session 時才啟動即時監聽
-    const isQrAuth = Boolean(state.currentUser?.isQrAuthorized || sessionStorage.getItem('qr_authorized_session'));
+    if (state.currentUser?.isDevMode || state.currentUser?.isGuest) return;
+
     const authUser = fbAuth?.currentUser;
-    const targetUid = authUser?.uid || (isQrAuth ? state.currentUser?.uid : null);
+    const targetUid = resolveTargetUid(authUser);
     if (!targetUid) return;
 
-    if (unsubAppData) {
-        try { unsubAppData(); } catch(e) {}
-        unsubAppData = null;
-    }
+    stopRealtimeCloudSync();
 
     const applyIncomingData = (payload) => {
         if (state.adminViewModeUserId || sessionStorage.getItem('app_is_guest_mode') === 'true') return;
@@ -638,12 +643,25 @@ export function startRealtimeCloudSync() {
         }
 
         if (state.isSaving) {
+            setTimeout(() => applyIncomingData(payload), 350);
             return;
         }
 
         try {
-            const cloudData = sanitizeAppData(JSON.parse(incomingStr));
+            const incomingRawObj = JSON.parse(incomingStr);
+            const localTs = Number(state.appData?._lastModifiedAt || 0);
+            const payloadUpdatedMs = payload.updatedAt ? (Date.parse(payload.updatedAt) || 0) : 0;
+            const incomingTs = Number(incomingRawObj?._lastModifiedAt || payload.lastModifiedAt || payloadUpdatedMs || 0);
+
+            if (localTs > 0 && incomingTs > 0 && incomingTs < localTs) {
+                return;
+            }
+
+            const cloudData = sanitizeAppData(incomingRawObj);
             fixDates(cloudData);
+            if (incomingTs > 0 && !cloudData._lastModifiedAt) {
+                cloudData._lastModifiedAt = incomingTs;
+            }
             state.appData = cloudData;
             lastSyncedDataStr = incomingStr;
             const userKey = getUserStorageKey(state.currentUser);
@@ -679,49 +697,47 @@ export function startRealtimeCloudSync() {
         }
     };
 
-    const listenToSyncChannel = () => {
-        if (!targetUid) return;
-        try {
-            const syncDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', `sync_${targetUid}`);
-            unsubAppData = onSnapshot(syncDocRef, { includeMetadataChanges: false }, (docSnap) => {
-                if (docSnap.metadata && docSnap.metadata.hasPendingWrites) return;
-                if (!docSnap.exists()) return;
-                applyIncomingData(docSnap.data());
-            }, (e) => {
-                console.warn("Sync channel listen notice:", e?.message || e);
-            });
-        } catch (e) {}
-    };
-
     try {
-        if (authUser?.uid) {
+        const syncDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', `sync_${targetUid}`);
+        unsubSyncChannel = onSnapshot(syncDocRef, { includeMetadataChanges: false }, (docSnap) => {
+            if (docSnap.metadata && docSnap.metadata.hasPendingWrites) return;
+            if (!docSnap.exists()) return;
+            applyIncomingData(docSnap.data());
+        }, (e) => {
+            console.warn("Sync channel listen notice:", e?.message || e);
+        });
+        unsubAppData = unsubSyncChannel;
+    } catch (e) {
+        console.warn("Init sync channel error:", e);
+    }
+
+    if (authUser?.uid) {
+        try {
             const docRef = doc(fbDb, 'artifacts', globalAppId, 'users', targetUid, 'appData', 'mainDoc');
-            unsubAppData = onSnapshot(docRef, { includeMetadataChanges: false }, (docSnap) => {
+            unsubMainDoc = onSnapshot(docRef, { includeMetadataChanges: false }, (docSnap) => {
                 if (state.adminViewModeUserId || sessionStorage.getItem('app_is_guest_mode') === 'true') return;
                 if (docSnap.metadata && docSnap.metadata.hasPendingWrites) return;
                 if (fbAuth?.currentUser?.uid !== targetUid) return;
                 if (!docSnap.exists()) return;
                 applyIncomingData(docSnap.data());
             }, (err) => {
-                if (err?.code === 'permission-denied') {
-                    if (unsubAppData) {
-                        try { unsubAppData(); } catch(e) {}
-                        unsubAppData = null;
-                    }
-                    listenToSyncChannel();
-                    return;
-                }
-                console.warn("Realtime cloud sync listen notice:", err?.message || err);
+                console.warn("Realtime cloud sync mainDoc listen notice:", err?.message || err);
             });
-        } else if (isQrAuth && targetUid) {
-            listenToSyncChannel();
+        } catch (e) {
+            console.warn("Init mainDoc sync error:", e);
         }
-    } catch(e) {
-        console.warn("Start realtime sync failed:", e);
     }
 }
 
 export function stopRealtimeCloudSync() {
+    if (unsubMainDoc) {
+        try { unsubMainDoc(); } catch(e) {}
+        unsubMainDoc = null;
+    }
+    if (unsubSyncChannel) {
+        try { unsubSyncChannel(); } catch(e) {}
+        unsubSyncChannel = null;
+    }
     if (unsubAppData) {
         try { unsubAppData(); } catch(e) {}
         unsubAppData = null;
@@ -743,12 +759,11 @@ if (typeof window !== 'undefined') {
 
 export async function syncDataToCloud() {
     const isQrAuth = Boolean(state.currentUser?.isQrAuthorized || sessionStorage.getItem('qr_authorized_session'));
-    if (state.adminViewModeUserId || sessionStorage.getItem('app_is_guest_mode') === 'true' || !state.currentUser || !fbDb) return;
-    if (!fbAuth?.currentUser && !isQrAuth) return;
+    if (state.adminViewModeUserId || sessionStorage.getItem('app_is_guest_mode') === 'true' || !state.currentUser || state.currentUser?.isGuest || !fbDb) return;
 
     try {
         const authUid = fbAuth?.currentUser?.uid;
-        const targetUid = authUid || (isQrAuth ? state.currentUser.uid : null);
+        const targetUid = authUid || state.currentUser?.uid || state.currentUser?.id || (state.currentUser?.username ? 'user_' + String(state.currentUser.username).trim().toLowerCase() : null);
         if (!targetUid) return;
 
         // 嚴格身分校驗：防止切換帳號過渡期非同步調用導致前一帳號資料寫入新帳號之雲端
@@ -758,24 +773,26 @@ export async function syncDataToCloud() {
         }
 
         const dataStr = safeStringify(state.appData);
+        const lastModifiedAt = Number(state.appData?._lastModifiedAt || Date.now());
         lastSyncedDataStr = dataStr;
 
         // 若具備 Firebase Auth 認證，同步寫入官方私有 mainDoc
         if (authUid) {
             try {
                 const docRef = doc(fbDb, 'artifacts', globalAppId, 'users', targetUid, 'appData', 'mainDoc');
-                await setDoc(docRef, { data: dataStr, updatedAt: new Date().toISOString() });
+                await setDoc(docRef, { data: dataStr, updatedAt: new Date().toISOString(), lastModifiedAt });
             } catch (mainDocErr) {
                 console.warn("MainDoc write notice:", mainDocErr?.message || mainDocErr);
             }
         }
 
-        // 同步寫入跨設備快取通道 (保證跨裝置即時雙向互通)
+        // 同步寫入跨設備快取通道 (保證跨裝置與雙版本即時雙向互通)
         try {
             const syncDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', `sync_${targetUid}`);
             await setDoc(syncDocRef, {
                 data: dataStr,
                 updatedAt: new Date().toISOString(),
+                lastModifiedAt,
                 userEmail: state.currentUser.email || '',
                 userDisplayName: state.currentUser.displayName || ''
             });
@@ -788,6 +805,7 @@ export async function syncDataToCloud() {
                 if (c && c.accessCode && String(c.accessCode).trim()) {
                     const code = String(c.accessCode).trim();
                     const parentDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'parentClasses', code);
+                    const fallbackDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', 'parentClass_' + code);
                     const classHomeworks = (state.appData.homeworks || []).filter(h => h.classId === c.id).map(h => ({
                         id: h.id,
                         name: h.name,
@@ -796,7 +814,6 @@ export async function syncDataToCloud() {
                         studentCount: typeof h.studentCount === 'number' ? h.studentCount : (h.students || []).length,
                         students: (h.students || []).map(s => ({ seat: s.seat, status: s.status }))
                     }));
-                    // 規範：預設 PIN 碼全面採用【班級代碼 + 座號】
                     c.studentPins = c.studentPins || {};
                     const maxSeat = typeof c.lastMaxSeat === 'number' ? c.lastMaxSeat : 30;
                     for (let s = 1; s <= maxSeat; s++) {
@@ -806,11 +823,17 @@ export async function syncDataToCloud() {
                         }
                     }
 
-                    // 保護學生已提交之小考成績，避免雲端同步時遭空 submissions 覆寫
+                    // 保護新版欄位 (studentTokens / attendanceRecords / studentNames / skippedSeats) 與學生小考成績不被覆蓋
                     try {
                         const existingSnap = await getDoc(parentDocRef);
                         if (existingSnap.exists()) {
-                            const cloudExams = existingSnap.data()?.exams || [];
+                            const existingRaw = existingSnap.data() || {};
+                            if (existingRaw.studentTokens && !c.studentTokens) c.studentTokens = existingRaw.studentTokens;
+                            if (existingRaw.studentNames && !c.studentNames) c.studentNames = existingRaw.studentNames;
+                            if (existingRaw.skippedSeats && !c.skippedSeats) c.skippedSeats = existingRaw.skippedSeats;
+                            if (existingRaw.attendanceRecords && !c.attendanceRecords) c.attendanceRecords = existingRaw.attendanceRecords;
+                            if (existingRaw.attendanceSettings && !c.attendanceSettings) c.attendanceSettings = existingRaw.attendanceSettings;
+                            const cloudExams = existingRaw.exams || [];
                             (c.exams || []).forEach(localExam => {
                                 const cloudExam = cloudExams.find(ce => ce.id === localExam.id);
                                 if (cloudExam && cloudExam.submissions) {
@@ -829,6 +852,8 @@ export async function syncDataToCloud() {
                         accessCode: code,
                         lastMaxSeat: typeof c.lastMaxSeat === 'number' ? c.lastMaxSeat : 30,
                         lastMissingSeats: c.lastMissingSeats || '',
+                        skippedSeats: Array.isArray(c.skippedSeats) ? c.skippedSeats : [],
+                        studentNames: c.studentNames || {},
                         teacherEmail: state.currentUser.email || '',
                         teacherName: state.currentUser.displayName || state.currentUser.email || '班級導師',
                         teacherUid: targetUid,
@@ -837,13 +862,21 @@ export async function syncDataToCloud() {
                         contactBook: c.contactBook || {},
                         homeworkTypes: safeClone(state.appData.homeworkTypes || DEFAULT_TYPES),
                         studentPins: c.studentPins || {},
-                        exams: c.exams || []
+                        studentTokens: c.studentTokens || {},
+                        exams: c.exams || [],
+                        attendanceRecords: c.attendanceRecords || {},
+                        attendanceSettings: c.attendanceSettings || {}
                     };
                     await setDoc(parentDocRef, {
                         ...parentPayload,
                         data: safeStringify(parentPayload),
                         updatedAt: new Date().toISOString()
-                    });
+                    }).catch(() => {});
+                    await setDoc(fallbackDocRef, {
+                        ...parentPayload,
+                        data: safeStringify(parentPayload),
+                        updatedAt: new Date().toISOString()
+                    }, { merge: true }).catch(() => {});
                 }
             }
         }
@@ -856,36 +889,41 @@ export async function syncDataToCloud() {
 
 export async function loadDataFromCloud(silent = false, onLoadedCallback) {
     const isQrAuth = Boolean(state.currentUser?.isQrAuthorized || sessionStorage.getItem('qr_authorized_session'));
-    if (!state.currentUser || !fbDb) return false;
-    if (!fbAuth?.currentUser && !isQrAuth) return false;
+    if (!state.currentUser || state.currentUser?.isGuest || !fbDb) return false;
 
     try {
         const isInspectingUser = Boolean(state.adminViewModeUserId);
-        let targetUid = state.adminViewModeUserId || fbAuth?.currentUser?.uid || (isQrAuth ? state.currentUser?.uid : null);
+        let targetUid = state.adminViewModeUserId || fbAuth?.currentUser?.uid || state.currentUser?.uid || state.currentUser?.id || (state.currentUser?.username ? 'user_' + String(state.currentUser.username).trim().toLowerCase() : null);
         if (!targetUid) return false;
 
-        let docSnap = null;
+        let mainSnap = null;
+        let syncSnap = null;
         if (fbAuth?.currentUser?.uid || isInspectingUser) {
             try {
                 let docRef = doc(fbDb, 'artifacts', globalAppId, 'users', targetUid, 'appData', 'mainDoc');
-                docSnap = await getDoc(docRef);
+                mainSnap = await getDoc(docRef);
             } catch (docErr) {
                 console.warn("MainDoc get notice:", docErr?.message || docErr);
             }
         }
+        try {
+            let syncDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', `sync_${targetUid}`);
+            syncSnap = await getDoc(syncDocRef);
+        } catch (e) {}
 
-        // 若無 mainDoc 或權限限制，備援讀取跨設備同步通道
-        if ((!docSnap || !docSnap.exists()) && targetUid) {
-            try {
-                let syncDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', `sync_${targetUid}`);
-                let syncDocSnap = await getDoc(syncDocRef);
-                if (syncDocSnap.exists()) {
-                    docSnap = syncDocSnap;
-                }
-            } catch (e) {}
-        }
+        // 同時讀取雙通道，自動挑選較新的版本 (lastModifiedAt / _lastModifiedAt / updatedAt)
+        const extractTs = (snap) => {
+            if (!snap || !snap.exists() || !snap.data()?.data) return -1;
+            const d = snap.data();
+            let embedded = 0;
+            try { embedded = Number(JSON.parse(d.data)?._lastModifiedAt || 0); } catch (e) {}
+            return Math.max(embedded, Number(d.lastModifiedAt || 0), d.updatedAt ? (Date.parse(d.updatedAt) || 0) : 0);
+        };
+        const mainTs = extractTs(mainSnap);
+        const syncTs = extractTs(syncSnap);
+        const docSnap = (syncTs > mainTs && syncSnap?.exists()) ? syncSnap : (mainSnap?.exists() && mainSnap.data()?.data ? mainSnap : syncSnap);
 
-        if (docSnap.exists() && docSnap.data()?.data) {
+        if (docSnap && docSnap.exists() && docSnap.data()?.data) {
             const rawStr = docSnap.data().data;
             lastSyncedDataStr = rawStr;
             const cloudData = sanitizeAppData(JSON.parse(rawStr));
