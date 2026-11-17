@@ -39,10 +39,14 @@ function applyExpandedState(isExpanded) {
 
     if (isExpanded) {
         card.classList.remove('hidden');
+        card.style.display = 'block';
         pill.classList.add('hidden');
+        pill.style.display = 'none';
     } else {
         card.classList.add('hidden');
+        card.style.display = 'none';
         pill.classList.remove('hidden');
+        pill.style.display = 'inline-flex';
     }
 }
 
@@ -61,8 +65,9 @@ function ensureNoticeBannerElement() {
     container.id = 'palclass-new-version-notice';
     container.setAttribute('aria-label', 'PalClass 新版本通知');
     container.className = 'fixed bottom-4 right-4 z-[95] select-none flex flex-col items-end pointer-events-none max-w-[calc(100vw-2rem)]';
+    container.style.cssText = 'position:fixed;right:1rem;bottom:1rem;z-index:95;max-width:calc(100vw - 2rem);display:flex;flex-direction:column;align-items:flex-end;pointer-events:none;';
     container.innerHTML = `
-        <div id="palclass-notice-card" class="pointer-events-auto w-[calc(100vw-2rem)] sm:w-[360px] max-w-[360px] rounded-2xl bg-white/95 backdrop-blur-xl border-2 border-indigo-500/80 shadow-2xl p-4 text-slate-800">
+        <div id="palclass-notice-card" style="pointer-events:auto;background:linear-gradient(145deg,rgba(255,255,255,0.96) 0%,rgba(246,249,255,0.94) 100%);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);color:#0f172a;" class="pointer-events-auto w-[calc(100vw-2rem)] sm:w-[360px] max-w-[360px] rounded-2xl bg-white/95 backdrop-blur-xl border-2 border-indigo-500/80 shadow-2xl p-4 text-slate-900">
             <div class="flex items-start justify-between gap-2.5">
                 <div class="flex items-start gap-2.5 min-w-0">
                     <span class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-sm shrink-0 shadow-sm">
@@ -96,7 +101,7 @@ function ensureNoticeBannerElement() {
             </div>
         </div>
 
-        <button type="button" id="palclass-notice-pill-btn" class="hidden pointer-events-auto px-3.5 py-2 rounded-full bg-white/95 hover:bg-indigo-50 text-slate-800 hover:text-indigo-900 border border-indigo-300 shadow-lg backdrop-blur-md flex items-center gap-2 text-xs font-black transition-all active:scale-95 cursor-pointer max-w-full" title="展開新版 PalClass 通知" aria-label="展開新版 PalClass 通知">
+        <button type="button" id="palclass-notice-pill-btn" style="pointer-events:auto;background:linear-gradient(145deg,rgba(255,255,255,0.96) 0%,rgba(246,249,255,0.94) 100%);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);color:#0f172a;" class="hidden pointer-events-auto px-3.5 py-2 rounded-full bg-white/95 hover:bg-indigo-50 text-slate-900 hover:text-indigo-900 border border-indigo-300 shadow-lg backdrop-blur-md flex items-center gap-2 text-xs font-black transition-all active:scale-95 cursor-pointer max-w-full" title="展開新版 PalClass 通知" aria-label="展開新版 PalClass 通知">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
             <i class="fa-solid fa-rocket text-indigo-600 shrink-0" aria-hidden="true"></i>
             <span class="truncate">新版 PalClass 已上線</span>

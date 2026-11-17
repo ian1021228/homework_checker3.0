@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hw-checker-v4.2.8-sync';
+const CACHE_NAME = 'hw-checker-v4.2.9-sync';
 const urlsToCache = [
   './index.html',
   './parent.html',
@@ -47,6 +47,14 @@ self.addEventListener('activate', event => {
         })
       );
     }).then(() => self.clients.claim())
+     .then(async () => {
+      try {
+        const allClients = await self.clients.matchAll({ includeUncontrolled: true, type: 'window' });
+        for (const client of allClients) {
+          client.postMessage({ type: 'PALCLASS_NOTICE_REFRESH' });
+        }
+      } catch (e) {}
+    })
   );
 });
 

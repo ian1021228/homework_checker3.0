@@ -225,6 +225,7 @@ async function init() {
     checkUrlForQrLogin();
     updateDataManagementUI();
     document.getElementById('loading-page')?.classList.add('hidden');
+    initNewVersionNotice();
 
     // 4. 恢復偏好設定
     const savedMode = localStorage.getItem('checkMode') || 'manual';
@@ -247,7 +248,6 @@ async function init() {
     }
 
     initPortalScrollIndicator();
-    initNewVersionNotice();
     if ((fbAuth?.currentUser || state.currentUser) && fbDb && sessionStorage.getItem('app_is_guest_mode') !== 'true' && !state.currentUser?.isGuest && !state.currentUser?.isDevMode) {
         startRealtimeCloudSync();
     }

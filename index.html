@@ -30,23 +30,56 @@
     <link rel="stylesheet" href="css/style.css">
 
     <script>
-        if ('serviceWorker' in navigator) {
-            let refreshing = false;
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                if (!refreshing) {
-                    refreshing = true;
-                    console.log('偵測到核心更新，已自動更新至最新版本');
-                }
-            });
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => {
-                        reg.update();
-                        console.log('系統離線防護已啟動:', reg.scope);
-                    })
-                    .catch(err => console.log('離線快取載入失敗', err));
-            });
-        }
+        (function () {
+            const mountNoticeWithoutReload = async (forceBust = false) => {
+                try {
+                    if (typeof window.__refreshV3NewVersionNotice === 'function' && document.getElementById('palclass-new-version-notice')) {
+                        window.__refreshV3NewVersionNotice();
+                        return;
+                    }
+                    const suffix = forceBust ? ('?v=' + Date.now()) : '';
+                    const mod = await import('./js/newVersionNotice.js' + suffix);
+                    mod?.initNewVersionNotice?.();
+                } catch (e) {}
+            };
+
+            if ('serviceWorker' in navigator) {
+                let refreshing = false;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (!refreshing) {
+                        refreshing = true;
+                        console.log('偵測到核心更新，已即時啟用新版通知');
+                    }
+                    mountNoticeWithoutReload(true);
+                });
+                navigator.serviceWorker.addEventListener('message', (ev) => {
+                    if (ev?.data?.type === 'PALCLASS_NOTICE_REFRESH') {
+                        mountNoticeWithoutReload(true);
+                    }
+                });
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('./sw.js')
+                        .then(reg => {
+                            reg.update().catch(() => {});
+                            setInterval(() => { reg.update().catch(() => {}); }, 60000);
+                            document.addEventListener('visibilitychange', () => {
+                                if (!document.hidden) {
+                                    reg.update().catch(() => {});
+                                    mountNoticeWithoutReload(false);
+                                }
+                            });
+                            window.addEventListener('focus', () => {
+                                reg.update().catch(() => {});
+                                mountNoticeWithoutReload(false);
+                            });
+                            console.log('系統離線防護已啟動:', reg.scope);
+                        })
+                        .catch(err => console.log('離線快取載入失敗', err));
+                });
+            } else {
+                window.addEventListener('load', () => mountNoticeWithoutReload(false));
+            }
+        })();
     </script>
 </head>
 <body class="text-slate-800 antialiased overflow-x-hidden relative">
