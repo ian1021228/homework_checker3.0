@@ -702,6 +702,7 @@ export function setupButtonEvents() {
         localStorage.setItem('storageSelected', 'true');
         updateDataManagementUI();
         try { updatePortalUI(); } catch(e) {}
+        try { window.__refreshV3NewVersionNotice?.(); } catch(e) {}
         if (isAdminUser) {
             document.getElementById('admin-modal-btn')?.classList.remove('hidden');
             document.getElementById('admin-btn')?.classList.remove('hidden');
@@ -908,11 +909,12 @@ export function setupButtonEvents() {
                 (b.displayName && b.displayName.toLowerCase() === inputLower)
             );
 
-            // 若使用者輸入的是電子信箱，也支援以 email / authEmail 比對
+            // 若使用者輸入的是電子信箱，也支援以真實信箱或淨化後信箱比對
             if (matchingCandidates.length === 0 && (accountInput.includes('@') || inputLower === 'ianw.solar@gmail.com')) {
+                const cleanInputEmail = accountInput.trim().replace(/\+acc[a-z0-9_]+(?=@)/i, '').toLowerCase();
                 matchingCandidates = boundList.filter(b => 
-                    (b.email && b.email.toLowerCase() === inputLower) ||
-                    (b.authEmail && b.authEmail.toLowerCase() === inputLower)
+                    (b.email && b.email.trim().replace(/\+acc[a-z0-9_]+(?=@)/i, '').toLowerCase() === cleanInputEmail) ||
+                    (b.authEmail && b.authEmail.trim().replace(/\+acc[a-z0-9_]+(?=@)/i, '').toLowerCase() === cleanInputEmail)
                 );
             }
 
@@ -923,40 +925,41 @@ export function setupButtonEvents() {
                     return;
                 }
                 let cred = null;
-                const targetEmail = cand.authEmail || cand.email;
+                const cleanEmail = String(cand.email || cand.authEmail || '').trim().replace(/\+acc[a-z0-9_]+(?=@)/i, '');
+                const rawAuthEmail = cand.authEmail || cand.email;
+                const targetEmail = cleanEmail || rawAuthEmail;
+                const inputHash = await hashPassword(password);
+                const isPasswordMatch = (cand.passwordHash && cand.passwordHash === inputHash) ||
+                                        (cand.password && (cand.password === inputHash || cand.password === password));
                 try {
                     cred = await signInWithEmailAndPassword(fbAuth, targetEmail, password);
                 } catch (signInErr) {
-                    if (cand.email && cand.email !== targetEmail) {
-                        try { cred = await signInWithEmailAndPassword(fbAuth, cand.email, password); } catch(e) {}
+                    if (rawAuthEmail && rawAuthEmail !== targetEmail) {
+                        try { cred = await signInWithEmailAndPassword(fbAuth, rawAuthEmail, password); } catch(e) {}
                     }
-                    if (!cred) {
-                        const inputHash = await hashPassword(password);
-                        const isPasswordMatch = (cand.passwordHash && cand.passwordHash === inputHash) ||
-                                                (cand.password && (cand.password === inputHash || cand.password === password));
-                        if (!isPasswordMatch && (cand.password || cand.passwordHash)) {
+                    if (!cred && !isPasswordMatch) {
+                        if (cand.password || cand.passwordHash) {
                             showAlertModal("登入失敗", "密碼錯誤，請確認後重試。若忘記密碼請點選下方「忘記密碼？」");
                             return;
                         }
-                        if (!isPasswordMatch) {
-                            if (signInErr.code === 'auth/invalid-credential' || signInErr.code === 'auth/wrong-password' || signInErr.code === 'auth/user-not-found') {
-                                if ((cand.email || '').toLowerCase() === 'ianw.solar@gmail.com' || (cand.email || '').toLowerCase().includes('@gmail.com')) {
-                                    showAlertModal("登入提示", "帳號或密碼不相符。\n\n提示：若此帳號平時是使用 Google 授權登入，請直接點選下方「使用 Google 帳號快速登入」按鈕！");
-                                } else {
-                                    showAlertModal("登入失敗", "密碼錯誤或憑證無效，請確認後重試。若忘記密碼請點選下方「忘記密碼？」");
-                                }
-                                return;
+                        if (signInErr.code === 'auth/invalid-credential' || signInErr.code === 'auth/wrong-password' || signInErr.code === 'auth/user-not-found') {
+                            if ((cleanEmail || '').toLowerCase() === 'ianw.solar@gmail.com' || (cleanEmail || '').toLowerCase().includes('@gmail.com')) {
+                                showAlertModal("登入提示", "帳號或密碼不相符。\n\n提示：若此帳號平時是使用 Google 授權登入，請直接點選下方「使用 Google 帳號快速登入」按鈕！");
+                            } else {
+                                showAlertModal("登入失敗", "密碼錯誤或憑證無效，請確認後重試。若忘記密碼請點選下方「忘記密碼？」");
                             }
-                            throw signInErr;
+                            return;
                         }
+                        throw signInErr;
                     }
                 }
 
-                const isUserAdmin = ((cand.email || (cred ? cred.user.email : '')).toLowerCase() === 'ianw.solar@gmail.com') || !!cand.isAdmin || cand.role === 'admin';
+                const isUserAdmin = ((cleanEmail || (cred ? cred.user.email : '')).toLowerCase() === 'ianw.solar@gmail.com') || !!cand.isAdmin || cand.role === 'admin';
                 const userObj = {
-                    uid: cred ? cred.user.uid : (cand.uid || cand.id),
-                    email: cand.email || (cred ? cred.user.email : ''),
+                    uid: cand.uid || cand.id || (cred ? cred.user.uid : ''),
+                    email: cleanEmail || (cred ? cred.user.email : ''),
                     authEmail: targetEmail,
+                    username: cand.username || cand.accountName || cand.displayName || '一般使用者',
                     displayName: cand.displayName || cand.username || cand.accountName || '一般使用者',
                     emailVerified: true,
                     isGoogleAuth: false,
@@ -1053,6 +1056,7 @@ export function setupButtonEvents() {
                     state.currentUser = userObj;
                     localStorage.setItem('app_user_session', JSON.stringify(userObj));
                     localStorage.setItem('storageSelected', 'true');
+                    try { window.__refreshV3NewVersionNotice?.(); } catch(e) {}
                     if (isUserAdmin) {
                         document.getElementById('admin-modal-btn')?.classList.remove('hidden');
                         document.getElementById('admin-btn')?.classList.remove('hidden');
@@ -1110,11 +1114,14 @@ export function setupButtonEvents() {
         }
     });
 
-    // 註冊表單 (支援所有信箱申請多組帳號，必填使用者名稱)
+    // 移除早期多帳號產生的 +acc... 次位址別名，還原真實電子信箱
+    const stripSubAddressAlias = (raw) => String(raw || '').trim().replace(/\+acc[a-z0-9_]+(?=@)/i, '');
+
+    // 註冊表單 (一般信箱一信箱一帳號；ianw.solar@gmail.com 可註冊多組獨立帳號且不產生 +acc 別名)
     bindSubmit('portal-signup-form', async (e) => {
         e.preventDefault();
         const name = document.getElementById('portal-signup-name')?.value.trim();
-        const email = document.getElementById('portal-signup-email')?.value.trim();
+        const email = stripSubAddressAlias(document.getElementById('portal-signup-email')?.value.trim());
         const password = document.getElementById('portal-signup-password')?.value;
         const confirmPassword = document.getElementById('portal-signup-confirm')?.value;
 
@@ -1197,27 +1204,68 @@ export function setupButtonEvents() {
                 return;
             }
 
+            const emailLower = email.toLowerCase();
+            if (!isIanw) {
+                const existingEmailAcc = boundList.find(b =>
+                    stripSubAddressAlias(b.email || '').toLowerCase() === emailLower ||
+                    stripSubAddressAlias(b.authEmail || '').toLowerCase() === emailLower
+                );
+                if (existingEmailAcc) {
+                    showAlertModal(
+                        "此電子信箱已註冊",
+                        `信箱「${email}」已經註冊過帳號「${existingEmailAcc.username || existingEmailAcc.displayName || email}」囉！（一個信箱僅限註冊一組帳號）\n\n系統已自動切換至【登入】分頁，請直接登入或點選忘記密碼。`
+                    );
+                    document.getElementById('portal-view-signup')?.classList.add('hidden');
+                    document.getElementById('portal-view-signin')?.classList.remove('hidden');
+                    const signinEmail = document.getElementById('portal-signin-email');
+                    if (signinEmail) signinEmail.value = existingEmailAcc.username || email;
+                    document.getElementById('portal-signin-password')?.focus();
+                    return;
+                }
+            }
+
             let cred = null;
             let finalAuthEmail = email;
+            let customAccountUid = null;
 
-            // 支援所有信箱皆可重複申請多組獨立帳號 (透過 sub-addressing 建立獨立 Firebase Auth 實體)
             try {
                 cred = await createUserWithEmailAndPassword(fbAuth, email, password);
                 finalAuthEmail = email;
             } catch (firstCreateErr) {
                 if (firstCreateErr.code === 'auth/email-already-in-use') {
-                    // 同一個信箱申辦第二組以上帳號：為該信箱建立次位址別名實體
-                    const atIdx = email.indexOf('@');
-                    const localPart = email.substring(0, atIdx).replace(/\+.*$/, '');
-                    const domainPart = email.substring(atIdx);
-                    const randomId = Date.now().toString(36) + '_' + Math.floor(Math.random() * 900 + 100);
-                    const subEmail = `${localPart}+acc${randomId}${domainPart}`;
-                    try {
-                        cred = await createUserWithEmailAndPassword(fbAuth, subEmail, password);
-                        finalAuthEmail = subEmail;
-                    } catch(subErr) {
-                        throw subErr;
+                    if (!isIanw) {
+                        const existingEmailAcc = boundList.find(b =>
+                            stripSubAddressAlias(b.email || '').toLowerCase() === emailLower ||
+                            stripSubAddressAlias(b.authEmail || '').toLowerCase() === emailLower
+                        );
+                        showAlertModal(
+                            "此電子信箱已註冊",
+                            `信箱「${email}」已經被註冊過囉！（一個信箱僅限註冊一組帳號）\n\n系統已自動切換至【登入】分頁，請直接登入或點選忘記密碼。`
+                        );
+                        document.getElementById('portal-view-signup')?.classList.add('hidden');
+                        document.getElementById('portal-view-signin')?.classList.remove('hidden');
+                        const signinEmail = document.getElementById('portal-signin-email');
+                        if (signinEmail) signinEmail.value = existingEmailAcc?.username || email;
+                        document.getElementById('portal-signin-password')?.focus();
+                        return;
                     }
+                    // 特例：ianw.solar@gmail.com 可註冊多組獨立帳號，嚴禁產生 +acc 別名
+                    const hasVerifiedIanw = (fbAuth?.currentUser?.email?.toLowerCase() === 'ianw.solar@gmail.com' && fbAuth.currentUser.emailVerified) ||
+                        boundList.some(b => stripSubAddressAlias(b.email || '').toLowerCase() === 'ianw.solar@gmail.com' && b.emailVerified !== false);
+                    if (!hasVerifiedIanw) {
+                        try {
+                            const existingCred = await signInWithEmailAndPassword(fbAuth, email, password);
+                            cred = existingCred;
+                        } catch (reauthErr) {
+                            showAlertModal(
+                                "請先完成主信箱驗證或 Google 登入",
+                                `信箱「${email}」已存在主記錄。請先使用原本的帳號或下方「Google 帳號快速登入」驗證一次 ${email}，即可在此信箱註冊多組獨立帳號（絕不產生額外別名）。`
+                            );
+                            return;
+                        }
+                    }
+                    customAccountUid = 'ianw_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 7);
+                    finalAuthEmail = email;
                 } else if (firstCreateErr.code === 'auth/weak-password') {
                     showAlertModal("密碼強度不足", "為保障帳號安全，密碼長度需至少 6 個字元。");
                     return;
@@ -1239,28 +1287,30 @@ export function setupButtonEvents() {
 
             // 將使用者帳號與雜湊密碼安全記錄至 boundAccounts (杜絕明文密碼存儲)
             const pwdHash = await hashPassword(password);
+            const resolvedUid = customAccountUid || cred?.user?.uid;
+            const autoVerifiedExtra = Boolean(customAccountUid && isIanw && ((fbAuth?.currentUser?.email?.toLowerCase() === 'ianw.solar@gmail.com' && fbAuth.currentUser.emailVerified) || boundList.some(b => stripSubAddressAlias(b.email || '').toLowerCase() === 'ianw.solar@gmail.com' && b.emailVerified !== false)));
             const boundDoc = {
-                id: cred.user.uid,
-                uid: cred.user.uid,
+                id: resolvedUid,
+                uid: resolvedUid,
                 email: email, // 使用者真實收信信箱
                 authEmail: finalAuthEmail, // Firebase Auth 實體信箱
                 username: name,
                 displayName: name,
                 accountName: name,
                 passwordHash: pwdHash,
-                emailVerified: false,
+                emailVerified: autoVerifiedExtra,
                 createdAt: new Date().toISOString()
             };
 
-            if (fbDb) {
+            if (fbDb && resolvedUid) {
                 try {
-                    await setDoc(doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'boundAccounts', cred.user.uid), boundDoc);
+                    await setDoc(doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'boundAccounts', resolvedUid), boundDoc);
                 } catch(e) { console.warn("Firestore save boundAccount err:", e); }
             }
 
             let localBounds = [];
             try { localBounds = JSON.parse(localStorage.getItem('bound_accounts_all') || localStorage.getItem('bound_accounts_ianw') || '[]'); } catch(e) {}
-            localBounds = localBounds.filter(b => b.id !== cred.user.uid && b.uid !== cred.user.uid);
+            localBounds = localBounds.filter(b => b.id !== resolvedUid && b.uid !== resolvedUid);
             localBounds.push(boundDoc);
             localStorage.setItem('bound_accounts_all', JSON.stringify(localBounds));
             if (isIanw) {
@@ -1271,7 +1321,7 @@ export function setupButtonEvents() {
             sessionStorage.removeItem('app_is_guest_mode');
             localStorage.removeItem('visitor_id');
             localStorage.removeItem('visitor_name');
-            const newUserKey = getUserStorageKey({ uid: cred.user.uid, email: email, authEmail: finalAuthEmail });
+            const newUserKey = getUserStorageKey({ uid: resolvedUid, email: email, authEmail: finalAuthEmail });
             if (!state.appData || !Array.isArray(state.appData.classes) || state.appData.classes.length === 0) {
                 state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
                 state.currentClassId = null;
@@ -1288,9 +1338,22 @@ export function setupButtonEvents() {
             // 關閉註冊表單 Modal
             closeModal(document.getElementById('portal-auth-modal'));
 
+            if (autoVerifiedExtra) {
+                await completeVerificationAndLogin({
+                    uid: resolvedUid,
+                    email: email,
+                    displayEmail: email,
+                    authEmail: finalAuthEmail,
+                    name: name,
+                    username: name,
+                    displayName: name
+                });
+                return;
+            }
+
             // 啟動信箱驗證等待機制：註冊後需等待驗證完成才能進入系統
             showToast("驗證郵件已寄出！請至信箱開啟郵件並點選驗證連結", "info");
-            openEmailVerificationModal(email, cred.user, {
+            openEmailVerificationModal(email, cred?.user, {
                 displayEmail: email,
                 authEmail: finalAuthEmail,
                 name: name,
@@ -1498,8 +1561,11 @@ export function setupButtonEvents() {
             );
 
             if (matched) {
-                targetEmail = matched.email;
-                targetAuthEmail = matched.authEmail || matched.email;
+                targetEmail = stripSubAddressAlias(matched.email || matched.authEmail || inputVal);
+                targetAuthEmail = stripSubAddressAlias(matched.email || matched.authEmail || inputVal);
+            } else {
+                targetEmail = stripSubAddressAlias(targetEmail);
+                targetAuthEmail = stripSubAddressAlias(targetAuthEmail);
             }
 
             await sendPasswordResetEmail(fbAuth, targetAuthEmail);

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hw-checker-v4.2.9-sync';
+const CACHE_NAME = 'hw-checker-v4.3.1-sync';
 const urlsToCache = [
   './index.html',
   './parent.html',
@@ -64,9 +64,9 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
-  // 網路優先策略 (Network First, Cache Fallback)，確保最新代碼即時生效
+  // 網路優先策略 (Network First, Cache Fallback) + 繞過 HTTP 短期快取，確保免重整即時取得新版通知與最新程式碼
   event.respondWith(
-    fetch(event.request)
+    fetch(event.request, { cache: 'no-cache' })
       .then(networkResponse => {
         if (networkResponse && networkResponse.status === 200) {
           const resClone = networkResponse.clone();
