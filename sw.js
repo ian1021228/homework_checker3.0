@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hw-checker-v4.3.1-sync';
+const CACHE_NAME = 'hw-checker-v4.3.2-sync';
 const urlsToCache = [
   './index.html',
   './parent.html',

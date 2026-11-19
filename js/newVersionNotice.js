@@ -1,21 +1,53 @@
 /**
  * PalClass 新版本通知與雙版本同帳號自動同步引導 (homework_checker3.0)
  * 全用戶永久顯示，無法關閉，僅能收合為右下角快捷提示並可勾選「一律收合」。
+ * 支援 0 毫秒直開新版正式網址（無 about:blank 空白頁）＋ postMessage 即時握手主通道 ＋ 2KB 極輕量 Firestore 備援通道。
  */
 
 import { state } from './state.js';
 import { fbAuth, fbDb, globalAppId, doc, setDoc, syncDataToCloud } from './firebase.js';
 import { flushPendingSave } from './storage.js';
-import { safeClone } from './utils.js';
+import { safeStringify } from './utils.js';
 
-const NEW_VERSION_URL = 'https://palclass.pages.dev/?from=v3#portal';
+const DEFAULT_PALCLASS_ORIGIN = 'https://palclass.pages.dev';
 const ALWAYS_COLLAPSE_KEY = 'hw3_palclass_notice_always_collapse_v1';
-const NOTICE_DOM_VERSION = '4.3.1';
+const NOTICE_DOM_VERSION = '4.3.2';
+const HANDOFF_TTL_MS = 3 * 60 * 1000;
 
 let userSessionExpandedOverride = null;
 let lastRenderedAccountLabel = '';
+let cachedAuthSessionStr = null;
+let authPrefetchInFlight = false;
 
 const stripSubAddressAlias = (raw) => String(raw || '').trim().replace(/\+acc[a-z0-9_]+(?=@)/i, '');
+
+function isLoopbackHost() {
+    try {
+        const h = typeof window !== 'undefined' ? window.location.hostname : '';
+        return h === '127.0.0.1' || h === 'localhost';
+    } catch (e) {
+        return false;
+    }
+}
+
+function getPalClassBaseUrl() {
+    if (isLoopbackHost() && typeof window.__PALCLASS_NEW_VERSION_BASE_URL__ === 'string') {
+        const custom = window.__PALCLASS_NEW_VERSION_BASE_URL__.trim();
+        if (/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?\/?$/i.test(custom)) {
+            return custom.replace(/\/?$/, '/');
+        }
+    }
+    return DEFAULT_PALCLASS_ORIGIN + '/';
+}
+
+function isAllowedPalClassOrigin(origin) {
+    if (!origin || typeof origin !== 'string') return false;
+    if (origin === DEFAULT_PALCLASS_ORIGIN || origin === 'https://ian1021228.github.io') return true;
+    if (isLoopbackHost()) {
+        return /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/i.test(origin);
+    }
+    return false;
+}
 
 function readPersistedSessionUserFallback() {
     try {
@@ -54,19 +86,33 @@ function getActiveAccountDisplay() {
     return candidate || '';
 }
 
-function getV3FirebaseAuthSessionRecord() {
+function getV3FirebaseAuthSessionRecord(timeoutMs = 500) {
     return new Promise((resolve) => {
+        let settled = false;
+        const done = (val) => {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timer);
+            resolve(val);
+        };
+        const timer = setTimeout(() => done(null), timeoutMs);
         try {
             if (typeof indexedDB === 'undefined') {
-                resolve(null);
+                done(null);
                 return;
             }
             const req = indexedDB.open('firebaseLocalStorageDb');
+            req.onblocked = () => done(null);
+            req.onerror = () => done(null);
+            req.onupgradeneeded = () => {
+                // 不主動建立空資料庫，若尚未初始化直接回傳 null
+            };
             req.onsuccess = () => {
                 try {
                     const db = req.result;
                     if (!db.objectStoreNames.contains('firebaseLocalStorage')) {
-                        resolve(null);
+                        try { db.close(); } catch (e) {}
+                        done(null);
                         return;
                     }
                     const tx = db.transaction(['firebaseLocalStorage'], 'readonly');
@@ -75,17 +121,80 @@ function getV3FirebaseAuthSessionRecord() {
                     getAllReq.onsuccess = () => {
                         const list = Array.isArray(getAllReq.result) ? getAllReq.result : [];
                         const rec = list.find(item => item && typeof item.fbase_key === 'string' && item.fbase_key.startsWith('firebase:authUser:'));
-                        resolve(rec || null);
+                        try { db.close(); } catch (e) {}
+                        done(rec || null);
                     };
-                    getAllReq.onerror = () => resolve(null);
+                    getAllReq.onerror = () => {
+                        try { db.close(); } catch (e) {}
+                        done(null);
+                    };
                 } catch (err) {
-                    resolve(null);
+                    done(null);
                 }
             };
-            req.onerror = () => resolve(null);
         } catch (e) {
-            resolve(null);
+            done(null);
         }
+    });
+}
+
+function prefetchV3AuthSession() {
+    if (authPrefetchInFlight) return;
+    authPrefetchInFlight = true;
+    getV3FirebaseAuthSessionRecord(600)
+        .then((rec) => {
+            if (rec) {
+                try { cachedAuthSessionStr = JSON.stringify(rec); } catch (e) {}
+            }
+        })
+        .catch(() => {})
+        .finally(() => {
+            authPrefetchInFlight = false;
+        });
+}
+
+function getPendingHandoffMap() {
+    if (typeof window === 'undefined') return new Map();
+    if (!(window.__v3PendingHandoffs instanceof Map)) {
+        window.__v3PendingHandoffs = new Map();
+    }
+    const now = Date.now();
+    for (const [key, val] of window.__v3PendingHandoffs.entries()) {
+        if (!val || (now - (val.createdAtMs || 0)) > HANDOFF_TTL_MS) {
+            window.__v3PendingHandoffs.delete(key);
+        }
+    }
+    return window.__v3PendingHandoffs;
+}
+
+function ensureHandoffMessageListener() {
+    if (typeof window === 'undefined' || window.__v3HandoffMsgBound) return;
+    window.__v3HandoffMsgBound = true;
+    window.addEventListener('message', (ev) => {
+        try {
+            if (!isAllowedPalClassOrigin(ev.origin)) return;
+            const msg = ev.data;
+            if (!msg || msg.type !== 'PALCLASS_V3_HANDOFF_READY') return;
+            const handoffId = String(msg.handoffId || '').trim();
+            if (!handoffId || !handoffId.startsWith('v3_handoff_')) return;
+
+            const pendingMap = getPendingHandoffMap();
+            const entry = pendingMap.get(handoffId);
+            if (!entry || !entry.pmPayload) return;
+
+            // 若背景剛好剛補完 authSessionStr，順帶補進握手封包
+            if (!entry.pmPayload.authSessionStr && cachedAuthSessionStr) {
+                entry.pmPayload.authSessionStr = cachedAuthSessionStr;
+            }
+            ev.source?.postMessage(
+                {
+                    type: 'PALCLASS_V3_HANDOFF_DATA',
+                    handoffId,
+                    payload: entry.pmPayload
+                },
+                ev.origin
+            );
+        } catch (e) {}
     });
 }
 
@@ -132,6 +241,59 @@ function syncCheckboxWithPref() {
     if (chk) {
         chk.checked = readAlwaysCollapsePref();
     }
+}
+
+function buildHandoffPayloads(signedInUser, accountLabel) {
+    const activeUser = state.currentUser || signedInUser || {};
+    const authProvider =
+        (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('auth_provider')) ||
+        (activeUser.isGoogleAuth ? 'google' : 'password');
+    const cleanUserObj = {
+        uid: String(activeUser.uid || activeUser.id || fbAuth?.currentUser?.uid || ''),
+        id: String(activeUser.id || activeUser.uid || fbAuth?.currentUser?.uid || ''),
+        username: String(activeUser.username || ''),
+        email: stripSubAddressAlias(activeUser.email || fbAuth?.currentUser?.email || ''),
+        authEmail: stripSubAddressAlias(activeUser.authEmail || activeUser.email || fbAuth?.currentUser?.email || ''),
+        displayName: String(activeUser.displayName || activeUser.name || accountLabel || fbAuth?.currentUser?.displayName || '使用者'),
+        photoURL: String(activeUser.photoURL || fbAuth?.currentUser?.photoURL || ''),
+        isAdmin: Boolean(activeUser.isAdmin),
+        isGoogleAuth: Boolean(activeUser.isGoogleAuth || authProvider === 'google'),
+        emailVerified: true,
+        isGuest: false
+    };
+
+    const nowIso = new Date().toISOString();
+    const expiresIso = new Date(Date.now() + HANDOFF_TTL_MS).toISOString();
+
+    // Firestore 專用極輕量憑證 (< 2KB)：絕不寫入 appData，杜絕 nested arrays / 1MB 限制或寫入超時
+    const firestorePayload = {
+        type: 'v3_auto_login_handoff',
+        status: 'authorized',
+        createdAt: nowIso,
+        expiresAt: expiresIso,
+        accountLabel: String(accountLabel || cleanUserObj.displayName || cleanUserObj.email || ''),
+        userObj: cleanUserObj,
+        authProvider: String(authProvider),
+        authSessionStr: cachedAuthSessionStr || null
+    };
+
+    // postMessage 專用記憶體封包（同瀏覽器跨分頁 0 延遲直傳，可安全附帶序列化後的 appDataStr）
+    let appDataStr = null;
+    try {
+        if (state.appData && Array.isArray(state.appData.classes) && state.appData.classes.length > 0) {
+            const raw = safeStringify(state.appData);
+            if (raw && raw.length <= 450000) {
+                appDataStr = raw;
+            }
+        }
+    } catch (e) {}
+
+    const pmPayload = {
+        ...firestorePayload,
+        appDataStr
+    };
+
+    return { firestorePayload, pmPayload };
 }
 
 function ensureNoticeBannerElement(forceRebuild = false) {
@@ -223,111 +385,86 @@ function ensureNoticeBannerElement(forceRebuild = false) {
         }
     });
 
-    launchBtn?.addEventListener('click', async () => {
+    ensureHandoffMessageListener();
+
+    launchBtn?.addEventListener('click', () => {
         if (!launchBtn) return;
         const { user: signedInUser, isSignedIn } = getSignedInStateSnapshot();
         const accountLabel = getActiveAccountDisplay();
-        const canHandoff = Boolean(isSignedIn && signedInUser);
+        const baseUrl = getPalClassBaseUrl();
 
-        let targetWin = null;
-        if (canHandoff && fbDb) {
-            try {
-                targetWin = window.open('about:blank', '_blank');
-                if (targetWin && targetWin.document) {
-                    targetWin.document.title = '正在同步並自動登入新版 PalClass...';
-                    targetWin.document.body.innerHTML = '<div style="font-family:system-ui,-apple-system,sans-serif;padding:48px 20px;text-align:center;color:#0f172a;"><h2 style="margin:0 0 8px;">正在同步資料並前往新版 PalClass...</h2><p style="margin:0;color:#64748b;font-size:14px;">即將自動為您登入帳號並同步所有班級資料，請稍候。</p></div>';
-                }
-            } catch (e) {}
+        if (!isSignedIn || !signedInUser) {
+            window.open(`${baseUrl}?from=v3#portal`, '_blank', 'noopener');
+            return;
         }
 
-        let targetUrl = NEW_VERSION_URL;
-        if (canHandoff) {
-            launchBtn.disabled = true;
-            launchBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-[11px]" aria-hidden="true"></i><span>正在同步並準備自動登入...</span>';
+        // 1. 0 毫秒同步準備雙軌憑證（絕不開 about:blank，杜絕背景分頁節流或 IndexedDB 卡死空白頁）
+        const handoffId = `v3_handoff_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+        const { firestorePayload, pmPayload } = buildHandoffPayloads(signedInUser, accountLabel);
+
+        const pendingMap = getPendingHandoffMap();
+        pendingMap.set(handoffId, {
+            firestorePayload,
+            pmPayload,
+            createdAtMs: Date.now()
+        });
+        ensureHandoffMessageListener();
+
+        // 2. 立即同步直開新版 PalClass 正式網址（保留 window.opener 供 postMessage 毫秒握手）
+        const targetUrl = `${baseUrl}?from=v3&v3_handoff=${encodeURIComponent(handoffId)}&v3_pm=1#portal`;
+        let openedWin = null;
+        try {
+            openedWin = window.open(targetUrl, '_blank');
+        } catch (e) {}
+
+        // 3. 背景並行：寫入 2KB 極輕量 Firestore 憑證（供無 opener 環境備援）＋ 同步班級資料至雲端
+        (async () => {
             try {
-                await Promise.race([
-                    (async () => {
-                        await flushPendingSave();
-                        await syncDataToCloud();
-                    })(),
-                    new Promise(resolve => setTimeout(resolve, 3500))
-                ]);
+                if (!firestorePayload.authSessionStr) {
+                    const rec = await getV3FirebaseAuthSessionRecord(450);
+                    if (rec) {
+                        const recStr = JSON.stringify(rec);
+                        cachedAuthSessionStr = recStr;
+                        firestorePayload.authSessionStr = recStr;
+                        pmPayload.authSessionStr = recStr;
+                    }
+                }
             } catch (e) {}
 
-            if (fbDb) {
+            // 備援軌道：寫入極輕量 Firestore 憑證（不含 appData，與 syncDataToCloud 並行互不阻塞）
+            const writeHandoffPromise = (async () => {
+                if (!fbDb) return;
                 try {
-                    const handoffId = `v3_handoff_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
-                    let authSessionStr = null;
-                    try {
-                        const sessRec = await getV3FirebaseAuthSessionRecord();
-                        if (sessRec) authSessionStr = JSON.stringify(sessRec);
-                    } catch (e) {}
-
-                    const activeUser = state.currentUser || signedInUser || {};
-                    const authProvider = (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('auth_provider')) || (activeUser.isGoogleAuth ? 'google' : 'password');
-                    const cleanUserObj = {
-                        uid: activeUser.uid || activeUser.id || fbAuth?.currentUser?.uid || '',
-                        id: activeUser.id || activeUser.uid || fbAuth?.currentUser?.uid || '',
-                        username: activeUser.username || '',
-                        email: stripSubAddressAlias(activeUser.email || fbAuth?.currentUser?.email || ''),
-                        authEmail: stripSubAddressAlias(activeUser.authEmail || activeUser.email || fbAuth?.currentUser?.email || ''),
-                        displayName: activeUser.displayName || activeUser.name || accountLabel || fbAuth?.currentUser?.displayName || '使用者',
-                        photoURL: activeUser.photoURL || fbAuth?.currentUser?.photoURL || '',
-                        isAdmin: !!activeUser.isAdmin,
-                        isGoogleAuth: !!activeUser.isGoogleAuth || authProvider === 'google',
-                        emailVerified: true,
-                        isGuest: false
-                    };
-                    let sanitizedAppData = null;
-                    try {
-                        if (state.appData) sanitizedAppData = safeClone(state.appData);
-                    } catch (e) {}
-
-                    const handoffPayload = {
-                        type: 'v3_auto_login_handoff',
-                        status: 'authorized',
-                        createdAt: new Date().toISOString(),
-                        expiresAt: new Date(Date.now() + 3 * 60 * 1000).toISOString(),
-                        accountLabel: accountLabel || cleanUserObj.displayName || cleanUserObj.email,
-                        userObj: cleanUserObj,
-                        authProvider: String(authProvider),
-                        authSessionStr: authSessionStr || null,
-                        appData: sanitizedAppData
-                    };
-                    try {
-                        if (typeof localStorage !== 'undefined') {
-                            localStorage.setItem('palclass_v3_handoff_local_' + handoffId, JSON.stringify(handoffPayload));
-                        }
-                    } catch (e) {}
-                    await Promise.race([
-                        setDoc(doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', handoffId), handoffPayload),
-                        new Promise((_, reject) => setTimeout(() => reject(new Error('handoff_timeout')), 3000))
-                    ]);
-                    targetUrl = `https://palclass.pages.dev/?from=v3&v3_handoff=${encodeURIComponent(handoffId)}#portal`;
-                } catch (e) {
-                    console.warn('Write v3 handoff doc fallback:', e);
-                    targetUrl = NEW_VERSION_URL;
+                    await setDoc(
+                        doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', handoffId),
+                        firestorePayload
+                    );
+                } catch (err) {
+                    console.warn('Write lightweight v3 handoff doc notice:', err);
                 }
-            }
-        }
+            })();
 
-        if (targetWin && !targetWin.closed) {
-            try {
-                targetWin.location.href = targetUrl;
-            } catch (e) {
-                window.open(targetUrl, '_blank', 'noopener');
-            }
-        } else {
-            window.open(targetUrl, '_blank', 'noopener');
-        }
+            // 同時在背景把最新本機班級資料推送到雙版本共用雲端通道
+            const syncClassDataPromise = (async () => {
+                try {
+                    await flushPendingSave();
+                    await syncDataToCloud();
+                } catch (err) {}
+            })();
 
-        if (canHandoff) {
-            launchBtn.disabled = false;
-            const restoredLabel = accountLabel ? `前往新版（以 ${accountLabel} 自動登入）` : '前往新版 PalClass';
-            launchBtn.innerHTML = '<i class="fa-solid fa-arrow-up-right-from-square text-[11px]" aria-hidden="true"></i><span id="palclass-notice-launch-label"></span>';
-            const lbl = document.getElementById('palclass-notice-launch-label');
-            if (lbl) lbl.textContent = restoredLabel;
-        }
+            // 若 Popup 被瀏覽器完全攔截，等待極輕量憑證寫入（最多 1.2s）後於當前分頁直達新版
+            if (!openedWin) {
+                try {
+                    await Promise.race([
+                        writeHandoffPromise,
+                        new Promise(resolve => setTimeout(resolve, 1200))
+                    ]);
+                } catch (e) {}
+                window.location.href = targetUrl;
+            } else {
+                await Promise.allSettled([writeHandoffPromise, syncClassDataPromise]);
+            }
+        })();
     });
 
     const alwaysCollapsed = readAlwaysCollapsePref();
@@ -345,6 +482,12 @@ export function refreshNewVersionNotice(forceRebuild = false) {
 
         const accountLabel = getActiveAccountDisplay();
         lastRenderedAccountLabel = accountLabel;
+        if (accountLabel) {
+            prefetchV3AuthSession();
+        } else {
+            cachedAuthSessionStr = null;
+        }
+
         const badgeEl = document.getElementById('palclass-notice-account-badge');
         const badgeTextEl = document.getElementById('palclass-notice-account-text');
         const launchLabelEl = document.getElementById('palclass-notice-launch-label');
@@ -375,6 +518,7 @@ export function refreshNewVersionNotice(forceRebuild = false) {
 
 export function initNewVersionNotice(options = {}) {
     const forceRebuild = Boolean(options && options.forceRebuild);
+    ensureHandoffMessageListener();
     refreshNewVersionNotice(forceRebuild);
     if (typeof window !== 'undefined') {
         window.__refreshV3NewVersionNotice = refreshNewVersionNotice;
